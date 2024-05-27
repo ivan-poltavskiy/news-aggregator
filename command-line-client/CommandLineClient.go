@@ -2,8 +2,7 @@ package command_line_client
 
 import (
 	"NewsAggregator/entity/source"
-	. "NewsAggregator/filterService"
-	. "NewsAggregator/initialization-data"
+	. "NewsAggregator/filter"
 	"flag"
 	"fmt"
 	"strings"
@@ -49,17 +48,12 @@ func (cli *CommandLineClient) Run() {
 		return
 	}
 
-	InitializeSource()
-
 	sourceNames := strings.Split(cli.sources, ",")
-	uniqueNames := make(map[string]struct{})
+	uniqueSourceNames := filterUnique(sourceNames)
 	var sourceNameObjects []source.Name
 
-	for _, name := range sourceNames {
-		if _, ok := uniqueNames[name]; !ok {
-			uniqueNames[name] = struct{}{}
-			sourceNameObjects = append(sourceNameObjects, source.Name(name))
-		}
+	for _, name := range uniqueSourceNames {
+		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
 	articles, errorMessage := FindNewsForAllResources(sourceNameObjects)
@@ -69,7 +63,9 @@ func (cli *CommandLineClient) Run() {
 	}
 
 	if cli.keywords != "" {
-		articles = FilterNewsByKeyword(cli.keywords, articles)
+		keywordList := strings.Split(cli.keywords, ",")
+		uniqueKeywords := filterUnique(keywordList)
+		articles = NewsByKeywords(uniqueKeywords, articles)
 	}
 
 	var startDate, endDate time.Time
@@ -90,7 +86,7 @@ func (cli *CommandLineClient) Run() {
 			return
 		}
 
-		articles = FilterByDate(startDate, endDate, articles)
+		articles = ByDate(startDate, endDate, articles)
 	}
 
 	for _, article := range articles {
@@ -100,4 +96,17 @@ func (cli *CommandLineClient) Run() {
 		fmt.Println("Link:", article.Link)
 		fmt.Println("Date:", article.Date)
 	}
+}
+
+// filterUnique returns a slice containing only unique strings from the input slice.
+func filterUnique(input []string) []string {
+	uniqueMap := make(map[string]struct{})
+	var uniqueList []string
+	for _, item := range input {
+		if _, ok := uniqueMap[item]; !ok {
+			uniqueMap[item] = struct{}{}
+			uniqueList = append(uniqueList, item)
+		}
+	}
+	return uniqueList
 }
