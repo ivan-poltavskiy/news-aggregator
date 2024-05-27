@@ -3,6 +3,7 @@ package initialization_data
 import (
 	. "NewsAggregator/entity/source"
 	"NewsAggregator/parser"
+	"fmt"
 )
 
 var Sources []Source
@@ -25,4 +26,15 @@ func InitializeSource() {
 		{Name: "washington", PathToFile: "resources/washingtontimes-world-category-19-05-24.xml", SourceType: "RSS", Id: 4},
 		{Name: "usatoday", PathToFile: "resources/usatoday-world-news.html", SourceType: "Html", Id: 5},
 	}
+}
+
+// GetParserBySourceType returns the parser that is required for parsing files of the passed type.
+func GetParserBySourceType(typeOfSource Type) parser.Parser {
+
+	parser, exist := ParserMap[typeOfSource]
+	if !exist {
+		fmt.Println("Wrong Source", typeOfSource)
+		return nil
+	}
+	return parser
 }

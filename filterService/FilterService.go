@@ -1,37 +1,22 @@
-package service
+package filterService
 
 import (
 	. "NewsAggregator/entity/article"
 	. "NewsAggregator/entity/source"
 	. "NewsAggregator/initialization-data"
-	"NewsAggregator/parser"
 	"fmt"
 	"strings"
 	"time"
 )
 
-// Returns the parser that is required for parsing files of the passed type.
-func getParserBySourceType(typeOfSource Type) parser.Parser {
-
-	parser, exist := ParserMap[typeOfSource]
-	if !exist {
-		fmt.Println("Wrong Source", typeOfSource)
-		return nil
-	}
-	return parser
-}
-
-// FindNews returns the list of news from the passed sources.
-func FindNews(names []Name) ([]Article, string) {
+// FindNewsForAllResources returns the list of news from the passed sources.
+func FindNewsForAllResources(names []Name) ([]Article, string) {
 
 	var foundNews []Article
 
 	for _, name := range names {
 		for _, currentSourceType := range Sources {
 			foundNews = findNewsForCurrentSource(currentSourceType, name, foundNews)
-		}
-		if len(foundNews) == 0 {
-			return nil, fmt.Sprintf("Source not found: %s", names)
 		}
 	}
 	return foundNews, ""
@@ -42,7 +27,7 @@ func findNewsForCurrentSource(currentSourceType Source,
 	name Name, allArticles []Article) []Article {
 
 	if strings.ToLower(string(currentSourceType.Name)) == strings.ToLower(string(name)) {
-		articles := getParserBySourceType(currentSourceType.SourceType).ParseSource(currentSourceType.PathToFile)
+		articles := GetParserBySourceType(currentSourceType.SourceType).ParseSource(currentSourceType.PathToFile)
 		allArticles = append(allArticles, articles...)
 
 	}
@@ -60,7 +45,7 @@ func FilterNewsByKeyword(keyword string, articles []Article) []Article {
 	}
 
 	if len(matchingOptions) == 0 {
-		fmt.Println("No matching options found.")
+		fmt.Println("No matches found for this keyword.")
 	}
 
 	return matchingOptions
@@ -76,7 +61,7 @@ func FilterByDate(startDate time.Time, endDate time.Time, articles []Article) []
 		}
 	}
 	if len(matchingOptions) == 0 {
-		fmt.Println("No matching options found.")
+		fmt.Println("No articles were found in this time period.")
 	}
 
 	return matchingOptions
