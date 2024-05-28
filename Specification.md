@@ -14,20 +14,18 @@ He can get news from different news sources, filtering them by keywords and date
 
 
 # APIs design
-The API is composed of several layers. 
+The API consists of several levels.
 
-The top layer of this API is **client**.
-Depending on the environment of use, the client can be either a CLI 
-interface or a web client. Clients interact and pass data to the **services** layer,
-which will provide the response.
+The top level of this API is the **client**.
+Depending on the environment of use, the client can be either a CLI
+interface or a web client. Clients interact and pass data to the **aggregator** 
+layer, be it a news aggregator, or any other.
 
-The **services** layer works with the data passed by the client and with the data 
-that is already in the system. Thus, it is on this layer that news gathering and
-filtering is performed.  
+The client is required to pass the **aggregator** a list of articles to work with, 
+and optional filters.
 
-Services interact with parsers, which in turn simply analyze the files passed to
-it and return a list of all articles in the file. Depending on the resource
-passed by the client, its type is determined and the necessary parser is called.
+The aggregator works with the service layer.
+The **services** level works with the data that the client passed to the aggregator and with the data that is already in the system. Thus, it is at this level that news is collected and filtered.
 
 The service interacts with the data already known to it, whether it is data that
 is initialized by the user or data from a database.
@@ -35,7 +33,7 @@ is initialized by the user or data from a database.
 The service then formats this data into the desired form, filters it if necessary,
 and returns it to the client.
 
-# Example of use:
+# Example of use: 
 
 For the API to work correctly, it is required to enter a list of sources from
 which the user wants to receive news.
