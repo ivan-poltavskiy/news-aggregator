@@ -63,10 +63,12 @@ func (cli *CommandLineClient) Run() {
 		fmt.Println(errorMessage)
 	}
 
+	var filters []Filter
+
 	if cli.keywords != "" {
 		keywordList := strings.Split(cli.keywords, ",")
 		uniqueKeywords := filterUnique(keywordList)
-		articles = NewsByKeywords(uniqueKeywords, articles)
+		filters = append(filters, ByKeyword{Keywords: uniqueKeywords})
 	}
 
 	var startDate, endDate time.Time
@@ -87,7 +89,11 @@ func (cli *CommandLineClient) Run() {
 			return
 		}
 
-		articles = ByDate(startDate, endDate, articles)
+		filters = append(filters, ByDate{StartDate: startDate, EndDate: endDate})
+	}
+
+	for _, f := range filters {
+		articles = f.Filter(articles)
 	}
 
 	for _, article := range articles {
