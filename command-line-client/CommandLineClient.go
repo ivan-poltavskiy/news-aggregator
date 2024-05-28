@@ -3,6 +3,7 @@ package command_line_client
 import (
 	"NewsAggregator/entity/source"
 	. "NewsAggregator/filter"
+	. "NewsAggregator/news"
 	"flag"
 	"fmt"
 	"strings"
@@ -56,7 +57,7 @@ func (cli *CommandLineClient) Run() {
 		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
-	articles, errorMessage := FindNewsForAllResources(sourceNameObjects)
+	articles, errorMessage := FindNewsByResources(sourceNameObjects)
 
 	if errorMessage != "" {
 		fmt.Println(errorMessage)

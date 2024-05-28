@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-// RssParser for analyze RSS sources.
+// RssParser analyzes RSS sources.
 type RssParser struct {
 }
 

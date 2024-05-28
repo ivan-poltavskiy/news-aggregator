@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// JsonParser for analyze JSON sources.
+// JsonParser analyzes JSON sources.
 type JsonParser struct {
 }
 

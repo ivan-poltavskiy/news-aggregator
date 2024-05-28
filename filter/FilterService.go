@@ -2,37 +2,10 @@ package filter
 
 import (
 	. "NewsAggregator/entity/article"
-	. "NewsAggregator/entity/source"
-	. "NewsAggregator/initialization-data"
 	"fmt"
 	"strings"
 	"time"
 )
-
-// FindNewsForAllResources returns the list of news from the passed sources.
-func FindNewsForAllResources(sourcesNames []Name) ([]Article, string) {
-
-	var foundNews []Article
-
-	for _, name := range sourcesNames {
-		for _, currentSourceType := range Sources {
-			foundNews = findNewsForCurrentSource(currentSourceType, name, foundNews)
-		}
-	}
-	return foundNews, ""
-}
-
-// Returns the list of news from the passed source.
-func findNewsForCurrentSource(currentSourceType Source,
-	name Name, allArticles []Article) []Article {
-
-	if strings.ToLower(string(currentSourceType.Name)) == strings.ToLower(string(name)) {
-		articles := GetParserBySourceType(currentSourceType.SourceType).ParseSource(currentSourceType.PathToFile)
-		allArticles = append(allArticles, articles...)
-
-	}
-	return allArticles
-}
 
 // filterNewsByKeyword filters the incoming news list by keyword and returns the filtered list.
 func filterNewsByKeyword(keyword string, articles []Article) []Article {

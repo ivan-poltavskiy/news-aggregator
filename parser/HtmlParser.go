@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// HtmlParser for analyze HTML sources.
+// HtmlParser analyzes HTML sources.
 type HtmlParser struct {
 }
 
