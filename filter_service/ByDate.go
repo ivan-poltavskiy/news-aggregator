@@ -1,4 +1,4 @@
-package filter
+package filter_service
 
 import (
 	. "NewsAggregator/entity/article"

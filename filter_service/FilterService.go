@@ -1,7 +1,7 @@
-package filter
+package filter_service
 
 import . "NewsAggregator/entity/article"
 
-type Filter interface {
+type FilterService interface {
 	Filter(articles []Article) []Article
 }

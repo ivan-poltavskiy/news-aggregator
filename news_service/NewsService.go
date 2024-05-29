@@ -2,14 +2,15 @@ package news
 
 import (
 	. "NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
-	. "NewsAggregator/initialization-data"
+	. "NewsAggregator/entity/source"
 	"NewsAggregator/parser"
 	"strings"
 )
 
+var Sources []Source
+
 // FindNewsByResources returns the list of news from the passed sources.
-func FindNewsByResources(sourcesNames []source.Name) ([]Article, string) {
+func FindNewsByResources(sourcesNames []Name) ([]Article, string) {
 
 	var foundNews []Article
 
@@ -22,8 +23,8 @@ func FindNewsByResources(sourcesNames []source.Name) ([]Article, string) {
 }
 
 // Returns the list of news from the passed source.
-func findNewsForCurrentSource(currentSourceType source.Source,
-	name source.Name, allArticles []Article) []Article {
+func findNewsForCurrentSource(currentSourceType Source,
+	name Name, allArticles []Article) []Article {
 
 	if strings.ToLower(string(currentSourceType.Name)) == strings.ToLower(string(name)) {
 		articles := parser.GetParserBySourceType(currentSourceType.SourceType).ParseSource(currentSourceType.PathToFile)
@@ -31,4 +32,8 @@ func findNewsForCurrentSource(currentSourceType source.Source,
 
 	}
 	return allArticles
+}
+
+func InitializeSource(sources []Source) {
+	Sources = sources
 }
