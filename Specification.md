@@ -65,8 +65,3 @@ This query will retrieve all news from NBC, BBC and ABC sources between May 18,
 Also, there is no need to specify keywords or sort by date. In this case,
 all news from the specified resources will be displayed.
 
-
-# Unresolved issues
-
- - The functionality for parsing HTML pages has not been finalized,
-as there is a unification issue for all pages with this type.
