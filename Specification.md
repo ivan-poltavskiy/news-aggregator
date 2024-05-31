@@ -101,7 +101,7 @@ Example of JSON file parsing:
 For the API to work correctly, it is required to enter a list of sources from
 which the user wants to receive news.
 
-To do this, enter “news-aggregator --sources=” in the CLI terminal
+To do this, enter “--sources=” in the CLI terminal
 and specify sources after the equal sign.
 
 Also, to filter by keywords, you need to enter “--keywords=”
@@ -120,7 +120,7 @@ The list of news will be displayed in the format:
 ### For example:
 
 ```bash
-go run news-aggregator.go --sources=nbc,abc,bbc --startDate 2024-05-18 --endDate 2024-05-23 --keywords=ukr
+go run main.go --sources=nbc,abc,bbc --startDate 2024-05-18 --endDate 2024-05-23 --keywords=ukr
 ```
 
 This query will retrieve all news from NBC, BBC and ABC sources between May 18,
@@ -129,3 +129,6 @@ This query will retrieve all news from NBC, BBC and ABC sources between May 18,
 Also, there is no need to specify keywords or sort by date. In this case,
 all news from the specified resources will be displayed.
 
+### Unresolved questions
+
+1. Does it make sense to try to create a unified solution for websites that use HTML?

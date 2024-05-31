@@ -1,19 +1,20 @@
 package parser
 
 import (
-	. "NewsAggregator/entity"
-	. "NewsAggregator/entity/article"
+	"NewsAggregator/entity"
+	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"fmt"
 	"github.com/mmcdole/gofeed"
 	"os"
 )
 
-// RssParser analyzes RSS sources.
-type RssParser struct {
+// Rss analyzes RSS sources.
+type Rss struct {
 }
 
-func (rssParser RssParser) ParseSource(path source.PathToFile) []Article {
+// ParseSource reads and parses a XML (RSS) file specified by the path and returns a slice of articles.
+func (rss Rss) ParseSource(path source.PathToFile) []article.Article {
 
 	parser := gofeed.NewParser()
 	filename := fmt.Sprintf(string(path))
@@ -36,13 +37,13 @@ func (rssParser RssParser) ParseSource(path source.PathToFile) []Article {
 		return nil
 	}
 
-	var articles []Article
+	var articles []article.Article
 	for i, item := range feed.Items {
-		articles = append(articles, Article{
-			Id:          Id(i + 1),
-			Title:       Title(item.Title),
-			Description: Description(item.Description),
-			Link:        Link(item.Link),
+		articles = append(articles, article.Article{
+			Id:          entity.Id(i + 1),
+			Title:       article.Title(item.Title),
+			Description: article.Description(item.Description),
+			Link:        article.Link(item.Link),
 			Date:        *item.PublishedParsed,
 		})
 	}

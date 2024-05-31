@@ -23,7 +23,7 @@ Start the application with the required flags.
 
 For example:
 ```bash
-go run news-aggregator.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
+go run main.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
 ```
 
 Parameters

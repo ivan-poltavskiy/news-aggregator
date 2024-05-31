@@ -12,9 +12,9 @@ var ParserMap map[source.Type]Parser
 // InitializeParserMap initializes the parser map with available parsers.
 func InitializeParserMap() {
 	ParserMap = map[source.Type]Parser{
-		"RSS":  RssParser{},
-		"JSON": JsonParser{},
-		"Html": HtmlParser{},
+		"RSS":  Rss{},
+		"JSON": Json{},
+		"Html": UsaToday{},
 	}
 }
 

@@ -1,11 +1,11 @@
 package main
 
 import (
-	. "NewsAggregator/aggregator"
-	. "NewsAggregator/client"
+	"NewsAggregator/client"
 	. "NewsAggregator/entity/source"
-	"NewsAggregator/news_service"
+	"NewsAggregator/newsaggregator"
 	"NewsAggregator/parser"
+	"NewsAggregator/service/news"
 )
 
 func main() {
@@ -19,8 +19,8 @@ func main() {
 	})
 	parser.InitializeParserMap()
 
-	aggregator := NewNewsAggregator()
-	cli := NewCommandLineClient(aggregator)
+	newsAggregator := newsaggregator.New()
+	cli := client.NewCommandLine(newsAggregator)
 	articles := cli.FetchArticles()
 	if articles != nil {
 		cli.Print(articles)

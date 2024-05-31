@@ -1,19 +1,29 @@
-package aggregator
+package newsaggregator
 
 import (
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
-	"NewsAggregator/filter_service"
-	"NewsAggregator/news_service"
+	"NewsAggregator/service/filter"
+	"NewsAggregator/service/news"
 )
 
+// NewsAggregator provides methods for aggregating news articles from various sources.
 type NewsAggregator struct{}
 
-func NewNewsAggregator() *NewsAggregator {
+func New() *NewsAggregator {
 	return &NewsAggregator{}
 }
 
-func (na *NewsAggregator) Aggregate(sources []string, filters ...filter_service.FilterService) ([]article.Article, string) {
+// Aggregate fetches articles from the provided sources, applies the given
+// filters, and returns the filtered articles.
+// Parameters:
+// - sources: a slice of strings representing the names of the sources to fetch articles from.
+// - filters: a variadic parameter of filter.Service to apply filters to the fetched articles.
+//
+// Returns:
+// - A slice of articles that have been fetched and filtered.
+// - An error message string if any errors occurred during the process.
+func (na *NewsAggregator) Aggregate(sources []string, filters ...filter.Service) ([]article.Article, string) {
 	sourceNames := filterUnique(sources)
 	var sourceNameObjects []source.Name
 
@@ -21,7 +31,7 @@ func (na *NewsAggregator) Aggregate(sources []string, filters ...filter_service.
 		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
-	articles, errorMessage := news.FindNewsByResources(sourceNameObjects)
+	articles, errorMessage := news.FindByResourcesName(sourceNameObjects)
 	if errorMessage != "" {
 		return nil, errorMessage
 	}

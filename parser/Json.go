@@ -1,18 +1,19 @@
 package parser
 
 import (
-	. "NewsAggregator/entity/article"
+	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"encoding/json"
 	"fmt"
 	"os"
 )
 
-// JsonParser analyzes JSON sources.
-type JsonParser struct {
+// Json analyzes JSON sources.
+type Json struct {
 }
 
-func (jsonFile JsonParser) ParseSource(path source.PathToFile) []Article {
+// ParseSource reads and parses a JSON file specified by the path and returns a slice of articles.
+func (jsonFile Json) ParseSource(path source.PathToFile) []article.Article {
 	filename := fmt.Sprintf(string(path))
 
 	byteValue, err := os.ReadFile(filename)
@@ -22,7 +23,7 @@ func (jsonFile JsonParser) ParseSource(path source.PathToFile) []Article {
 	}
 
 	var articles struct {
-		Articles []Article `json:"articles"`
+		Articles []article.Article `json:"articles"`
 	}
 
 	err = json.Unmarshal(byteValue, &articles)
