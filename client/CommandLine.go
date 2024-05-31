@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-// CommandLineClient represents a command line client for the NewsAggregator application.
-type CommandLineClient struct {
+// CommandLine represents a command line client for the NewsAggregator application.
+type CommandLine struct {
 	aggregator   Aggregator
 	sources      string
 	keywords     string
@@ -19,9 +19,9 @@ type CommandLineClient struct {
 	help         bool
 }
 
-// NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
-func NewCommandLine(aggregator Aggregator) *CommandLineClient {
-	cli := &CommandLineClient{aggregator: aggregator}
+// NewCommandLine creates and initializes a new CommandLine with the provided aggregator.
+func NewCommandLine(aggregator Aggregator) *CommandLine {
+	cli := &CommandLine{aggregator: aggregator}
 	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter news articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
@@ -32,7 +32,7 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 }
 
 // printUsage prints the usage instructions
-func (cli *CommandLineClient) printUsage() {
+func (cli *CommandLine) printUsage() {
 	fmt.Println("Usage of NewsAggregator:" +
 		"\nType --sources, and then list the resources you want to retrieve information from. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
@@ -40,7 +40,7 @@ func (cli *CommandLineClient) printUsage() {
 }
 
 // FetchArticles fetches articles based on the command line arguments.
-func (cli *CommandLineClient) FetchArticles() []article.Article {
+func (cli *CommandLine) FetchArticles() []article.Article {
 	if cli.help {
 		cli.printUsage()
 		return nil
@@ -66,7 +66,7 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 }
 
 // fetchKeywords extracts keywords from command line arguments and adds them to the filters.
-func fetchKeywords(cli *CommandLineClient, filters []filter.Service) []filter.Service {
+func fetchKeywords(cli *CommandLine, filters []filter.Service) []filter.Service {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		filters = append(filters, filter.ByKeyword{Keywords: keywords})
@@ -75,7 +75,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.Service) []filter.Se
 }
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
-func fetchDateFilters(cli *CommandLineClient, filters []filter.Service) []filter.Service {
+func fetchDateFilters(cli *CommandLine, filters []filter.Service) []filter.Service {
 	if cli.startDateStr != "" || cli.endDateStr != "" {
 		if cli.startDateStr == "" || cli.endDateStr == "" {
 			fmt.Println("Please specify both start date and end date or omit them")
@@ -97,7 +97,7 @@ func fetchDateFilters(cli *CommandLineClient, filters []filter.Service) []filter
 }
 
 // Print prints the provided articles.
-func (cli *CommandLineClient) Print(articles []article.Article) {
+func (cli *CommandLine) Print(articles []article.Article) {
 	for _, article := range articles {
 		fmt.Println("---------------------------------------------------")
 		fmt.Println("Title of article:", article.Title)

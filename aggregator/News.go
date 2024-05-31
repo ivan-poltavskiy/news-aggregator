@@ -1,4 +1,4 @@
-package newsaggregator
+package aggregator
 
 import (
 	"NewsAggregator/entity/article"
@@ -7,11 +7,11 @@ import (
 	"NewsAggregator/service/news"
 )
 
-// NewsAggregator provides methods for aggregating news articles from various sources.
-type NewsAggregator struct{}
+// News provides methods for aggregating news articles from various sources.
+type News struct{}
 
-func New() *NewsAggregator {
-	return &NewsAggregator{}
+func New() *News {
+	return &News{}
 }
 
 // Aggregate fetches articles from the provided sources, applies the given
@@ -23,7 +23,7 @@ func New() *NewsAggregator {
 // Returns:
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
-func (na *NewsAggregator) Aggregate(sources []string, filters ...filter.Service) ([]article.Article, string) {
+func (na *News) Aggregate(sources []string, filters ...filter.Service) ([]article.Article, string) {
 	sourceNames := filterUnique(sources)
 	var sourceNameObjects []source.Name
 
