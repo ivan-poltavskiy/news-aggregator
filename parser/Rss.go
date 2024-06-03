@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"NewsAggregator/entity"
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"fmt"
@@ -38,9 +37,8 @@ func (rss Rss) ParseSource(path source.PathToFile) []article.Article {
 	}
 
 	var articles []article.Article
-	for i, item := range feed.Items {
+	for _, item := range feed.Items {
 		articles = append(articles, article.Article{
-			Id:          entity.Id(i + 1),
 			Title:       article.Title(item.Title),
 			Description: article.Description(item.Description),
 			Link:        article.Link(item.Link),

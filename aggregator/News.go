@@ -37,7 +37,7 @@ func (na *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]
 	}
 
 	if len(articles) == 0 {
-		return nil, "Sources not found."
+		return nil, "Sources not found. The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times."
 	}
 
 	for _, filter := range filters {

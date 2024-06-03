@@ -23,11 +23,11 @@ func FindByResourcesName(sourcesNames []source.Name) ([]article.Article, string)
 }
 
 // Returns the list of collector from the passed source.
-func findForCurrentSource(currentSourceType source.Source,
+func findForCurrentSource(currentSource source.Source,
 	name source.Name, allArticles []article.Article) []article.Article {
 
-	if strings.ToLower(string(currentSourceType.Name)) == strings.ToLower(string(name)) {
-		articles := parser.GetParserBySourceType(currentSourceType.SourceType).ParseSource(currentSourceType.PathToFile)
+	if strings.ToLower(string(currentSource.Name)) == strings.ToLower(string(name)) {
+		articles := parser.GetParserBySourceType(currentSource.SourceType).ParseSource(currentSource.PathToFile)
 		allArticles = append(allArticles, articles...)
 
 	}

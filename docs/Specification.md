@@ -56,25 +56,27 @@ Passing filters is optional, unlike sources, which must be passed anyway.
 
 The aggregator works with the `service` layer.
 
-### 3. Service
+### 3. ArticleCollector
 
-The services layer stores the business logic of the application.
-This is where news is directly collected and filtered.
+The collector layer stores the logic for the collection of articles.
 
-The **services** level works with the data that the client passed to the
+The **collector** level works with the data that the client passed to the
 aggregator and with the data that is already in the system.
 
-`NewsService` is used to search news by resource name.
+`ArticleCollector` is used to search news by resource name.
 Thus, the `FindByResourcesName()` method will return a list of news from these
-sources.
+sources. `InitializeSource(sources []source.Source)` is used for initialize
+the sources of articles.
 
-`FilterService` and structures that override the `Filter()` method are used to
+### 4. Filter
+
+`ArticleFilter` and structures that override the `Filter()` method are used to
 filter news by different aspects using this function.
 `ByKeyword` is used to filter news by the passed keyword, and `ByDate`
 is used to filter news by date, namely it returns a list of news that are
 published between `StartDate` and `EndDate`.
 
-### 4. Parser
+### 5. Parser
 
 Parsing of the required files is done at the `parser` layer. They are used to
 parse files and return news from them.

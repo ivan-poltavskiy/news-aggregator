@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"NewsAggregator/entity"
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"github.com/PuerkitoBio/goquery"
@@ -55,7 +54,6 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 		}
 
 		articles = append(articles, article.Article{
-			Id:          entity.Id(i + 1),
 			Title:       article.Title(strings.TrimSpace(title)),
 			Description: article.Description(strings.TrimSpace(description)),
 			Link:        article.Link(strings.TrimSpace(link)),

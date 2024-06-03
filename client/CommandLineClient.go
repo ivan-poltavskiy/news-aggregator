@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-// CommandLine represents a command line client for the NewsAggregator application.
-type CommandLine struct {
+// CommandLineClient represents a command line client for the NewsAggregator application.
+type CommandLineClient struct {
 	aggregator   Aggregator
 	sources      string
 	keywords     string
@@ -19,10 +19,10 @@ type CommandLine struct {
 	help         bool
 }
 
-// NewCommandLine creates and initializes a new CommandLine with the provided aggregator.
-func NewCommandLine(aggregator Aggregator) *CommandLine {
-	cli := &CommandLine{aggregator: aggregator}
-	flag.StringVar(&cli.sources, "sources", "", "Specify collector sources separated by comma")
+// NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
+func NewCommandLine(aggregator Aggregator) *CommandLineClient {
+	cli := &CommandLineClient{aggregator: aggregator}
+	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
@@ -32,22 +32,25 @@ func NewCommandLine(aggregator Aggregator) *CommandLine {
 }
 
 // printUsage prints the usage instructions
-func (cli *CommandLine) printUsage() {
+func (cli *CommandLineClient) printUsage() {
 	fmt.Println("Usage of NewsAggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. \n" +
+		"\nType --sources, and then list the resources you want to retrieve information from. " +
+		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
-		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown.")
+		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
+		"Date format - yyyy-mm-dd")
 }
 
 // FetchArticles fetches articles based on the command line arguments.
-func (cli *CommandLine) FetchArticles() []article.Article {
+func (cli *CommandLineClient) FetchArticles() []article.Article {
 	if cli.help {
 		cli.printUsage()
 		return nil
 	}
 
 	if cli.sources == "" {
-		fmt.Println("Please specify at least one collector source using --sources flag.")
+		fmt.Println("Please specify at least one collector source using --sources flag." +
+			"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times.")
 		return nil
 	}
 
@@ -66,7 +69,7 @@ func (cli *CommandLine) FetchArticles() []article.Article {
 }
 
 // fetchKeywords extracts keywords from command line arguments and adds them to the filters.
-func fetchKeywords(cli *CommandLine, filters []filter.ArticleFilter) []filter.ArticleFilter {
+func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		filters = append(filters, filter.ByKeyword{Keywords: keywords})
@@ -75,10 +78,11 @@ func fetchKeywords(cli *CommandLine, filters []filter.ArticleFilter) []filter.Ar
 }
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
-func fetchDateFilters(cli *CommandLine, filters []filter.ArticleFilter) []filter.ArticleFilter {
+func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.startDateStr != "" || cli.endDateStr != "" {
 		if cli.startDateStr == "" || cli.endDateStr == "" {
-			fmt.Println("Please specify both start date and end date or omit them")
+			fmt.Println("Please specify both start date and end date or omit them." +
+				"Date format - yyyy-mm-dd")
 			return nil
 		}
 		startDate, err := time.Parse("2006-01-02", cli.startDateStr)
@@ -97,7 +101,7 @@ func fetchDateFilters(cli *CommandLine, filters []filter.ArticleFilter) []filter
 }
 
 // Print prints the provided articles.
-func (cli *CommandLine) Print(articles []article.Article) {
+func (cli *CommandLineClient) Print(articles []article.Article) {
 	for _, article := range articles {
 		fmt.Println("---------------------------------------------------")
 		fmt.Println("Title:", article.Title)

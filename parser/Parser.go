@@ -9,7 +9,7 @@ import (
 // ParserMap stores the mapping of source types to their corresponding parsers.
 var ParserMap map[source.Type]Parser
 
-// InitializeParserMap initializes the parser map with available parsers.
+// InitializeParserMap initializes a parser map with available parsers for different file types.
 func InitializeParserMap() {
 	ParserMap = map[source.Type]Parser{
 		"RSS":  Rss{},
