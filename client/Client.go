@@ -4,7 +4,7 @@ import (
 	"NewsAggregator/entity/article"
 )
 
-// Client defines an interface for a client that can fetch and print news articles.
+// Client defines an interface for a client that can fetch and print collector articles.
 type Client interface {
 	// FetchArticles fetches and returns a slice of articles.
 	//

@@ -1,2 +1,2 @@
-// Package aggregator provides API for aggregating news articles from various sources.
+// Package aggregator provides API for aggregating collector articles from various sources.
 package aggregator

@@ -1,4 +1,4 @@
-package news
+package collector
 
 import (
 	"NewsAggregator/entity/article"
@@ -9,7 +9,7 @@ import (
 
 var Sources []source.Source
 
-// FindByResourcesName returns the list of news from the passed sources.
+// FindByResourcesName returns the list of collector from the passed sources.
 func FindByResourcesName(sourcesNames []source.Name) ([]article.Article, string) {
 
 	var foundNews []article.Article
@@ -22,7 +22,7 @@ func FindByResourcesName(sourcesNames []source.Name) ([]article.Article, string)
 	return foundNews, ""
 }
 
-// Returns the list of news from the passed source.
+// Returns the list of collector from the passed source.
 func findForCurrentSource(currentSourceType source.Source,
 	name source.Name, allArticles []article.Article) []article.Article {
 

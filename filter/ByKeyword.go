@@ -12,7 +12,7 @@ type ByKeyword struct {
 	Keywords []string
 }
 
-// Filter filters the incoming news list from different sources by keywords.
+// Filter filters the incoming collector list from different sources by keywords.
 func (f ByKeyword) Filter(articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 	for _, keyword := range f.Keywords {
@@ -21,7 +21,7 @@ func (f ByKeyword) Filter(articles []article.Article) []article.Article {
 	return matchingArticles
 }
 
-// filterNewsByKeyword filters the incoming news list by keyword and returns the filtered list.
+// filterNewsByKeyword filters the incoming collector list by keyword and returns the filtered list.
 func filterNewsByKeyword(keyword string, articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 

@@ -1,13 +1,13 @@
 package aggregator
 
 import (
+	"NewsAggregator/collector"
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
-	"NewsAggregator/service/filter"
-	"NewsAggregator/service/news"
+	"NewsAggregator/filter"
 )
 
-// News provides methods for aggregating news articles from various sources.
+// News provides methods for aggregating collector articles from various sources.
 type News struct{}
 
 func New() *News {
@@ -23,7 +23,7 @@ func New() *News {
 // Returns:
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
-func (na *News) Aggregate(sources []string, filters ...filter.Service) ([]article.Article, string) {
+func (na *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, string) {
 	sourceNames := filterUnique(sources)
 	var sourceNameObjects []source.Name
 
@@ -31,7 +31,7 @@ func (na *News) Aggregate(sources []string, filters ...filter.Service) ([]articl
 		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
-	articles, errorMessage := news.FindByResourcesName(sourceNameObjects)
+	articles, errorMessage := collector.FindByResourcesName(sourceNameObjects)
 	if errorMessage != "" {
 		return nil, errorMessage
 	}
