@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"strings"
-	"time"
 )
 
 // CommandLineClient represents a command line client for the NewsAggregator application.
@@ -48,19 +47,9 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 		return nil
 	}
 
-	if cli.sources == "" {
-		fmt.Println("Please specify at least one collector source using --sources flag." +
-			"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times.")
-		return nil
-	}
+	filters, uniqueSources := fetchParameters(cli)
 
-	sourceNames := strings.Split(cli.sources, ",")
-	var filters []filter.ArticleFilter
-
-	filters = fetchKeywords(cli, filters)
-	filters = fetchDateFilters(cli, filters)
-
-	articles, errorMessage := cli.aggregator.Aggregate(sourceNames, filters...)
+	articles, errorMessage := cli.aggregator.Aggregate(uniqueSources, filters...)
 	if errorMessage != "" {
 		fmt.Println(errorMessage)
 	}
@@ -68,33 +57,32 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 	return articles
 }
 
+// fetchParameters extracts and validates command line parameters,
+// including sources and filters, and returns them for use in article fetching.
+func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) {
+	sourceNames := strings.Split(cli.sources, ",")
+	var filters []filter.ArticleFilter
+
+	filters = fetchKeywords(cli, filters)
+	filters = fetchDateFilters(cli, filters)
+	uniqueSources := CheckUnique(sourceNames)
+	return filters, uniqueSources
+}
+
 // fetchKeywords extracts keywords from command line arguments and adds them to the filters.
 func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
-		filters = append(filters, filter.ByKeyword{Keywords: keywords})
+		uniqueKeywords := CheckUnique(keywords)
+		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
 }
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	if cli.startDateStr != "" || cli.endDateStr != "" {
-		if cli.startDateStr == "" || cli.endDateStr == "" {
-			fmt.Println("Please specify both start date and end date or omit them." +
-				"Date format - yyyy-mm-dd")
-			return nil
-		}
-		startDate, err := time.Parse("2006-01-02", cli.startDateStr)
-		if err != nil {
-			fmt.Println("Error parsing start date:", err)
-			return nil
-		}
-		endDate, err := time.Parse("2006-01-02", cli.endDateStr)
-		if err != nil {
-			fmt.Println("Error parsing end date:", err)
-			return nil
-		}
+	isValid, startDate, endDate := CheckData(cli.startDateStr, cli.endDateStr)
+	if isValid {
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
 	return filters

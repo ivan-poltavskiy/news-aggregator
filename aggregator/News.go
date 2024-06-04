@@ -1,10 +1,12 @@
 package aggregator
 
 import (
+	"NewsAggregator/client"
 	"NewsAggregator/collector"
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"NewsAggregator/filter"
+	"fmt"
 )
 
 // News provides methods for aggregating collector articles from various sources.
@@ -24,10 +26,9 @@ func New() *News {
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
 func (na *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, string) {
-	sourceNames := filterUnique(sources)
 	var sourceNameObjects []source.Name
 
-	for _, name := range sourceNames {
+	for _, name := range sources {
 		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
@@ -36,26 +37,11 @@ func (na *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]
 		return nil, errorMessage
 	}
 
-	if len(articles) == 0 {
-		return nil, "Sources not found. The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times."
-	}
+	fmt.Println(client.CheckSource(articles))
 
 	for _, filter := range filters {
 		articles = filter.Filter(articles)
 	}
 
 	return articles, ""
-}
-
-// filterUnique returns a slice containing only unique strings from the input slice.
-func filterUnique(input []string) []string {
-	uniqueMap := make(map[string]struct{})
-	var uniqueList []string
-	for _, item := range input {
-		if _, ok := uniqueMap[item]; !ok {
-			uniqueMap[item] = struct{}{}
-			uniqueList = append(uniqueList, item)
-		}
-	}
-	return uniqueList
 }

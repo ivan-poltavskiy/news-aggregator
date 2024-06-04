@@ -39,10 +39,20 @@ get the result of the article. He does it with the help of flags, namely:
   to mark the date from which to search for news.
 - --help - for outputting help on using the application to the console
 
-Clients interact and pass data to the **aggregator**
-layer, be it a news aggregator, or any other.
+Customers interact and pass data to an **aggregator**
+layer, be it a news aggregator or any other, before validating them with a
+**validation** layer.
 
-### 2. Aggregator
+### 2. Validator
+
+The validator layer is used to check the correctness and validity of the input
+data.
+It checks if the resources passed by the user exist in the system, checks if the
+date for sorting is entered correctly and removes duplicates for entered
+resources and keywords.Also, the validator checks if the date format entered by
+the user is correct.
+
+### 3. Aggregator
 
 Used to aggregate a response based on incoming data. The client passes to the
 `Aggregate()` method a list of `sources` and a list of `filters` that the
@@ -56,7 +66,7 @@ Passing filters is optional, unlike sources, which must be passed anyway.
 
 The aggregator works with the `service` layer.
 
-### 3. ArticleCollector
+### 4. ArticleCollector
 
 The collector layer stores the logic for the collection of articles.
 
@@ -68,7 +78,7 @@ Thus, the `FindByResourcesName()` method will return a list of news from these
 sources. `InitializeSource(sources []source.Source)` is used for initialize
 the sources of articles.
 
-### 4. Filter
+### 5. Filter
 
 `ArticleFilter` and structures that override the `Filter()` method are used to
 filter news by different aspects using this function.
@@ -76,7 +86,7 @@ filter news by different aspects using this function.
 is used to filter news by date, namely it returns a list of news that are
 published between `StartDate` and `EndDate`.
 
-### 5. Parser
+### 6. Parser
 
 Parsing of the required files is done at the `parser` layer. They are used to
 parse files and return news from them.
@@ -92,6 +102,7 @@ To get the required type of parser, the `GetParserBySourceType()` function
 requires passing the type of Source for which the parser is needed.
 
 Example of JSON file parsing:
+
 ```
  somePath := "some/path/to/file/"
  jsonParser := parser.GetParserBySourceType(JSON)
@@ -133,4 +144,5 @@ all news from the specified resources will be displayed.
 
 ### Unresolved questions
 
-1. Does it make sense to try to create a unified solution for websites that use HTML?
+1. Does it make sense to try to create a unified solution for websites that use
+   HTML?
