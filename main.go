@@ -4,13 +4,15 @@ import (
 	"NewsAggregator/aggregator"
 	"NewsAggregator/client"
 	"NewsAggregator/collector"
-	. "NewsAggregator/entity/source"
+	"NewsAggregator/entity/source"
 	"NewsAggregator/parser"
+	"os"
+	"text/template"
 )
 
 func main() {
 
-	collector.InitializeSource([]Source{
+	collector.InitializeSource([]source.Source{
 		{Name: "bbc", PathToFile: "resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "abc", PathToFile: "resources/abcnews-international-category-19-05-24.xml", SourceType: "RSS"},
@@ -22,7 +24,13 @@ func main() {
 	newsAggregator := aggregator.New()
 	cli := client.NewCommandLine(newsAggregator)
 	articles := cli.FetchArticles()
-	if articles != nil {
-		cli.Print(articles)
+
+	tmpl, err := template.New("articles").ParseFiles("client/OutputTemplate.tmpl")
+	if err != nil {
+		panic(err)
+	}
+	err = tmpl.ExecuteTemplate(os.Stdout, "articles", articles)
+	if err != nil {
+		panic(err)
 	}
 }

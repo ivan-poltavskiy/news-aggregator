@@ -1,0 +1,18 @@
+{{- define "articles" -}}
+Articles found: {{len .}}
+    {{range .}}
+ {{template "article" .}}
+    {{- end -}}
+{{end}}
+
+{{- define "article" -}}
+-------------------------------
+ Tile: {{.Title }}
+ Description: {{.Description}}
+ Link: {{.Link}}
+ Date: {{.Date}}
+{{end}}
+
+
+
+
