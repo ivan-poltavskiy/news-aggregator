@@ -41,6 +41,10 @@ func CheckData(startDateStr, endDateStr string) (bool, time.Time, time.Time) {
 		return false, time.Time{}, time.Time{}
 	}
 
+	if startDate.After(endDate) {
+		return false, time.Time{}, time.Time{}
+	}
+
 	return true, startDate, endDate
 }
 
