@@ -7,6 +7,7 @@ import (
 	"NewsAggregator/entity/source"
 	"NewsAggregator/parser"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -25,7 +26,14 @@ func main() {
 	cli := client.NewCommandLine(newsAggregator)
 	articles := cli.FetchArticles()
 
-	tmpl, err := template.New("articles").ParseFiles("client/OutputTemplate.tmpl")
+	funcMap := template.FuncMap{
+		"highlight": func(text, keywords string) string {
+			for _, keyword := range strings.Split(keywords, ",") {
+				text = strings.ReplaceAll(text, keyword, ""+keyword+"")
+			}
+			return text
+		}}
+	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
 	if err != nil {
 		panic(err)
 	}

@@ -74,6 +74,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := CheckUnique(keywords)
+		filtersForTemplate = append(filtersForTemplate, uniqueKeywords...)
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
@@ -83,9 +84,19 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	isValid, startDate, endDate := CheckData(cli.startDateStr, cli.endDateStr)
 	if isValid {
+		filtersForTemplate = append(filtersForTemplate, cli.startDateStr, cli.endDateStr)
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
 	return filters
+}
+
+type Filters struct {
+}
+
+var filtersForTemplate = []string{}
+
+func GetFilters() []string {
+	return filtersForTemplate
 }
 
 // Print prints the provided articles.

@@ -1,6 +1,10 @@
 {{- define "articles" -}}
-Articles found: {{len .}}
-    {{range .}}
+{{- if eq (len .) 0 -}}
+   Articles not found.
+{{- else -}}
+Articles found: {{len . -}}
+{{end}}
+    {{- range .}}
  {{template "article" .}}
     {{- end -}}
 {{end}}
@@ -12,7 +16,3 @@ Articles found: {{len .}}
  Link: {{.Link}}
  Date: {{.Date}}
 {{end}}
-
-
-
-
