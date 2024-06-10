@@ -43,7 +43,8 @@ func (cli *CommandLineClient) printUsage() {
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
-		"Date format - yyyy-mm-dd")
+		"Date format - yyyy-mm-dd" + "" +
+		"Type --sortedBy to sort by DESC/ASC.")
 }
 
 // FetchArticles fetches articles based on the command line arguments.
@@ -60,6 +61,17 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 		fmt.Println(errorMessage)
 	}
 
+	cli.sortedByDate(articles)
+
+	return articles
+}
+
+// sortedByDate sorts news by ASC or DESC.
+func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
+
+	if len(articles) == 0 || cli.sortBy != "asc" || cli.sortBy != "desc" {
+
+	}
 	if strings.ToLower(cli.sortBy) == "asc" {
 		sort.Slice(articles, func(i, j int) bool {
 			return articles[i].Date.Before(articles[j].Date)
@@ -69,8 +81,6 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 			return articles[i].Date.After(articles[j].Date)
 		})
 	}
-
-	return articles
 }
 
 // fetchParameters extracts and validates command line parameters,
