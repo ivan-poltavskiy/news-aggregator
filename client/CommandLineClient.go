@@ -5,7 +5,10 @@ import (
 	"NewsAggregator/filter"
 	"flag"
 	"fmt"
+	"os"
+	"regexp"
 	"strings"
+	"text/template"
 )
 
 // CommandLineClient represents a command line client for the NewsAggregator application.
@@ -74,7 +77,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := CheckUnique(keywords)
-		filtersForTemplate = append(filtersForTemplate, uniqueKeywords...)
+		filtersForTemplate = append(filtersForTemplate, "Keywords: "+strings.Join(uniqueKeywords, ", "))
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
@@ -84,28 +87,60 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	isValid, startDate, endDate := CheckData(cli.startDateStr, cli.endDateStr)
 	if isValid {
-		filtersForTemplate = append(filtersForTemplate, cli.startDateStr, cli.endDateStr)
+		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
 	return filters
 }
 
-type Filters struct {
-}
-
 var filtersForTemplate = []string{}
 
-func GetFilters() []string {
-	return filtersForTemplate
+func GetFilters() string {
+	return strings.Join(filtersForTemplate, ", ")
 }
 
-// Print prints the provided articles.
+// Print prints the provided articles using a template.
 func (cli *CommandLineClient) Print(articles []article.Article) {
-	for _, article := range articles {
-		fmt.Println("---------------------------------------------------")
-		fmt.Println("Title:", article.Title)
-		fmt.Println("Description:", article.Description)
-		fmt.Println("Link:", article.Link)
-		fmt.Println("Date:", article.Date)
+	funcMap := template.FuncMap{
+		"emphasise": func(keywords, text string) string {
+			for _, keyword := range strings.Split(keywords, ",") {
+				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
+				text = re.ReplaceAllString(text, "**"+keyword+"**")
+			}
+			return text
+		},
+	}
+
+	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
+	if err != nil {
+		panic(err)
+	}
+
+	type articleData struct {
+		Article  article.Article
+		Keywords string
+	}
+
+	var data []articleData
+	for _, art := range articles {
+		data = append(data, articleData{
+			Article:  art,
+			Keywords: cli.keywords,
+		})
+	}
+
+	outputData := struct {
+		Filters  string
+		Count    int
+		Articles []articleData
+	}{
+		Filters:  GetFilters(),
+		Count:    len(articles),
+		Articles: data,
+	}
+
+	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
+	if err != nil {
+		panic(err)
 	}
 }
