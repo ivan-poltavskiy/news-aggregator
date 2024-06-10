@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -18,6 +19,7 @@ type CommandLineClient struct {
 	keywords     string
 	startDateStr string
 	endDateStr   string
+	sortBy       string
 	help         bool
 }
 
@@ -28,6 +30,7 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
+	flag.StringVar(&cli.sortBy, "sortBy", "", "Specify sort by DESC/ASC.")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
 	return cli
@@ -55,6 +58,16 @@ func (cli *CommandLineClient) FetchArticles() []article.Article {
 	articles, errorMessage := cli.aggregator.Aggregate(uniqueSources, filters...)
 	if errorMessage != "" {
 		fmt.Println(errorMessage)
+	}
+
+	if strings.ToLower(cli.sortBy) == "asc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.Before(articles[j].Date)
+		})
+	} else if strings.ToLower(cli.sortBy) == "desc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.After(articles[j].Date)
+		})
 	}
 
 	return articles
@@ -93,7 +106,7 @@ func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []
 	return filters
 }
 
-var filtersForTemplate = []string{}
+var filtersForTemplate []string
 
 func GetFilters() string {
 	return strings.Join(filtersForTemplate, ", ")
