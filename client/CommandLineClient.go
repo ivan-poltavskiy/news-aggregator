@@ -116,11 +116,15 @@ func GetFilters() string {
 func (cli *CommandLineClient) Print(articles []article.Article) {
 	funcMap := template.FuncMap{
 		"emphasise": func(keywords, text string) string {
-			for _, keyword := range strings.Split(keywords, ",") {
-				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
-				text = re.ReplaceAllString(text, "**"+keyword+"**")
+			if keywords == "" {
+				return text
+			} else {
+				for _, keyword := range strings.Split(keywords, ",") {
+					re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
+					text = re.ReplaceAllString(text, "**"+keyword+"**")
+				}
+				return text
 			}
-			return text
 		},
 	}
 
