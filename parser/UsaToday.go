@@ -3,9 +3,11 @@ package parser
 import (
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -41,16 +43,26 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 		}
 
 		dateStr, _ := s.Find("div.gnt_m_flm_sbt").Attr("data-c-dt")
-		parsedDate, err := time.Parse(layout, dateStr)
-		if err != nil {
-			log.Println("Error parsing date:", err)
-			parsedDate = time.Time{}
+		var parsedDate time.Time
+		var err error
+
+		if dateStr != "" {
+			re := regexp.MustCompile("[A-Za-z]+\\s" + "\\d{1,2}")
+			datePart := re.FindString(dateStr)
+			if datePart != "" {
+				datePart = fmt.Sprintf("%s %d", datePart, time.Now().Year())
+				parsedDate, err = time.Parse("January 2 2006", datePart)
+				if err != nil {
+					return
+				}
+			}
 		}
 
 		formattedDateStr := parsedDate.Format(outputLayout)
 		formattedDate, err := time.Parse(outputLayout, formattedDateStr)
-		if err != nil {
-			log.Println("Error formatting date:", err)
+		if formattedDate.Year() < 1000 {
+			formattedDateStr = time.Now().Format(outputLayout)
+			formattedDate, err = time.Parse(outputLayout, formattedDateStr)
 		}
 
 		articles = append(articles, article.Article{
