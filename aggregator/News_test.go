@@ -14,6 +14,7 @@ func beforeEach() {
 	collector.InitializeSource([]source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "Html"},
 	})
 	parser.InitializeParserMap()
 }
@@ -30,7 +31,7 @@ func TestNews_Aggregate(t *testing.T) {
 		wantQuantity int
 	}{
 		{
-			name: "Test with date filter from two sources",
+			name: "Test with date filter from bbc and nbc sources",
 			args: args{
 				sources: []string{"bbc", "nbc"},
 				filters: []filter.ArticleFilter{filter.ByDate{
@@ -41,7 +42,7 @@ func TestNews_Aggregate(t *testing.T) {
 			wantQuantity: 89,
 		},
 		{
-			name: "Test with keyword filter from one source",
+			name: "Test with keyword filter from bbc source with rss type",
 			args: args{
 				sources: []string{"bbc"},
 				filters: []filter.ArticleFilter{filter.ByKeyword{
@@ -49,6 +50,26 @@ func TestNews_Aggregate(t *testing.T) {
 				}},
 			},
 			wantQuantity: 2,
+		},
+		{
+			name: "Test with keyword filter from Usa Today source with html type",
+			args: args{
+				sources: []string{"usatoday"},
+				filters: []filter.ArticleFilter{filter.ByKeyword{
+					Keywords: []string{"ukr"},
+				}},
+			},
+			wantQuantity: 4,
+		},
+		{
+			name: "Test with keyword filter from NBC source with JSON type",
+			args: args{
+				sources: []string{"nbc"},
+				filters: []filter.ArticleFilter{filter.ByKeyword{
+					Keywords: []string{"ukr"},
+				}},
+			},
+			wantQuantity: 1,
 		},
 	}
 	for _, tt := range tests {
