@@ -28,7 +28,6 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 		log.Fatal(err)
 	}
 
-	const layout = "January 2, 2006"
 	const outputLayout = "2006-01-02"
 	baseURL := "https://www.usatoday.com"
 
