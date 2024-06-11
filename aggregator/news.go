@@ -6,6 +6,7 @@ import (
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
 	"NewsAggregator/filter"
+	"NewsAggregator/validator"
 	"fmt"
 )
 
@@ -39,7 +40,7 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		return nil, errorMessage
 	}
 
-	fmt.Println(client.CheckSource(articles))
+	fmt.Println(validator.CheckSource(articles))
 
 	for _, filter := range filters {
 		articles = filter.Filter(articles)

@@ -3,6 +3,7 @@ package client
 import (
 	"NewsAggregator/entity/article"
 	"NewsAggregator/filter"
+	"NewsAggregator/validator"
 	"flag"
 	"fmt"
 	"strings"
@@ -65,7 +66,7 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) 
 
 	filters = fetchKeywords(cli, filters)
 	filters = fetchDateFilters(cli, filters)
-	uniqueSources := CheckUnique(sourceNames)
+	uniqueSources := validator.CheckUnique(sourceNames)
 	return filters, uniqueSources
 }
 
@@ -73,7 +74,7 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) 
 func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
-		uniqueKeywords := CheckUnique(keywords)
+		uniqueKeywords := validator.CheckUnique(keywords)
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
@@ -81,7 +82,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	isValid, startDate, endDate := CheckData(cli.startDateStr, cli.endDateStr)
+	isValid, startDate, endDate := validator.CheckData(cli.startDateStr, cli.endDateStr)
 	if isValid {
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
