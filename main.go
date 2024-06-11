@@ -22,7 +22,6 @@ func main() {
 	newsAggregator := aggregator.New()
 	cli := client.NewCommandLine(newsAggregator)
 	articles := cli.FetchArticles()
-	if articles != nil {
-		cli.Print(articles)
-	}
+	cli.Print(articles)
+
 }
