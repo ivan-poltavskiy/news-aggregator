@@ -144,7 +144,7 @@ func TestFetchParameters(t *testing.T) {
 
 func TestCommandLineClient_printUsage(t *testing.T) {
 	cli := &CommandLineClient{}
-	expectedOutput := "Usage of NewsAggregator:" +
+	expectedOutput := "Usage of news-aggregator:" +
 		"\nType --sources, and then list the resources you want to retrieve information from. " +
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
