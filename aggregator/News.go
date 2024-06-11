@@ -9,11 +9,11 @@ import (
 	"fmt"
 )
 
-// News provides methods for aggregating collector articles from various sources.
-type News struct{}
+// news provides methods for aggregating collector articles from various sources.
+type news struct{}
 
-func New() *News {
-	return &News{}
+func New() client.Aggregator {
+	return &news{}
 }
 
 // Aggregate fetches articles from the provided sources, applies the given
@@ -27,7 +27,7 @@ func New() *News {
 // - An error message string if any errors occurred during the process.
 //
 //go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator NewsAggregator/client Aggregator
-func (na *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, string) {
+func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, string) {
 	var sourceNameObjects []source.Name
 
 	for _, name := range sources {

@@ -74,7 +74,7 @@ func TestNews_Aggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			na := &News{}
+			na := &news{}
 			got, _ := na.Aggregate(tt.args.sources, tt.args.filters...)
 			if !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Aggregate() got = %v, wantQuantity %v", len(got), tt.wantQuantity)
