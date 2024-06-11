@@ -1,4 +1,4 @@
-package parser
+package html
 
 import (
 	"NewsAggregator/entity/article"

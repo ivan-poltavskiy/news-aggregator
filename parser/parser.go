@@ -3,6 +3,7 @@ package parser
 import (
 	"NewsAggregator/entity/article"
 	"NewsAggregator/entity/source"
+	"NewsAggregator/parser/html"
 	"fmt"
 )
 
@@ -14,7 +15,7 @@ func Initialize() {
 	Parsers = map[source.Type]Parser{
 		"RSS":  Rss{},
 		"JSON": Json{},
-		"Html": UsaToday{},
+		"Html": html.UsaToday{},
 	}
 }
 
