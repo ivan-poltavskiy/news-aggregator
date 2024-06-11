@@ -16,7 +16,7 @@ func beforeEach() {
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "Html"},
 	})
-	parser.InitializeParserMap()
+	parser.Initialize()
 }
 
 func TestNews_Aggregate(t *testing.T) {

@@ -17,7 +17,7 @@ func main() {
 		{Name: "washington", PathToFile: "resources/washingtontimes-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "usatoday", PathToFile: "resources/usatoday-world-news.html", SourceType: "Html"},
 	})
-	parser.InitializeParserMap()
+	parser.Initialize()
 
 	newsAggregator := aggregator.New()
 	cli := client.NewCommandLine(newsAggregator)

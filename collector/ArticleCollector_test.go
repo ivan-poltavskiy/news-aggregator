@@ -13,7 +13,7 @@ func beforeEach() {
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	})
-	parser.InitializeParserMap()
+	parser.Initialize()
 }
 
 func TestFindByResourcesName(t *testing.T) {
