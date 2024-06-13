@@ -3,12 +3,12 @@ package client
 import (
 	"flag"
 	"fmt"
-	"os"
-	"regexp"
-	"sort"
 	"news_aggregator/entity/article"
 	"news_aggregator/filter"
 	"news_aggregator/validator"
+	"os"
+	"regexp"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -68,9 +68,9 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 // sortedByDate sorts news by ASC or DESC.
 func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
 
-	if len(articles) == 0 || cli.sortBy != "asc" || cli.sortBy != "desc" {
-
-	}
+	//if len(articles) == 0 || cli.sortBy != "asc" || cli.sortBy != "desc" {
+	//
+	//}
 	if strings.ToLower(cli.sortBy) == "asc" {
 		sort.Slice(articles, func(i, j int) bool {
 			return articles[i].Date.Before(articles[j].Date)
