@@ -1,6 +1,7 @@
 package article
 
 import (
+	"news_aggregator/entity/source"
 	"time"
 )
 
@@ -10,4 +11,5 @@ type Article struct {
 	Description Description `json:"description"`
 	Link        Link        `json:"url"`
 	Date        time.Time   `json:"publishedAt"`
+	SourceName  source.Name
 }

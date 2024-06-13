@@ -32,5 +32,5 @@ func GetParserBySourceType(typeOfSource source.Type) (Parser, error) {
 type Parser interface {
 
 	// ParseSource returns a list of the source's articles by his path.
-	ParseSource(path source.PathToFile) ([]article.Article, error)
+	ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error)
 }
