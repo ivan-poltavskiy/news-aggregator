@@ -1,0 +1,49 @@
+package html
+
+import (
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
+	"reflect"
+	"testing"
+	"time"
+)
+
+func TestUsaToday_ParseSource(t *testing.T) {
+	type args struct {
+		path source.PathToFile
+	}
+	tests := []struct {
+		name string
+		args args
+		want []article.Article
+	}{
+		{
+			name: "Parse valid HTML file",
+			args: args{
+				path: "../../resources/testdata/test_usatoday.html",
+			},
+			want: []article.Article{
+				{
+					Title:       "Test Article 1",
+					Description: "Description 1",
+					Link:        "https://www.usatoday.com/story/1",
+					Date:        time.Date(time.Now().Year(), time.June, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					Title:       "Test Article 2",
+					Description: "Description 2",
+					Link:        "https://www.usatoday.com/story/2",
+					Date:        time.Date(time.Now().Year(), time.June, 2, 0, 0, 0, 0, time.UTC),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			htmlParser := UsaToday{}
+			if got := htmlParser.ParseSource(tt.args.path); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseSource() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -59,7 +59,7 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 
 		formattedDateStr := parsedDate.Format(outputLayout)
 		formattedDate, err := time.Parse(outputLayout, formattedDateStr)
-		if formattedDate.Year() < 1000 {
+		if formattedDate.Year() < 2000 {
 			formattedDateStr = time.Now().Format(outputLayout)
 			formattedDate, err = time.Parse(outputLayout, formattedDateStr)
 		}
