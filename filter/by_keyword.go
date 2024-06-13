@@ -25,10 +25,10 @@ func (f ByKeyword) Filter(articles []article.Article) []article.Article {
 func filterNewsByKeyword(keyword string, articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 
-	for _, article := range articles {
-		if strings.Contains(strings.ToLower(string(article.Title)), strings.ToLower(keyword)) ||
-			strings.Contains(strings.ToLower(string(article.Description)), strings.ToLower(keyword)) {
-			matchingArticles = append(matchingArticles, article)
+	for _, a := range articles {
+		if strings.Contains(strings.ToLower(string(a.Title)), strings.ToLower(keyword)) ||
+			strings.Contains(strings.ToLower(string(a.Description)), strings.ToLower(keyword)) {
+			matchingArticles = append(matchingArticles, a)
 		}
 	}
 
