@@ -1,18 +1,19 @@
 package client
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/filter"
 	"flag"
 	"fmt"
 	"os"
 	"regexp"
 	"sort"
+	"news_aggregator/entity/article"
+	"news_aggregator/filter"
+	"news_aggregator/validator"
 	"strings"
 	"text/template"
 )
 
-// CommandLineClient represents a command line client for the NewsAggregator application.
+// CommandLineClient represents a command line client for the news-aggregator application.
 type CommandLineClient struct {
 	aggregator   Aggregator
 	sources      string
@@ -38,7 +39,7 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 
 // printUsage prints the usage instructions
 func (cli *CommandLineClient) printUsage() {
-	fmt.Println("Usage of NewsAggregator:" +
+	fmt.Println("Usage of news-aggregator:" +
 		"\nType --sources, and then list the resources you want to retrieve information from. " +
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
@@ -48,22 +49,20 @@ func (cli *CommandLineClient) printUsage() {
 }
 
 // FetchArticles fetches articles based on the command line arguments.
-func (cli *CommandLineClient) FetchArticles() []article.Article {
+func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 	if cli.help {
 		cli.printUsage()
-		return nil
+		return nil, nil
 	}
 
 	filters, uniqueSources := fetchParameters(cli)
 
-	articles, errorMessage := cli.aggregator.Aggregate(uniqueSources, filters...)
-	if errorMessage != "" {
-		fmt.Println(errorMessage)
+	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	if err != nil {
+		return nil, err
 	}
-
 	cli.sortedByDate(articles)
-
-	return articles
+	return articles, nil
 }
 
 // sortedByDate sorts news by ASC or DESC.
@@ -91,7 +90,7 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) 
 
 	filters = fetchKeywords(cli, filters)
 	filters = fetchDateFilters(cli, filters)
-	uniqueSources := CheckUnique(sourceNames)
+	uniqueSources := validator.CheckUnique(sourceNames)
 	return filters, uniqueSources
 }
 
@@ -99,7 +98,7 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) 
 func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
-		uniqueKeywords := CheckUnique(keywords)
+		uniqueKeywords := validator.CheckUnique(keywords)
 		filtersForTemplate = append(filtersForTemplate, "Keywords: "+strings.Join(uniqueKeywords, ", "))
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
@@ -108,7 +107,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	isValid, startDate, endDate := CheckData(cli.startDateStr, cli.endDateStr)
+	isValid, startDate, endDate := validator.CheckData(cli.startDateStr, cli.endDateStr)
 	if isValid {
 		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})

@@ -1,7 +1,7 @@
 package filter
 
 import (
-	"NewsAggregator/entity/article"
+	"news_aggregator/entity/article"
 	"reflect"
 	"testing"
 )

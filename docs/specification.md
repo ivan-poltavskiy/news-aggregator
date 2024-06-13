@@ -64,14 +64,14 @@ a response with the filtered news.
 
 Passing filters is optional, unlike sources, which must be passed anyway.
 
-The aggregator works with the `service` layer.
+The aggregator works with the `ArticleCollector` layer.
 
 ### 4. ArticleCollector
 
 The collector layer stores the logic for the collection of articles.
 
 The **collector** level works with the data that the client passed to the
-aggregator and with the data that is already in the system.
+aggregator and with the data that is already defines in the system.
 
 `ArticleCollector` is used to search news by resource name.
 Thus, the `FindByResourcesName()` method will return a list of news from these

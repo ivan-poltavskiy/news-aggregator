@@ -1,8 +1,8 @@
 package filter
 
 import (
-	"NewsAggregator/entity/article"
 	"fmt"
+	"news_aggregator/entity/article"
 	"strings"
 )
 

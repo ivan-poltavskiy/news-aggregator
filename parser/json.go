@@ -1,10 +1,11 @@
 package parser
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
 	"os"
 )
 
@@ -13,13 +14,12 @@ type Json struct {
 }
 
 // ParseSource reads and parses a JSON file specified by the path and returns a slice of articles.
-func (jsonFile Json) ParseSource(path source.PathToFile) []article.Article {
+func (jsonFile Json) ParseSource(path source.PathToFile) ([]article.Article, error) {
 	filename := fmt.Sprintf(string(path))
 
 	byteValue, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("Error with parse JSON content:", err)
-		return nil
+		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
 
 	var articles struct {
@@ -28,9 +28,8 @@ func (jsonFile Json) ParseSource(path source.PathToFile) []article.Article {
 
 	err = json.Unmarshal(byteValue, &articles)
 	if err != nil {
-		fmt.Println("Error unmarshalling JSON content:", err)
-		return nil
+		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
 
-	return articles.Articles
+	return articles.Articles, nil
 }

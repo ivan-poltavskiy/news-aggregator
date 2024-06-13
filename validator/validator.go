@@ -1,8 +1,8 @@
-package client
+package validator
 
 import (
-	"NewsAggregator/entity/article"
 	"fmt"
+	"news_aggregator/entity/article"
 	"time"
 )
 

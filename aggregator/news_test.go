@@ -1,10 +1,10 @@
 package aggregator
 
 import (
-	"NewsAggregator/collector"
-	"NewsAggregator/entity/source"
-	"NewsAggregator/filter"
-	"NewsAggregator/parser"
+	"news_aggregator/collector"
+	"news_aggregator/entity/source"
+	"news_aggregator/filter"
+	"news_aggregator/parser"
 	"reflect"
 	"testing"
 	"time"
@@ -16,7 +16,7 @@ func beforeEach() {
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "Html"},
 	})
-	parser.InitializeParserMap()
+	parser.Initialize()
 }
 
 func TestNews_Aggregate(t *testing.T) {
@@ -74,7 +74,7 @@ func TestNews_Aggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			na := &News{}
+			na := &news{}
 			got, _ := na.Aggregate(tt.args.sources, tt.args.filters...)
 			if !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Aggregate() got = %v, wantQuantity %v", len(got), tt.wantQuantity)

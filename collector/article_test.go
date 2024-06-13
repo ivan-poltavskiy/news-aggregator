@@ -1,9 +1,9 @@
 package collector
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
-	"NewsAggregator/parser"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
+	"news_aggregator/parser"
 	"reflect"
 	"testing"
 )
@@ -13,7 +13,7 @@ func beforeEach() {
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	})
-	parser.InitializeParserMap()
+	parser.Initialize()
 }
 
 func TestFindByResourcesName(t *testing.T) {
@@ -98,7 +98,7 @@ func Test_findForCurrentSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := findForCurrentSource(tt.args.currentSource, tt.args.name, tt.args.allArticles); !reflect.DeepEqual(len(got), tt.wantQuantity) {
+			if got, _ := findForCurrentSource(tt.args.currentSource, tt.args.name, tt.args.allArticles); !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
 		})

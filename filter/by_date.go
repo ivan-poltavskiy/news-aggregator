@@ -1,8 +1,8 @@
 package filter
 
 import (
-	"NewsAggregator/entity/article"
 	"fmt"
+	"news_aggregator/entity/article"
 	"time"
 )
 
@@ -16,9 +16,9 @@ type ByDate struct {
 // Filter filters the incoming list of articles by the date range specified in the ByDate struct.
 func (f ByDate) Filter(articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
-	for _, article := range articles {
-		if article.Date.After(f.StartDate) && article.Date.Before(f.EndDate) {
-			matchingArticles = append(matchingArticles, article)
+	for _, a := range articles {
+		if a.Date.After(f.StartDate) && a.Date.Before(f.EndDate) {
+			matchingArticles = append(matchingArticles, a)
 		}
 	}
 	if len(matchingArticles) == 0 {
