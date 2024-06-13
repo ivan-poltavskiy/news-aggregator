@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
-	"NewsAggregator/parser/html"
 	"fmt"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
+	"news_aggregator/parser/html"
 )
 
 // Parsers stores the mapping of source types to their corresponding parsers.

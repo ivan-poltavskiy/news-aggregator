@@ -1,11 +1,11 @@
 package html
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
 	"os"
 	"regexp"
 	"strings"

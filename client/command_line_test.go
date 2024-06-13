@@ -1,12 +1,12 @@
 package client
 
 import (
-	"NewsAggregator/aggregator/mock_aggregator"
-	"NewsAggregator/entity/article"
-	"NewsAggregator/filter"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"io"
+	"news_aggregator/aggregator/mock_aggregator"
+	"news_aggregator/entity/article"
+	"news_aggregator/filter"
 	"os"
 	"reflect"
 	"strings"

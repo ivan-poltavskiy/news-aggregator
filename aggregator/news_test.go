@@ -1,10 +1,10 @@
 package aggregator
 
 import (
-	"NewsAggregator/collector"
-	"NewsAggregator/entity/source"
-	"NewsAggregator/filter"
-	"NewsAggregator/parser"
+	"news_aggregator/collector"
+	"news_aggregator/entity/source"
+	"news_aggregator/filter"
+	"news_aggregator/parser"
 	"reflect"
 	"testing"
 	"time"

@@ -1,4 +1,4 @@
-module NewsAggregator
+module news_aggregator
 
 go 1.20
 

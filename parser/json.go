@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
 	"encoding/json"
 	"fmt"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
 	"os"
 )
 

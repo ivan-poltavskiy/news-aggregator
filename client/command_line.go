@@ -1,11 +1,11 @@
 package client
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/filter"
-	"NewsAggregator/validator"
 	"flag"
 	"fmt"
+	"news_aggregator/entity/article"
+	"news_aggregator/filter"
+	"news_aggregator/validator"
 	"strings"
 )
 

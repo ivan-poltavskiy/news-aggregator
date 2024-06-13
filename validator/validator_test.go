@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"NewsAggregator/entity/article"
+	"news_aggregator/entity/article"
 	"reflect"
 	"testing"
 	"time"

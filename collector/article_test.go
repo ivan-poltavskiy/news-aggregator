@@ -1,9 +1,9 @@
 package collector
 
 import (
-	"NewsAggregator/entity/article"
-	"NewsAggregator/entity/source"
-	"NewsAggregator/parser"
+	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
+	"news_aggregator/parser"
 	"reflect"
 	"testing"
 )
