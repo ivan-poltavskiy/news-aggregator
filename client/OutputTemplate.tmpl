@@ -4,11 +4,21 @@
 {{- else -}}
 Articles found: {{.Count}}
 Filters applied: {{.Filters}}
+    {{- if .SortingBySources }}
+        {{- range $sourceName, $articles := .ArticlesBySource }}
+Source: {{ $sourceName }}
+Number of articles: {{ len $articles }}
+    {{- range $articles }}
+        {{ template "articleWithoutSource" . }}
+    {{- end }}
+        {{- end }}
+    {{- else }}
+    {{- range .Articles }}
+        {{ template "article" . }}
+    {{- end }}
+    {{- end }}
 {{end}}
-    {{- range .Articles}}
- {{template "article" .}}
-    {{- end -}}
-{{end}}
+{{- end }}
 
 {{- define "article" -}}
 -------------------------------
@@ -17,4 +27,18 @@ Description: {{ .Article.Description.String | emphasise .Keywords }}
 Link: {{ .Article.Link }}
 Date: {{ .Article.Date }}
 SourceName: {{.Article.SourceName}}
+{{end}}
+
+{{- define "articleWithoutSource" -}}
+-------------------------------
+Title: {{ .Article.Title.String | emphasise .Keywords }}
+Description: {{ .Article.Description.String | emphasise .Keywords }}
+Link: {{ .Article.Link }}
+Date: {{ .Article.Date }}
+{{end}}
+
+{{- define "source_sorting" -}}
+    {{- range .Articles }}
+        {{ template "articleWithoutSource" . }}
+    {{- end }}
 {{end}}

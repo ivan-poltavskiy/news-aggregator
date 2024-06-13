@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
 	"news_aggregator/filter"
 	"news_aggregator/validator"
 	"os"
@@ -15,13 +16,14 @@ import (
 
 // CommandLineClient represents a command line client for the news-aggregator application.
 type CommandLineClient struct {
-	aggregator   Aggregator
-	sources      string
-	keywords     string
-	startDateStr string
-	endDateStr   string
-	sortBy       string
-	help         bool
+	aggregator       Aggregator
+	sources          string
+	keywords         string
+	startDateStr     string
+	endDateStr       string
+	sortBy           string
+	sortingBySources bool
+	help             bool
 }
 
 // NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
@@ -32,6 +34,7 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
 	flag.StringVar(&cli.sortBy, "sortBy", "", "Specify sort by DESC/ASC.")
+	flag.BoolVar(&cli.sortingBySources, "sortingBySources", false, "Enable sorting articles by sources")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
 	return cli
@@ -156,13 +159,27 @@ func (cli *CommandLineClient) Print(articles []article.Article) {
 	}
 
 	outputData := struct {
-		Filters  string
-		Count    int
-		Articles []articleData
+		Filters          string
+		Count            int
+		Articles         []articleData
+		ArticlesBySource map[source.Name][]articleData
+		SortingBySources bool
 	}{
-		Filters:  GetFilters(),
-		Count:    len(articles),
-		Articles: data,
+		Filters:          GetFilters(),
+		Count:            len(articles),
+		Articles:         data,
+		SortingBySources: cli.sortingBySources,
+	}
+
+	if cli.sortingBySources {
+		outputData.ArticlesBySource = make(map[source.Name][]articleData)
+		for _, art := range articles {
+			sourceName := art.SourceName
+			outputData.ArticlesBySource[sourceName] = append(outputData.ArticlesBySource[sourceName], articleData{
+				Article:  art,
+				Keywords: cli.keywords,
+			})
+		}
 	}
 
 	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
