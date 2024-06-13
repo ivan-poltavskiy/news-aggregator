@@ -9,7 +9,7 @@ import (
 
 var Sources []source.Source
 
-// FindByResourcesName returns the list of collector from the passed sources.
+// FindByResourcesName returns the list of news from the passed sources.
 func FindByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundNews []article.Article
@@ -31,9 +31,9 @@ func InitializeSource(sources []source.Source) {
 	Sources = sources
 }
 
-// Returns the list of collector from the passed source.
-func findForCurrentSource(currentSource source.Source,
-	name source.Name, allArticles []article.Article) ([]article.Article, error) {
+// Returns the list of news from the passed source.
+func findForCurrentSource(currentSource source.Source, name source.Name,
+	allArticles []article.Article) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) == strings.ToLower(string(name)) {
 		currentParser, err := parser.GetParserBySourceType(currentSource.SourceType)

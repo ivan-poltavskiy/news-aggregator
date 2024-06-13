@@ -71,6 +71,22 @@ func TestNews_Aggregate(t *testing.T) {
 			},
 			wantQuantity: 1,
 		},
+		{
+			name: "Test with non-existent sources",
+			args: args{
+				sources: []string{"source1", "source2"},
+				filters: nil,
+			},
+			wantQuantity: 0,
+		},
+		{
+			name: "Test with empty sources",
+			args: args{
+				sources: nil,
+				filters: nil,
+			},
+			wantQuantity: 0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -60,12 +60,12 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 
 // Print prints the provided articles.
 func (cli *CommandLineClient) Print(articles []article.Article) {
-	for _, article := range articles {
+	for _, a := range articles {
 		fmt.Println("---------------------------------------------------")
-		fmt.Println("Title:", article.Title)
-		fmt.Println("Description:", article.Description)
-		fmt.Println("Link:", article.Link)
-		fmt.Println("Date:", article.Date)
+		fmt.Println("Title:", a.Title)
+		fmt.Println("Description:", a.Description)
+		fmt.Println("Link:", a.Link)
+		fmt.Println("Date:", a.Date)
 	}
 }
 
