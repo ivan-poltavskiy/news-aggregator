@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"news_aggregator/parser"
 	"reflect"
@@ -71,7 +70,6 @@ func Test_findForCurrentSource(t *testing.T) {
 	type args struct {
 		currentSource source.Source
 		name          source.Name
-		allArticles   []article.Article
 	}
 	tests := []struct {
 		name         string
@@ -82,7 +80,6 @@ func Test_findForCurrentSource(t *testing.T) {
 			args: args{
 				currentSource: source.Source{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 				name:          "bbc",
-				allArticles:   []article.Article{},
 			},
 			wantQuantity: 54,
 		},
@@ -91,14 +88,13 @@ func Test_findForCurrentSource(t *testing.T) {
 			args: args{
 				currentSource: source.Source{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 				name:          "nbc",
-				allArticles:   []article.Article{},
 			},
 			wantQuantity: 100,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := findForCurrentSource(tt.args.currentSource, tt.args.name, tt.args.allArticles); !reflect.DeepEqual(len(got), tt.wantQuantity) {
+			if got, _ := findForCurrentSource(tt.args.currentSource, tt.args.name); !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
 		})

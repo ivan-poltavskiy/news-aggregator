@@ -29,13 +29,13 @@ func New() client.Aggregator {
 //
 //go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator
 func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error) {
-	var sourceNameObjects []source.Name
+	var sourceNames []source.Name
 
 	for _, name := range sources {
-		sourceNameObjects = append(sourceNameObjects, source.Name(name))
+		sourceNames = append(sourceNames, source.Name(name))
 	}
 
-	articles, err := collector.FindByResourcesName(sourceNameObjects)
+	articles, err := collector.FindByResourcesName(sourceNames)
 	if err != nil {
 		return nil, err
 	}
