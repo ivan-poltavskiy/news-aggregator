@@ -98,7 +98,7 @@ func Test_findForCurrentSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := findForCurrentSource(tt.args.currentSource, tt.args.name, tt.args.allArticles); !reflect.DeepEqual(len(got), tt.wantQuantity) {
+			if got, _ := findForCurrentSource(tt.args.currentSource, tt.args.name, tt.args.allArticles); !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
 		})

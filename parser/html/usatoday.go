@@ -16,23 +16,30 @@ import (
 type UsaToday struct {
 }
 
-func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article {
+func (htmlParser UsaToday) ParseSource(path source.PathToFile) ([]article.Article, error) {
 	file, err := os.Open(string(path))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(file)
 
 	doc, err := goquery.NewDocumentFromReader(file)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	const outputLayout = "2006-01-02"
 	baseURL := "https://www.usatoday.com"
 
 	var articles []article.Article
-	doc.Find("main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a").Each(func(i int, s *goquery.Selection) {
+	var parseError error
+
+	doc.Find("main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		title := s.Text()
 		description, _ := s.Attr("data-c-br")
 		link, _ := s.Attr("href")
@@ -46,22 +53,32 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 		var err error
 
 		if dateStr != "" {
-			re := regexp.MustCompile("[A-Za-z]+\\s" + "\\d{1,2}")
+			re := regexp.MustCompile("[A-Za-z]+\\s\\d{1,2}")
 			datePart := re.FindString(dateStr)
 			if datePart != "" {
 				datePart = fmt.Sprintf("%s %d", datePart, time.Now().Year())
 				parsedDate, err = time.Parse("January 2 2006", datePart)
 				if err != nil {
-					return
+					parseError = err
+					return false
 				}
 			}
 		}
 
 		formattedDateStr := parsedDate.Format(outputLayout)
 		formattedDate, err := time.Parse(outputLayout, formattedDateStr)
+		if err != nil {
+			parseError = err
+			return false
+		}
+
 		if formattedDate.Year() < 2000 {
 			formattedDateStr = time.Now().Format(outputLayout)
 			formattedDate, err = time.Parse(outputLayout, formattedDateStr)
+			if err != nil {
+				parseError = err
+				return false
+			}
 		}
 
 		articles = append(articles, article.Article{
@@ -70,7 +87,13 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) []article.Article
 			Link:        article.Link(strings.TrimSpace(link)),
 			Date:        formattedDate,
 		})
+
+		return true
 	})
 
-	return articles
+	if parseError != nil {
+		return nil, parseError
+	}
+
+	return articles, nil
 }

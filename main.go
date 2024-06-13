@@ -21,7 +21,10 @@ func main() {
 
 	newsAggregator := aggregator.New()
 	cli := client.NewCommandLine(newsAggregator)
-	articles := cli.FetchArticles()
+	articles, err := cli.FetchArticles()
+	if err != nil {
+		println(err.Error())
+	}
 	cli.Print(articles)
 
 }

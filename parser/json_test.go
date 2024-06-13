@@ -31,7 +31,7 @@ func TestJson_ParseSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jsonFile := Json{}
-			if got := jsonFile.ParseSource(tt.args.path); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := jsonFile.ParseSource(tt.args.path); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseSource() = %v, want %v", got, tt.want)
 			}
 		})

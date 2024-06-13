@@ -42,20 +42,31 @@ func (cli *CommandLineClient) printUsage() {
 }
 
 // FetchArticles fetches articles based on the command line arguments.
-func (cli *CommandLineClient) FetchArticles() []article.Article {
+func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 	if cli.help {
 		cli.printUsage()
-		return nil
+		return nil, nil
 	}
 
 	filters, uniqueSources := fetchParameters(cli)
 
-	articles, errorMessage := cli.aggregator.Aggregate(uniqueSources, filters...)
-	if errorMessage != "" {
-		fmt.Println(errorMessage)
+	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	if err != nil {
+		return nil, err
 	}
 
-	return articles
+	return articles, nil
+}
+
+// Print prints the provided articles.
+func (cli *CommandLineClient) Print(articles []article.Article) {
+	for _, article := range articles {
+		fmt.Println("---------------------------------------------------")
+		fmt.Println("Title:", article.Title)
+		fmt.Println("Description:", article.Description)
+		fmt.Println("Link:", article.Link)
+		fmt.Println("Date:", article.Date)
+	}
 }
 
 // fetchParameters extracts and validates command line parameters,
@@ -87,15 +98,4 @@ func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
 	return filters
-}
-
-// Print prints the provided articles.
-func (cli *CommandLineClient) Print(articles []article.Article) {
-	for _, article := range articles {
-		fmt.Println("---------------------------------------------------")
-		fmt.Println("Title:", article.Title)
-		fmt.Println("Description:", article.Description)
-		fmt.Println("Link:", article.Link)
-		fmt.Println("Date:", article.Date)
-	}
 }

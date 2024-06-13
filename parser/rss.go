@@ -13,14 +13,13 @@ type Rss struct {
 }
 
 // ParseSource reads and parses a XML (RSS) file specified by the path and returns a slice of articles.
-func (rss Rss) ParseSource(path source.PathToFile) []article.Article {
+func (rss Rss) ParseSource(path source.PathToFile) ([]article.Article, error) {
 
 	parser := gofeed.NewParser()
 	filename := fmt.Sprintf(string(path))
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Cannot open the file:", err)
-		return nil
+		return nil, err
 
 	}
 	defer func(file *os.File) {
@@ -32,8 +31,7 @@ func (rss Rss) ParseSource(path source.PathToFile) []article.Article {
 
 	feed, err := parser.Parse(file)
 	if err != nil {
-		fmt.Println("Error with parse RSS content:", err)
-		return nil
+		return nil, err
 	}
 
 	var articles []article.Article
@@ -45,5 +43,5 @@ func (rss Rss) ParseSource(path source.PathToFile) []article.Article {
 			Date:        *item.PublishedParsed,
 		})
 	}
-	return articles
+	return articles, nil
 }

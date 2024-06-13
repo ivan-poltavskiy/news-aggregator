@@ -27,24 +27,24 @@ func New() client.Aggregator {
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
 //
-//go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news-aggregator/client Aggregator
-func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, string) {
+//go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator
+func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error) {
 	var sourceNameObjects []source.Name
 
 	for _, name := range sources {
 		sourceNameObjects = append(sourceNameObjects, source.Name(name))
 	}
 
-	articles, errorMessage := collector.FindByResourcesName(sourceNameObjects)
-	if errorMessage != "" {
-		return nil, errorMessage
+	articles, err := collector.FindByResourcesName(sourceNameObjects)
+	if err != nil {
+		return nil, err
 	}
 
 	fmt.Println(validator.CheckSource(articles))
 
-	for _, filter := range filters {
-		articles = filter.Filter(articles)
+	for _, f := range filters {
+		articles = f.Filter(articles)
 	}
 
-	return articles, ""
+	return articles, nil
 }

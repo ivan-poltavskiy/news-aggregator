@@ -49,7 +49,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 					Aggregate([]string{"source1", "source2"}, gomock.Any()).
 					Return([]article.Article{
 						{Title: "Test Title", Description: "Test Description", Link: "http://test.com", Date: time.Date(2023, time.May, 1, 0, 0, 0, 0, time.UTC)},
-					}, "")
+					}, nil)
 			},
 			want: []article.Article{
 				{Title: "Test Title", Description: "Test Description", Link: "http://test.com", Date: time.Date(2023, time.May, 1, 0, 0, 0, 0, time.UTC)},
@@ -84,7 +84,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 				endDateStr:   tt.fields.endDateStr,
 				help:         tt.fields.help,
 			}
-			if got := cli.FetchArticles(); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := cli.FetchArticles(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Actual result = %v,expexted %v", got, tt.want)
 			}
 		})

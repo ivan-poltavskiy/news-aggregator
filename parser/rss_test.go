@@ -41,7 +41,7 @@ func TestRss_ParseSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rss := Rss{}
-			if got := rss.ParseSource(tt.args.path); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := rss.ParseSource(tt.args.path); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseSource() = %v, want %v", got, tt.want)
 			}
 		})
