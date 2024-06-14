@@ -23,7 +23,7 @@ func Initialize() {
 func GetParserBySourceType(typeOfSource source.Type) (Parser, error) {
 	parser, exist := Parsers[typeOfSource]
 	if !exist {
-		return nil, errors.New("Parser not exist")
+		return nil, errors.New("parser not exist")
 	}
 	return parser, nil
 }
