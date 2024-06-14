@@ -26,6 +26,8 @@ type CommandLineClient struct {
 	help             bool
 }
 
+var filtersForTemplate []string
+
 // NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 	cli := &CommandLineClient{aggregator: aggregator}
@@ -48,7 +50,7 @@ func (cli *CommandLineClient) printUsage() {
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
 		"Date format - yyyy-mm-dd" + "" +
-		"Type --sortedBy to sort by DESC/ASC.")
+		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
 }
 
 // FetchArticles fetches articles based on the command line arguments.
@@ -71,9 +73,6 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 // sortedByDate sorts news by ASC or DESC.
 func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
 
-	//if len(articles) == 0 || cli.sortBy != "asc" || cli.sortBy != "desc" {
-	//
-	//}
 	if strings.ToLower(cli.sortBy) == "asc" {
 		sort.Slice(articles, func(i, j int) bool {
 			return articles[i].Date.Before(articles[j].Date)
@@ -118,12 +117,6 @@ func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []
 	return filters
 }
 
-var filtersForTemplate []string
-
-func GetFilters() string {
-	return strings.Join(filtersForTemplate, ", ")
-}
-
 // Print prints the provided articles using a template.
 func (cli *CommandLineClient) Print(articles []article.Article) {
 	funcMap := template.FuncMap{
@@ -165,7 +158,7 @@ func (cli *CommandLineClient) Print(articles []article.Article) {
 		ArticlesBySource map[source.Name][]articleData
 		SortingBySources bool
 	}{
-		Filters:          GetFilters(),
+		Filters:          strings.Join(filtersForTemplate, ", "),
 		Count:            len(articles),
 		Articles:         data,
 		SortingBySources: cli.sortingBySources,
