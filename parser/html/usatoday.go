@@ -16,7 +16,7 @@ import (
 type UsaToday struct {
 }
 
-func (htmlParser UsaToday) ParseSource(path source.PathToFile) ([]article.Article, error) {
+func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
 	file, err := os.Open(string(path))
 	if err != nil {
 		return nil, err
@@ -86,6 +86,7 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile) ([]article.Articl
 			Description: article.Description(strings.TrimSpace(description)),
 			Link:        article.Link(strings.TrimSpace(link)),
 			Date:        formattedDate,
+			SourceName:  name,
 		})
 
 		return true

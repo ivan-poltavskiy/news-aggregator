@@ -14,7 +14,7 @@ type Json struct {
 }
 
 // ParseSource reads and parses a JSON file specified by the path and returns a slice of articles.
-func (jsonFile Json) ParseSource(path source.PathToFile) ([]article.Article, error) {
+func (jsonFile Json) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
 	filename := fmt.Sprintf(string(path))
 
 	byteValue, err := os.ReadFile(filename)
@@ -29,6 +29,10 @@ func (jsonFile Json) ParseSource(path source.PathToFile) ([]article.Article, err
 	err = json.Unmarshal(byteValue, &articles)
 	if err != nil {
 		return nil, errors.New("Error with parse JSON content: " + err.Error())
+	}
+
+	for i := range articles.Articles {
+		articles.Articles[i].SourceName = name
 	}
 
 	return articles.Articles, nil

@@ -43,7 +43,7 @@ func findForCurrentSource(currentSource source.Source, name source.Name) ([]arti
 		return nil, err
 	}
 
-	articles, err := currentParser.ParseSource(currentSource.PathToFile)
+	articles, err := currentParser.ParseSource(currentSource.PathToFile, name)
 	if err != nil {
 		return nil, err
 	}

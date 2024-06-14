@@ -149,7 +149,8 @@ func TestCommandLineClient_printUsage(t *testing.T) {
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
-		"Date format - yyyy-mm-dd"
+		"Date format - yyyy-mm-dd" + "" +
+		"Type --sortedBy to sort by DESC/ASC."
 
 	var output bytes.Buffer
 	old := os.Stdout

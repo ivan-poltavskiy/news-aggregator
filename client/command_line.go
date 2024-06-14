@@ -4,19 +4,26 @@ import (
 	"flag"
 	"fmt"
 	"news_aggregator/entity/article"
+	"news_aggregator/entity/source"
 	"news_aggregator/filter"
 	"news_aggregator/validator"
+	"os"
+	"regexp"
+	"sort"
 	"strings"
+	"text/template"
 )
 
 // CommandLineClient represents a command line client for the news-aggregator application.
 type CommandLineClient struct {
-	aggregator   Aggregator
-	sources      string
-	keywords     string
-	startDateStr string
-	endDateStr   string
-	help         bool
+	aggregator       Aggregator
+	sources          string
+	keywords         string
+	startDateStr     string
+	endDateStr       string
+	sortBy           string
+	sortingBySources bool
+	help             bool
 }
 
 // NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
@@ -26,6 +33,8 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
+	flag.StringVar(&cli.sortBy, "sortBy", "", "Specify sort by DESC/ASC.")
+	flag.BoolVar(&cli.sortingBySources, "sortingBySources", false, "Enable sorting articles by sources")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
 	return cli
@@ -38,7 +47,8 @@ func (cli *CommandLineClient) printUsage() {
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
-		"Date format - yyyy-mm-dd")
+		"Date format - yyyy-mm-dd" + "" +
+		"Type --sortedBy to sort by DESC/ASC.")
 }
 
 // FetchArticles fetches articles based on the command line arguments.
@@ -54,18 +64,24 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	cli.sortedByDate(articles)
 	return articles, nil
 }
 
-// Print prints the provided articles.
-func (cli *CommandLineClient) Print(articles []article.Article) {
-	for _, a := range articles {
-		fmt.Println("---------------------------------------------------")
-		fmt.Println("Title:", a.Title)
-		fmt.Println("Description:", a.Description)
-		fmt.Println("Link:", a.Link)
-		fmt.Println("Date:", a.Date)
+// sortedByDate sorts news by ASC or DESC.
+func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
+
+	//if len(articles) == 0 || cli.sortBy != "asc" || cli.sortBy != "desc" {
+	//
+	//}
+	if strings.ToLower(cli.sortBy) == "asc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.Before(articles[j].Date)
+		})
+	} else if strings.ToLower(cli.sortBy) == "desc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.After(articles[j].Date)
+		})
 	}
 }
 
@@ -86,6 +102,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := validator.CheckUnique(keywords)
+		filtersForTemplate = append(filtersForTemplate, "Keywords: "+strings.Join(uniqueKeywords, ", "))
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
@@ -95,7 +112,78 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	isValid, startDate, endDate := validator.CheckData(cli.startDateStr, cli.endDateStr)
 	if isValid {
+		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
 	}
 	return filters
+}
+
+var filtersForTemplate []string
+
+func GetFilters() string {
+	return strings.Join(filtersForTemplate, ", ")
+}
+
+// Print prints the provided articles using a template.
+func (cli *CommandLineClient) Print(articles []article.Article) {
+	funcMap := template.FuncMap{
+		"emphasise": func(keywords, text string) string {
+			if keywords == "" {
+				return text
+			} else {
+				for _, keyword := range strings.Split(keywords, ",") {
+					re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
+					text = re.ReplaceAllString(text, "**"+keyword+"**")
+				}
+				return text
+			}
+		},
+	}
+
+	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
+	if err != nil {
+		panic(err)
+	}
+
+	type articleData struct {
+		Article  article.Article
+		Keywords string
+	}
+
+	var data []articleData
+	for _, art := range articles {
+		data = append(data, articleData{
+			Article:  art,
+			Keywords: cli.keywords,
+		})
+	}
+
+	outputData := struct {
+		Filters          string
+		Count            int
+		Articles         []articleData
+		ArticlesBySource map[source.Name][]articleData
+		SortingBySources bool
+	}{
+		Filters:          GetFilters(),
+		Count:            len(articles),
+		Articles:         data,
+		SortingBySources: cli.sortingBySources,
+	}
+
+	if cli.sortingBySources {
+		outputData.ArticlesBySource = make(map[source.Name][]articleData)
+		for _, art := range articles {
+			sourceName := art.SourceName
+			outputData.ArticlesBySource[sourceName] = append(outputData.ArticlesBySource[sourceName], articleData{
+				Article:  art,
+				Keywords: cli.keywords,
+			})
+		}
+	}
+
+	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
+	if err != nil {
+		panic(err)
+	}
 }
