@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"fmt"
+	"errors"
 	"news_aggregator/entity/article"
 	"time"
 )
@@ -12,45 +12,14 @@ func ValidateSource(sources []article.Article) bool {
 	return len(sources) != 0
 }
 
-// ValidateDate validates the provided start and end date strings.
-// It prints an error message and returns false if either date string is empty
-// or if there is an error parsing the dates.
-// It returns the parsed start and end dates if validation is successful.
-func ValidateDate(startDateStr, endDateStr string) (bool, time.Time, time.Time) {
-	if startDateStr == "" || endDateStr == "" {
-		fmt.Println("Please specify both start date and end date or omit them." +
-			"Date format - yyyy-mm-dd")
-		return false, time.Time{}, time.Time{}
+// ValidateDate validates the provided start and end dates.
+// It returns an error if the start date is after the end date, otherwise, it returns nil.
+func ValidateDate(startDate, endDate time.Time) error {
+	if startDate.IsZero() || endDate.IsZero() {
+		return errors.New("start date or end date is empty or incorrect")
 	}
-
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-	if err != nil {
-		fmt.Println("Error parsing start date:", err)
-		return false, time.Time{}, time.Time{}
-	}
-
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		fmt.Println("Error parsing end date:", err)
-		return false, time.Time{}, time.Time{}
-	}
-
 	if startDate.After(endDate) {
-		return false, time.Time{}, time.Time{}
+		return errors.New("start date is after end date")
 	}
-
-	return true, startDate, endDate
-}
-
-// CheckUnique returns a slice containing only unique strings from the input slice.
-func CheckUnique(input []string) []string {
-	uniqueMap := make(map[string]struct{})
-	var uniqueList []string
-	for _, item := range input {
-		if _, ok := uniqueMap[item]; !ok {
-			uniqueMap[item] = struct{}{}
-			uniqueList = append(uniqueList, item)
-		}
-	}
-	return uniqueList
+	return nil
 }

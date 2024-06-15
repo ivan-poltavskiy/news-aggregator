@@ -108,7 +108,7 @@ func TestFetchKeywords(t *testing.T) {
 func TestFetchDateFilters(t *testing.T) {
 	cli := &CommandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
 	var filters []filter.ArticleFilter
-	filters = fetchDateFilters(cli, filters)
+	filters, _ = buildDateFilters(cli, filters)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
@@ -117,13 +117,13 @@ func TestFetchDateFilters(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(filters, expectedFilters) {
-		t.Errorf("fetchDateFilters() failed, got: %v, want: %v", filters, expectedFilters)
+		t.Errorf("buildDateFilters() failed, got: %v, want: %v", filters, expectedFilters)
 	}
 }
 
 func TestFetchParameters(t *testing.T) {
 	cli := &CommandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	filters, uniqueSources := fetchParameters(cli)
+	filters, uniqueSources, _ := fetchParameters(cli)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
@@ -195,5 +195,39 @@ func TestNewCommandLine(t *testing.T) {
 	}
 	if cli.help {
 		t.Errorf("Expected help to be false, got true")
+	}
+}
+
+func TestCheckUnique(t *testing.T) {
+	type args struct {
+		input []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Check unique with 3 identical values",
+			args: args{
+				input: []string{"Check", "Check", "Check"},
+			},
+			want: []string{"Check"},
+		},
+
+		{
+			name: "Check unique with 5 identical values",
+			args: args{
+				input: []string{"Check", "Random", "Check", "Random", "Check"},
+			},
+			want: []string{"Check", "Random"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkUnique(tt.args.input); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Actual result %v, expexted %v", got, tt.want)
+			}
+		})
 	}
 }

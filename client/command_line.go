@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+	"time"
 )
 
 // CommandLineClient represents a command line client for the news-aggregator application.
@@ -60,7 +61,10 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, nil
 	}
 
-	filters, uniqueSources := fetchParameters(cli)
+	filters, uniqueSources, fetchParametrsError := fetchParameters(cli)
+	if fetchParametrsError != nil {
+		return nil, fetchParametrsError
+	}
 
 	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
 	if err != nil {
@@ -150,33 +154,56 @@ func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
 
 // fetchParameters extracts and validates command line parameters,
 // including sources and filters, and returns them for use in article fetching.
-func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) {
+func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string, error) {
 	sourceNames := strings.Split(cli.sources, ",")
 	var filters []filter.ArticleFilter
 
 	filters = buildKeywordFilter(cli, filters)
-	filters = fetchDateFilters(cli, filters)
-	uniqueSources := validator.CheckUnique(sourceNames)
-	return filters, uniqueSources
+	filters, err := buildDateFilters(cli, filters)
+	if err != nil {
+		return nil, nil, err
+	}
+	uniqueSources := checkUnique(sourceNames)
+	return filters, uniqueSources, nil
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
 func buildKeywordFilter(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
-		uniqueKeywords := validator.CheckUnique(keywords)
+		uniqueKeywords := checkUnique(keywords)
 		filtersForTemplate = append(filtersForTemplate, "Keywords: "+strings.Join(uniqueKeywords, ", "))
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
 }
 
-// fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
-func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	isValid, startDate, endDate := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
-	if isValid {
+// buildDateFilters extracts date filters from command line arguments and adds them to the filters.
+func buildDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+
+	startDate, _ := time.Parse("2006-01-02", cli.startDateStr)
+
+	endDate, _ := time.Parse("2006-01-02", cli.endDateStr)
+
+	validationErr := validator.ValidateDate(startDate, endDate)
+
+	if validationErr == nil {
 		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
+		return filters, nil
 	}
-	return filters
+	return nil, validationErr
+}
+
+// CheckUnique returns a slice containing only unique strings from the input slice.
+func checkUnique(input []string) []string {
+	uniqueMap := make(map[string]struct{})
+	var uniqueList []string
+	for _, item := range input {
+		if _, ok := uniqueMap[item]; !ok {
+			uniqueMap[item] = struct{}{}
+			uniqueList = append(uniqueList, item)
+		}
+	}
+	return uniqueList
 }
