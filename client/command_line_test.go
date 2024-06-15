@@ -94,14 +94,14 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 func TestFetchKeywords(t *testing.T) {
 	cli := &CommandLineClient{keywords: "keyword1,keyword2"}
 	var filters []filter.ArticleFilter
-	filters = fetchKeywords(cli, filters)
+	filters = buildKeywordFilter(cli, filters)
 
 	expectedFilters := []filter.ArticleFilter{
 		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
 	}
 
 	if !reflect.DeepEqual(filters, expectedFilters) {
-		t.Errorf("fetchKeywords() failed, got: %v, want: %v", filters, expectedFilters)
+		t.Errorf("buildKeywordFilter() failed, got: %v, want: %v", filters, expectedFilters)
 	}
 }
 

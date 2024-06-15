@@ -154,14 +154,14 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string) 
 	sourceNames := strings.Split(cli.sources, ",")
 	var filters []filter.ArticleFilter
 
-	filters = fetchKeywords(cli, filters)
+	filters = buildKeywordFilter(cli, filters)
 	filters = fetchDateFilters(cli, filters)
 	uniqueSources := validator.CheckUnique(sourceNames)
 	return filters, uniqueSources
 }
 
-// fetchKeywords extracts keywords from command line arguments and adds them to the filters.
-func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
+// buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
+func buildKeywordFilter(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := validator.CheckUnique(keywords)
@@ -173,7 +173,7 @@ func fetchKeywords(cli *CommandLineClient, filters []filter.ArticleFilter) []fil
 
 // fetchDateFilters extracts date filters from command line arguments and adds them to the filters.
 func fetchDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	isValid, startDate, endDate := validator.CheckData(cli.startDateStr, cli.endDateStr)
+	isValid, startDate, endDate := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
 	if isValid {
 		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
 		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})

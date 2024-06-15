@@ -37,7 +37,7 @@ func TestCheckSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CheckSource(tt.args.sources); got != tt.want {
+			if got := ValidateSource(tt.args.sources); got != tt.want {
 				t.Errorf("Actual result %v, expexted %v", got, tt.want)
 			}
 		})
@@ -99,7 +99,7 @@ func TestCheckData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, got2 := CheckData(tt.args.startDateStr, tt.args.endDateStr)
+			got, got1, got2 := ValidateDate(tt.args.startDateStr, tt.args.endDateStr)
 			if got != tt.want {
 				t.Errorf("Actual bool var %v, expected %v", got, tt.want)
 			}

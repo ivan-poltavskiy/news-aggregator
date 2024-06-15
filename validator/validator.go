@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-// CheckSource validates the provided list of news articles.
+// ValidateSource validates the provided list of news articles.
 // It returns a message prompting the user to specify at least one correct news source
 // if the input slice is empty. The supported news sources are listed in the message.
-func CheckSource(sources []article.Article) string {
+func ValidateSource(sources []article.Article) string {
 	if len(sources) == 0 {
 		return "Please, specify at least one news source. " +
 			"The program supports such news resources:\nABC, BBC, NBC, USA " +
@@ -18,11 +18,11 @@ func CheckSource(sources []article.Article) string {
 	return ""
 }
 
-// CheckData validates the provided start and end date strings.
+// ValidateDate validates the provided start and end date strings.
 // It prints an error message and returns false if either date string is empty
 // or if there is an error parsing the dates.
 // It returns the parsed start and end dates if validation is successful.
-func CheckData(startDateStr, endDateStr string) (bool, time.Time, time.Time) {
+func ValidateDate(startDateStr, endDateStr string) (bool, time.Time, time.Time) {
 	if startDateStr == "" || endDateStr == "" {
 		fmt.Println("Please specify both start date and end date or omit them." +
 			"Date format - yyyy-mm-dd")

@@ -40,7 +40,7 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		return nil, err
 	}
 
-	fmt.Println(validator.CheckSource(articles))
+	fmt.Println(validator.ValidateSource(articles))
 
 	for _, f := range filters {
 		articles = f.Filter(articles)
