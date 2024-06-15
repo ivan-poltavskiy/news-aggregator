@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-// CommandLineClient represents a command line client for the news-aggregator application.
-type CommandLineClient struct {
+// commandLineClient represents a command line client for the news-aggregator application.
+type commandLineClient struct {
 	aggregator       Aggregator
 	sources          string
 	keywords         string
@@ -29,9 +29,9 @@ type CommandLineClient struct {
 
 var filtersForTemplate []string
 
-// NewCommandLine creates and initializes a new CommandLineClient with the provided aggregator.
-func NewCommandLine(aggregator Aggregator) *CommandLineClient {
-	cli := &CommandLineClient{aggregator: aggregator}
+// NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
+func NewCommandLine(aggregator Aggregator) *commandLineClient {
+	cli := &commandLineClient{aggregator: aggregator}
 	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
@@ -44,7 +44,7 @@ func NewCommandLine(aggregator Aggregator) *CommandLineClient {
 }
 
 // printUsage prints the usage instructions
-func (cli *CommandLineClient) printUsage() {
+func (cli *commandLineClient) printUsage() {
 	fmt.Println("Usage of news-aggregator:" +
 		"\nType --sources, and then list the resources you want to retrieve information from. " +
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
@@ -55,7 +55,7 @@ func (cli *CommandLineClient) printUsage() {
 }
 
 // FetchArticles fetches articles based on the command line arguments.
-func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
+func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 	if cli.help {
 		cli.printUsage()
 		return nil, nil
@@ -75,7 +75,7 @@ func (cli *CommandLineClient) FetchArticles() ([]article.Article, error) {
 }
 
 // Print prints the provided articles using a template.
-func (cli *CommandLineClient) Print(articles []article.Article) {
+func (cli *commandLineClient) Print(articles []article.Article) {
 	funcMap := template.FuncMap{
 		"emphasise": func(keywords, text string) string {
 			if keywords == "" {
@@ -139,7 +139,7 @@ func (cli *CommandLineClient) Print(articles []article.Article) {
 }
 
 // sortedByDate sorts news by ASC or DESC.
-func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
+func (cli *commandLineClient) sortedByDate(articles []article.Article) {
 
 	if strings.ToLower(cli.sortBy) == "asc" {
 		sort.Slice(articles, func(i, j int) bool {
@@ -154,7 +154,7 @@ func (cli *CommandLineClient) sortedByDate(articles []article.Article) {
 
 // fetchParameters extracts and validates command line parameters,
 // including sources and filters, and returns them for use in article fetching.
-func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string, error) {
+func fetchParameters(cli *commandLineClient) ([]filter.ArticleFilter, []string, error) {
 	sourceNames := strings.Split(cli.sources, ",")
 	var filters []filter.ArticleFilter
 
@@ -168,7 +168,7 @@ func fetchParameters(cli *CommandLineClient) ([]filter.ArticleFilter, []string, 
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
-func buildKeywordFilter(cli *CommandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
+func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := checkUnique(keywords)
@@ -179,7 +179,7 @@ func buildKeywordFilter(cli *CommandLineClient, filters []filter.ArticleFilter) 
 }
 
 // buildDateFilters extracts date filters from command line arguments and adds them to the filters.
-func buildDateFilters(cli *CommandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
 
 	startDate, _ := time.Parse("2006-01-02", cli.startDateStr)
 

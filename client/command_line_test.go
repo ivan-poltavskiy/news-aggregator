@@ -76,7 +76,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
-			cli := &CommandLineClient{
+			cli := &commandLineClient{
 				aggregator:   tt.fields.aggregator,
 				sources:      tt.fields.sources,
 				keywords:     tt.fields.keywords,
@@ -92,7 +92,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 }
 
 func TestFetchKeywords(t *testing.T) {
-	cli := &CommandLineClient{keywords: "keyword1,keyword2"}
+	cli := &commandLineClient{keywords: "keyword1,keyword2"}
 	var filters []filter.ArticleFilter
 	filters = buildKeywordFilter(cli, filters)
 
@@ -106,7 +106,7 @@ func TestFetchKeywords(t *testing.T) {
 }
 
 func TestFetchDateFilters(t *testing.T) {
-	cli := &CommandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
+	cli := &commandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
 	var filters []filter.ArticleFilter
 	filters, _ = buildDateFilters(cli, filters)
 
@@ -122,7 +122,7 @@ func TestFetchDateFilters(t *testing.T) {
 }
 
 func TestFetchParameters(t *testing.T) {
-	cli := &CommandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
+	cli := &commandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
 	filters, uniqueSources, _ := fetchParameters(cli)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -143,7 +143,7 @@ func TestFetchParameters(t *testing.T) {
 }
 
 func TestCommandLineClient_printUsage(t *testing.T) {
-	cli := &CommandLineClient{}
+	cli := &commandLineClient{}
 	expectedOutput := "Usage of news-aggregator:" +
 		"\nType --sources, and then list the resources you want to retrieve information from. " +
 		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
