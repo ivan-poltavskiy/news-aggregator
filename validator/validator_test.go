@@ -14,16 +14,14 @@ func TestCheckSource(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want string
+		want bool
 	}{
 		{
 			name: "Check empty sources",
 			args: args{
 				sources: []article.Article{},
 			},
-			want: "Please, specify at least one news source. " +
-				"The program supports such news resources:\nABC, BBC, NBC, USA " +
-				"Today and Washington Times.",
+			want: false,
 		},
 
 		{
@@ -32,7 +30,7 @@ func TestCheckSource(t *testing.T) {
 				sources: []article.Article{
 					{Title: "testTitle", Description: "testDescription", Link: "testLink", Date: time.Date(2003, time.January, 20, 0, 0, 0, 0, time.UTC)}},
 			},
-			want: "",
+			want: true,
 		},
 	}
 	for _, tt := range tests {

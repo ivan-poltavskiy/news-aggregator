@@ -6,16 +6,10 @@ import (
 	"time"
 )
 
-// ValidateSource validates the provided list of news articles.
-// It returns a message prompting the user to specify at least one correct news source
-// if the input slice is empty. The supported news sources are listed in the message.
-func ValidateSource(sources []article.Article) string {
-	if len(sources) == 0 {
-		return "Please, specify at least one news source. " +
-			"The program supports such news resources:\nABC, BBC, NBC, USA " +
-			"Today and Washington Times."
-	}
-	return ""
+// ValidateSource checks if the provided list of news articles contains at least one article.
+// If the input slice is empty, the function will return false, indicating that there are no valid news sources.
+func ValidateSource(sources []article.Article) bool {
+	return len(sources) != 0
 }
 
 // ValidateDate validates the provided start and end date strings.
