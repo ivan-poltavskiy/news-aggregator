@@ -3,7 +3,13 @@
    Articles not found.
 {{- else -}}
 Articles found: {{.Count}}
-Filters applied: {{.Filters}}
+Filters applied:
+    {{- if (index .Filters 0) }}
+- Keywords: {{ index .Filters 0 }}
+    {{- end }}
+    {{- if (and (index .Filters 1) (index .Filters 2)) }}
+- Date range: {{ index .Filters 1 }} to {{ index .Filters 2 }}
+    {{- end }}
     {{- if .SortingBySources }}
         {{- range $sourceName, $articles := .ArticlesBySource }}
 Source: {{ $sourceName }}

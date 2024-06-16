@@ -3,7 +3,6 @@ package validator
 import (
 	"errors"
 	"news_aggregator/entity/article"
-	"time"
 )
 
 // ValidateSource checks if the provided list of news articles contains at least one article.
@@ -14,12 +13,14 @@ func ValidateSource(sources []article.Article) bool {
 
 // ValidateDate validates the provided start and end dates.
 // It returns an error if the start date is after the end date, otherwise, it returns nil.
-func ValidateDate(startDate, endDate time.Time) error {
-	if startDate.IsZero() || endDate.IsZero() {
-		return errors.New("start date or end date is empty or incorrect")
+func ValidateDate(startDate, endDate string) (error, bool) {
+
+	if startDate == "" && endDate == "" {
+		return nil, false
 	}
-	if startDate.After(endDate) {
-		return errors.New("start date is after end date")
+	if startDate == "" || endDate == "" {
+		return errors.New("either both start date and end date must be provided, or neither"), false
 	}
-	return nil
+
+	return nil, true
 }

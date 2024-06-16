@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"news_aggregator/entity/article"
@@ -27,8 +28,6 @@ type commandLineClient struct {
 	help             bool
 }
 
-var filtersForTemplate []string
-
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
@@ -50,9 +49,9 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, nil
 	}
 
-	filters, uniqueSources, fetchParametrsError := fetchParameters(cli)
-	if fetchParametrsError != nil {
-		return nil, fetchParametrsError
+	filters, uniqueSources, fetchParametersError := fetchParameters(cli)
+	if fetchParametersError != nil {
+		return nil, fetchParametersError
 	}
 
 	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
@@ -98,13 +97,13 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	}
 
 	outputData := struct {
-		Filters          string
+		Filters          []string
 		Count            int
 		Articles         []articleData
 		ArticlesBySource map[source.Name][]articleData
 		SortingBySources bool
 	}{
-		Filters:          strings.Join(filtersForTemplate, ", "),
+		Filters:          []string{cli.keywords, cli.startDateStr, cli.endDateStr},
 		Count:            len(articles),
 		Articles:         data,
 		SortingBySources: cli.sortingBySources,
@@ -172,7 +171,6 @@ func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) 
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := checkUnique(keywords)
-		filtersForTemplate = append(filtersForTemplate, "Keywords: "+strings.Join(uniqueKeywords, ", "))
 		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
 	}
 	return filters
@@ -181,18 +179,28 @@ func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) 
 // buildDateFilters extracts date filters from command line arguments and adds them to the filters.
 func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
 
-	startDate, _ := time.Parse("2006-01-02", cli.startDateStr)
+	validationErr, isValid := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
 
-	endDate, _ := time.Parse("2006-01-02", cli.endDateStr)
-
-	validationErr := validator.ValidateDate(startDate, endDate)
-
-	if validationErr == nil {
-		filtersForTemplate = append(filtersForTemplate, fmt.Sprintf("Date filter - %s to %s", cli.startDateStr, cli.endDateStr))
-		filters = append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate})
-		return filters, nil
+	if validationErr != nil {
+		return nil, validationErr
 	}
-	return nil, validationErr
+	if isValid {
+
+		startDate, err := time.Parse("2006-01-02", cli.startDateStr)
+
+		if err != nil {
+			return nil, errors.New("Invalid start date: " + cli.startDateStr)
+		}
+
+		endDate, err := time.Parse("2006-01-02", cli.endDateStr)
+
+		if err != nil {
+			return nil, errors.New("Invalid end date: " + cli.endDateStr)
+		}
+
+		return append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate}), nil
+	}
+	return filters, nil
 }
 
 // CheckUnique returns a slice containing only unique strings from the input slice.
