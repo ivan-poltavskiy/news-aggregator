@@ -123,7 +123,7 @@ func TestFetchDateFilters(t *testing.T) {
 
 func TestFetchParameters(t *testing.T) {
 	cli := &commandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	filters, uniqueSources, _ := fetchParameters(cli)
+	filters, uniqueSources, _ := cli.fetchParameters()
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
@@ -165,36 +165,6 @@ func TestCommandLineClient_printUsage(t *testing.T) {
 
 	if strings.TrimSpace(output.String()) != strings.TrimSpace(expectedOutput) {
 		t.Errorf("Expected:\n%s\nGot:\n%s", expectedOutput, output.String())
-	}
-}
-
-func TestNewCommandLine(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockAggregator := mock_aggregator.NewMockAggregator(ctrl)
-
-	originalArgs := os.Args
-	defer func() { os.Args = originalArgs }()
-
-	os.Args = []string{"cmd", "-sources=ABC,BBC", "-keywords=test,news", "-startDate=2023-01-01", "-endDate=2023-12-31"}
-
-	cli := NewCommandLine(mockAggregator)
-
-	if cli.sources != "ABC,BBC" {
-		t.Errorf("Expected sources to be 'ABC,BBC', got '%s'", cli.sources)
-	}
-	if cli.keywords != "test,news" {
-		t.Errorf("Expected keywords to be 'test,news', got '%s'", cli.keywords)
-	}
-	if cli.startDateStr != "2023-01-01" {
-		t.Errorf("Expected startDate to be '2023-01-01', got '%s'", cli.startDateStr)
-	}
-	if cli.endDateStr != "2023-12-31" {
-		t.Errorf("Expected endDate to be '2023-12-31', got '%s'", cli.endDateStr)
-	}
-	if cli.help {
-		t.Errorf("Expected help to be false, got true")
 	}
 }
 

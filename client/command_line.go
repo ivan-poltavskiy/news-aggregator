@@ -49,7 +49,7 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, nil
 	}
 
-	filters, uniqueSources, fetchParametersError := fetchParameters(cli)
+	filters, uniqueSources, fetchParametersError := cli.fetchParameters()
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}
@@ -139,7 +139,7 @@ func (cli *commandLineClient) printUsage() {
 
 // fetchParameters extracts and validates command line parameters,
 // including sources and filters, and returns them for use in article fetching.
-func fetchParameters(cli *commandLineClient) ([]filter.ArticleFilter, []string, error) {
+func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []string, error) {
 	sourceNames := strings.Split(cli.sources, ",")
 	var filters []filter.ArticleFilter
 

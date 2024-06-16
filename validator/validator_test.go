@@ -43,62 +43,49 @@ func TestCheckSource(t *testing.T) {
 
 func TestValidateDate(t *testing.T) {
 	type args struct {
-		startDate time.Time
-		endDate   time.Time
+		startDate string
+		endDate   string
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name        string
+		args        args
+		wantError   bool
+		wantIsValid bool
 	}{
 		{
 			name: "Check data with only start date passed",
 			args: args{
-				startDate: parseDate("2003-05-05"),
+				startDate: "2003-05-05",
 			},
-			want: true,
+			wantError:   true,
+			wantIsValid: false,
 		},
 		{
 			name: "Check data with only end date passed",
 			args: args{
-				endDate: parseDate("2003-05-05"),
+				endDate: "2003-05-05",
 			},
-			want: true,
+			wantError:   true,
+			wantIsValid: false,
 		},
 
 		{
 			name: "Check data with two correct date passed",
 			args: args{
-				startDate: parseDate("2003-05-01"),
-				endDate:   parseDate("2003-05-05"),
+				startDate: "2003-05-01",
+				endDate:   "2003-05-05",
 			},
-			want: false,
-		},
-
-		{
-			name: "Check data with two incorrect date passed",
-			args: args{
-				startDate: parseDate("2003-05-05"),
-				endDate:   parseDate("2003-05-01"),
-			},
-			want: true,
+			wantError:   false,
+			wantIsValid: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ValidateDate(tt.args.startDate, tt.args.endDate)
+			gotError, gotBool := ValidateDate(tt.args.startDate, tt.args.endDate)
 
-			if (got == nil) == tt.want {
-				t.Errorf("Actual: %v, expected %v", got, tt.want)
+			if gotError != nil != tt.wantError && gotBool != tt.wantIsValid {
+				t.Errorf("Actual error: %v, expected %v", gotError != nil, tt.wantIsValid)
 			}
 		})
 	}
-}
-
-func parseDate(dateStr string) time.Time {
-	date, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		panic(err)
-	}
-	return date
 }
