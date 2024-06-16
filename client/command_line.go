@@ -10,7 +10,6 @@ import (
 	"news_aggregator/validator"
 	"os"
 	"regexp"
-	"sort"
 	"strings"
 	"text/template"
 	"time"
@@ -58,7 +57,11 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 	if err != nil {
 		return nil, err
 	}
-	cli.sortedByDate(articles)
+
+	articles, fetchParametersError = SortArticle(articles, cli.sortBy)
+	if fetchParametersError != nil {
+		return nil, fetchParametersError
+	}
 	return articles, nil
 }
 
@@ -150,20 +153,6 @@ func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []strin
 	}
 	uniqueSources := checkUnique(sourceNames)
 	return filters, uniqueSources, nil
-}
-
-// sortedByDate sorts news by ASC or DESC.
-func (cli *commandLineClient) sortedByDate(articles []article.Article) {
-
-	if strings.ToLower(cli.sortBy) == "asc" {
-		sort.Slice(articles, func(i, j int) bool {
-			return articles[i].Date.Before(articles[j].Date)
-		})
-	} else if strings.ToLower(cli.sortBy) == "desc" {
-		sort.Slice(articles, func(i, j int) bool {
-			return articles[i].Date.After(articles[j].Date)
-		})
-	}
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
