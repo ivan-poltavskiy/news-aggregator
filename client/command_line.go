@@ -30,7 +30,7 @@ type commandLineClient struct {
 var filtersForTemplate []string
 
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
-func NewCommandLine(aggregator Aggregator) *commandLineClient {
+func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
 	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
@@ -41,17 +41,6 @@ func NewCommandLine(aggregator Aggregator) *commandLineClient {
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
 	return cli
-}
-
-// printUsage prints the usage instructions
-func (cli *commandLineClient) printUsage() {
-	fmt.Println("Usage of news-aggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. " +
-		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
-		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
-		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
-		"Date format - yyyy-mm-dd" + "" +
-		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
 }
 
 // FetchArticles fetches articles based on the command line arguments.
@@ -138,18 +127,15 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	}
 }
 
-// sortedByDate sorts news by ASC or DESC.
-func (cli *commandLineClient) sortedByDate(articles []article.Article) {
-
-	if strings.ToLower(cli.sortBy) == "asc" {
-		sort.Slice(articles, func(i, j int) bool {
-			return articles[i].Date.Before(articles[j].Date)
-		})
-	} else if strings.ToLower(cli.sortBy) == "desc" {
-		sort.Slice(articles, func(i, j int) bool {
-			return articles[i].Date.After(articles[j].Date)
-		})
-	}
+// printUsage prints the usage instructions
+func (cli *commandLineClient) printUsage() {
+	fmt.Println("Usage of news-aggregator:" +
+		"\nType --sources, and then list the resources you want to retrieve information from. " +
+		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
+		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
+		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
+		"Date format - yyyy-mm-dd" + "" +
+		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
 }
 
 // fetchParameters extracts and validates command line parameters,
@@ -165,6 +151,20 @@ func fetchParameters(cli *commandLineClient) ([]filter.ArticleFilter, []string, 
 	}
 	uniqueSources := checkUnique(sourceNames)
 	return filters, uniqueSources, nil
+}
+
+// sortedByDate sorts news by ASC or DESC.
+func (cli *commandLineClient) sortedByDate(articles []article.Article) {
+
+	if strings.ToLower(cli.sortBy) == "asc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.Before(articles[j].Date)
+		})
+	} else if strings.ToLower(cli.sortBy) == "desc" {
+		sort.Slice(articles, func(i, j int) bool {
+			return articles[i].Date.After(articles[j].Date)
+		})
+	}
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
