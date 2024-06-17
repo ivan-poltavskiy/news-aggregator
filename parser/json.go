@@ -3,7 +3,6 @@ package parser
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"os"
@@ -15,9 +14,8 @@ type Json struct {
 
 // ParseSource reads and parses a JSON file specified by the path and returns a slice of articles.
 func (jsonFile Json) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
-	filename := fmt.Sprintf(string(path))
 
-	byteValue, err := os.ReadFile(filename)
+	articleContent, err := os.ReadFile(string(path))
 	if err != nil {
 		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
@@ -26,7 +24,7 @@ func (jsonFile Json) ParseSource(path source.PathToFile, name source.Name) ([]ar
 		Articles []article.Article `json:"articles"`
 	}
 
-	err = json.Unmarshal(byteValue, &articles)
+	err = json.Unmarshal(articleContent, &articles)
 	if err != nil {
 		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
