@@ -37,7 +37,7 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		sourceNames = append(sourceNames, source.Name(name))
 	}
 
-	articles, err := collector.FindByResourcesName(sourceNames)
+	articles, err := collector.FindNewsByResourcesName(sourceNames)
 	if err != nil {
 		return nil, err
 	}

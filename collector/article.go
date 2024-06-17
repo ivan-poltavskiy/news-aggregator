@@ -9,8 +9,8 @@ import (
 
 var Sources []source.Source
 
-// FindByResourcesName returns the list of news from the passed sources.
-func FindByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+// FindNewsByResourcesName returns the list of news from the passed sources.
+func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundNews []article.Article
 

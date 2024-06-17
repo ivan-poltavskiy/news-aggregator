@@ -1,5 +1,5 @@
 // Package collector provides functionality for gathering news from specific sources.
-// FindByResourcesName(sourcesNames []source.Name) ([]article.Article, string)
+// FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, string)
 // is used to receive all news from sources passed to it, if these sources are
 // correct and present in the system
 // findForCurrentSource(currentSource source.Source,

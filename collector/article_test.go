@@ -57,7 +57,7 @@ func TestFindByResourcesName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := FindByResourcesName(tt.args.sourcesNames)
+			got, _ := FindNewsByResourcesName(tt.args.sourcesNames)
 			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
