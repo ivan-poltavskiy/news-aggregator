@@ -16,7 +16,7 @@ func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, err
 
 	for _, name := range sourcesNames {
 		for _, currentSourceType := range Sources {
-			articles, err := findForCurrentSource(currentSourceType, name)
+			articles, err := findNewsForCurrentSource(currentSourceType, name)
 			if err != nil {
 				return nil, err
 			}
@@ -32,7 +32,7 @@ func InitializeSource(sources []source.Source) {
 }
 
 // Returns the list of news from the passed source.
-func findForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil

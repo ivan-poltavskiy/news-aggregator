@@ -2,13 +2,27 @@ package validator
 
 import (
 	"errors"
-	"news_aggregator/entity/article"
+	"fmt"
+	"news_aggregator/entity/source"
+	"slices"
+	"strings"
 )
 
 // ValidateSource checks if the provided list of news articles contains at least one article.
 // If the input slice is empty, the function will return false, indicating that there are no valid news sources.
-func ValidateSource(sources []article.Article) bool {
-	return len(sources) != 0
+func ValidateSource(sources []string) (bool, error) {
+	for _, currentSource := range sources {
+		if !slices.Contains(source.NewsSources, strings.ToLower(currentSource)) {
+			return false, errors.New("Source " + currentSource + " is not valid. " +
+				"The program supports such news resources:\n" + strings.Join(source.NewsSources, ", "))
+		}
+	}
+	if len(sources) == 0 {
+		return false, errors.New(fmt.Sprintf("Please, specify at least one "+
+			"news source. The program supports such news resources:\n%s.",
+			strings.Join(source.NewsSources, ", ")))
+	}
+	return true, nil
 }
 
 // ValidateDate validates the provided start and end dates.

@@ -16,9 +16,9 @@ const (
 
 // NewsSources stores name of resources from which news can be obtained.
 var NewsSources = []string{
-	"ABC",
-	"BBC",
-	"NBC",
-	"USA Today",
-	"Washington Times",
+	"abc",
+	"bbc",
+	"nbc",
+	"usatoday",
+	"washington",
 }

@@ -1,15 +1,12 @@
 package aggregator
 
 import (
-	"errors"
-	"fmt"
 	"news_aggregator/client"
 	"news_aggregator/collector"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"news_aggregator/filter"
 	"news_aggregator/validator"
-	"strings"
 )
 
 // news provides methods for aggregating collector articles from various sources.
@@ -37,15 +34,14 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		sourceNames = append(sourceNames, source.Name(name))
 	}
 
-	articles, err := collector.FindNewsByResourcesName(sourceNames)
-	if err != nil {
+	validateSource, err := validator.ValidateSource(sources)
+	if !validateSource {
 		return nil, err
 	}
 
-	if !validator.ValidateSource(articles) {
-		return nil, errors.New(fmt.Sprintf("Please, specify at least one "+
-			"news source. The program supports such news resources:\n%s.",
-			strings.Join(source.NewsSources, ", ")))
+	articles, err := collector.FindNewsByResourcesName(sourceNames)
+	if err != nil {
+		return nil, err
 	}
 
 	for _, f := range filters {

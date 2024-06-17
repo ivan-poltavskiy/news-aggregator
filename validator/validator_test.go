@@ -1,14 +1,12 @@
 package validator
 
 import (
-	"news_aggregator/entity/article"
 	"testing"
-	"time"
 )
 
 func TestCheckSource(t *testing.T) {
 	type args struct {
-		sources []article.Article
+		sources []string
 	}
 	tests := []struct {
 		name string
@@ -18,7 +16,7 @@ func TestCheckSource(t *testing.T) {
 		{
 			name: "Check empty sources",
 			args: args{
-				sources: []article.Article{},
+				sources: []string{},
 			},
 			want: false,
 		},
@@ -26,16 +24,18 @@ func TestCheckSource(t *testing.T) {
 		{
 			name: "Check not empty sources",
 			args: args{
-				sources: []article.Article{
-					{Title: "testTitle", Description: "testDescription", Link: "testLink", Date: time.Date(2003, time.January, 20, 0, 0, 0, 0, time.UTC)}},
+				sources: []string{
+					"abc",
+					"bbc",
+				},
 			},
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ValidateSource(tt.args.sources); got != tt.want {
-				t.Errorf("Actual result %v, expexted %v", got, tt.want)
+			if gotBool, _ := ValidateSource(tt.args.sources); gotBool != tt.want {
+				t.Errorf("Actual result %v, expexted %v", gotBool, tt.want)
 			}
 		})
 	}
