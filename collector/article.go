@@ -3,7 +3,6 @@ package collector
 import (
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
-	"news_aggregator/parser"
 	"strings"
 )
 
@@ -38,7 +37,7 @@ func findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]
 		return nil, nil
 	}
 
-	currentParser, err := parser.GetParserBySourceType(currentSource.SourceType)
+	currentParser, err := GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
 		return nil, err
 	}

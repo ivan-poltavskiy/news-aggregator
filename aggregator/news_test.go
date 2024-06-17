@@ -4,7 +4,6 @@ import (
 	"news_aggregator/collector"
 	"news_aggregator/entity/source"
 	"news_aggregator/filter"
-	"news_aggregator/parser"
 	"reflect"
 	"testing"
 	"time"
@@ -16,7 +15,7 @@ func beforeEach() {
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "UsaToday"},
 	})
-	parser.Initialize()
+	collector.Initialize()
 }
 
 func TestNews_Aggregate(t *testing.T) {

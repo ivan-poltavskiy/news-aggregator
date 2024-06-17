@@ -1,9 +1,10 @@
-package parser
+package collector
 
 import (
 	"errors"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
+	"news_aggregator/parser"
 	"news_aggregator/parser/html"
 )
 
@@ -13,8 +14,8 @@ var Parsers map[source.Type]Parser
 // Initialize initializes a parser map with available parsers for different file types.
 func Initialize() {
 	Parsers = map[source.Type]Parser{
-		source.RSS:      Rss{},
-		source.JSON:     Json{},
+		source.RSS:      parser.Rss{},
+		source.JSON:     parser.Json{},
 		source.UsaToday: html.UsaToday{},
 	}
 }

@@ -2,7 +2,6 @@ package collector
 
 import (
 	"news_aggregator/entity/source"
-	"news_aggregator/parser"
 	"reflect"
 	"testing"
 )
@@ -12,7 +11,7 @@ func beforeEach() {
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	})
-	parser.Initialize()
+	Initialize()
 }
 
 func TestFindByResourcesName(t *testing.T) {
