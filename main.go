@@ -15,7 +15,7 @@ func main() {
 		{Name: "nbc", PathToFile: "resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "abc", PathToFile: "resources/abcnews-international-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "washington", PathToFile: "resources/washingtontimes-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "usatoday", PathToFile: "resources/usatoday-world-news.html", SourceType: "Html"},
+		{Name: "usatoday", PathToFile: "resources/usatoday-world-news.html", SourceType: "UsaToday"},
 	})
 	parser.Initialize()
 

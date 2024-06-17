@@ -14,7 +14,7 @@ func beforeEach() {
 	collector.InitializeSource([]source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
-		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "Html"},
+		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "UsaToday"},
 	})
 	parser.Initialize()
 }

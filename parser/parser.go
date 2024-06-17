@@ -13,9 +13,9 @@ var Parsers map[source.Type]Parser
 // Initialize initializes a parser map with available parsers for different file types.
 func Initialize() {
 	Parsers = map[source.Type]Parser{
-		"RSS":  Rss{},
-		"JSON": Json{},
-		"Html": html.UsaToday{},
+		source.RSS:      Rss{},
+		source.JSON:     Json{},
+		source.UsaToday: html.UsaToday{},
 	}
 }
 
