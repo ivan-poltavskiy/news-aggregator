@@ -11,7 +11,7 @@ var Sources []source.Source
 // FindNewsByResourcesName returns the list of news from the passed sources.
 func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
-	var foundNews []article.Article
+	var foundArticles []article.Article
 
 	for _, name := range sourcesNames {
 		for _, currentSourceType := range Sources {
@@ -19,10 +19,10 @@ func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, err
 			if err != nil {
 				return nil, err
 			}
-			foundNews = append(foundNews, articles...)
+			foundArticles = append(foundArticles, articles...)
 		}
 	}
-	return foundNews, nil
+	return foundArticles, nil
 }
 
 // InitializeSource initializes the resources that will be available for parsing.
