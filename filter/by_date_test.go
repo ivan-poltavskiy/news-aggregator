@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"news_aggregator/constant"
 	"news_aggregator/entity/article"
 	"reflect"
 	"testing"
@@ -65,7 +66,7 @@ func TestByDate_Filter(t *testing.T) {
 }
 
 func parseDate(dateStr string) time.Time {
-	date, err := time.Parse("2006-01-02", dateStr)
+	date, err := time.Parse(constant.DateOutputLayout, dateStr)
 	if err != nil {
 		panic(err)
 	}

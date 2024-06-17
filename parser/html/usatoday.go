@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"news_aggregator/constant"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"os"
@@ -30,7 +31,6 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name)
 		return nil, err
 	}
 
-	const outputLayout = "2006-01-02"
 	baseURL := "https://www.usatoday.com"
 
 	doc.Find("main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a").EachWithBreak(func(i int, s *goquery.Selection) bool {
@@ -58,16 +58,16 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name)
 			}
 		}
 
-		formattedDateStr := parsedDate.Format(outputLayout)
-		formattedDate, err := time.Parse(outputLayout, formattedDateStr)
+		formattedDateStr := parsedDate.Format(constant.DateOutputLayout)
+		formattedDate, err := time.Parse(constant.DateOutputLayout, formattedDateStr)
 		if err != nil {
 			parseError = err
 			return false
 		}
 
 		if formattedDate.Year() < 2000 {
-			formattedDateStr = time.Now().Format(outputLayout)
-			formattedDate, err = time.Parse(outputLayout, formattedDateStr)
+			formattedDateStr = time.Now().Format(constant.DateOutputLayout)
+			formattedDate, err = time.Parse(constant.DateOutputLayout, formattedDateStr)
 			if err != nil {
 				parseError = err
 				return false

@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
+type DateSorter struct {
+}
+
 // SortArticle sorts news by ASC or DESC
-func SortArticle(articles []article.Article, sortBy string) ([]article.Article, error) {
+func (DateSorter) SortArticle(articles []article.Article, sortBy string) ([]article.Article, error) {
 
 	lowerCaseSortParameter := strings.ToLower(sortBy)
 	if lowerCaseSortParameter == "" {

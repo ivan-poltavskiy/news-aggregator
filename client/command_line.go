@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"news_aggregator/constant"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"news_aggregator/filter"
@@ -58,7 +59,7 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, err
 	}
 
-	articles, fetchParametersError = SortArticle(articles, cli.sortBy)
+	articles, fetchParametersError = DateSorter{}.SortArticle(articles, cli.sortBy)
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}
@@ -175,13 +176,13 @@ func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([
 	}
 	if isValid {
 
-		startDate, err := time.Parse("2006-01-02", cli.startDateStr)
+		startDate, err := time.Parse(constant.DateOutputLayout, cli.startDateStr)
 
 		if err != nil {
 			return nil, errors.New("Invalid start date: " + cli.startDateStr)
 		}
 
-		endDate, err := time.Parse("2006-01-02", cli.endDateStr)
+		endDate, err := time.Parse(constant.DateOutputLayout, cli.endDateStr)
 
 		if err != nil {
 			return nil, errors.New("Invalid end date: " + cli.endDateStr)
