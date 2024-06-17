@@ -48,13 +48,13 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name)
 			link = baseURL + link
 		}
 
-		dateStr, _ := s.Find("div.gnt_m_flm_sbt").Attr("data-c-dt")
+		date, _ := s.Find("div.gnt_m_flm_sbt").Attr("data-c-dt")
 		var parsedDate time.Time
 		var err error
 
-		if dateStr != "" {
+		if date != "" {
 			re := regexp.MustCompile("[A-Za-z]+\\s\\d{1,2}")
-			datePart := re.FindString(dateStr)
+			datePart := re.FindString(date)
 			if datePart != "" {
 				datePart = fmt.Sprintf("%s %d", datePart, time.Now().Year())
 				parsedDate, err = time.Parse("January 2 2006", datePart)

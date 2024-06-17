@@ -1,5 +1,14 @@
 package source
 
+// PathToFile describes the path to a specific source in the system
+type PathToFile string
+
+// Name describes the name of source
+type Name string
+
+// Type describes of the type of document for a particular source
+type Type string
+
 // Source is the set of information about source of article.
 type Source struct {
 	Name       Name
