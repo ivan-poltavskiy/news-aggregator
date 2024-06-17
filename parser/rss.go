@@ -20,14 +20,12 @@ func (rss Rss) ParseSource(path source.PathToFile, name source.Name) ([]article.
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
-
 	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			err = fmt.Errorf("cannot close JSON File")
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			err = fmt.Errorf("cannot close RSS file: %w", cerr)
 		}
-	}(file)
+	}()
 
 	feed, err := parser.Parse(file)
 	if err != nil {

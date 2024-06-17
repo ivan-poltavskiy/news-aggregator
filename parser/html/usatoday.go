@@ -3,7 +3,6 @@ package html
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"log"
 	"news_aggregator/entity/article"
 	"news_aggregator/entity/source"
 	"os"
@@ -13,20 +12,18 @@ import (
 )
 
 // UsaToday reads and parses an USAToday`s file specified by the path and returns a slice of articles.
-type UsaToday struct {
-}
+type UsaToday struct{}
 
-func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
+func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name) (articles []article.Article, parseError error) {
 	file, err := os.Open(string(path))
 	if err != nil {
 		return nil, err
 	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Fatal(err)
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			parseError = fmt.Errorf("cannot close HTML file: %w", cerr)
 		}
-	}(file)
+	}()
 
 	doc, err := goquery.NewDocumentFromReader(file)
 	if err != nil {
@@ -35,9 +32,6 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name)
 
 	const outputLayout = "2006-01-02"
 	baseURL := "https://www.usatoday.com"
-
-	var articles []article.Article
-	var parseError error
 
 	doc.Find("main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		title := s.Text()
@@ -50,7 +44,6 @@ func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name)
 
 		date, _ := s.Find("div.gnt_m_flm_sbt").Attr("data-c-dt")
 		var parsedDate time.Time
-		var err error
 
 		if date != "" {
 			re := regexp.MustCompile("[A-Za-z]+\\s\\d{1,2}")
