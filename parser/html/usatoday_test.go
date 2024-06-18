@@ -45,8 +45,8 @@ func TestUsaToday_ParseSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			htmlParser := UsaToday{}
-			if got, _ := htmlParser.ParseSource(tt.args.path, tt.args.name); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ParseSource() = %v, want %v", got, tt.want)
+			if got, _ := htmlParser.Parse(tt.args.path, tt.args.name); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Parse() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -15,7 +15,7 @@ import (
 // UsaToday reads and parses an USAToday`s file specified by the path and returns a slice of articles.
 type UsaToday struct{}
 
-func (htmlParser UsaToday) ParseSource(path source.PathToFile, name source.Name) (articles []article.Article, parseError error) {
+func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (articles []article.Article, parseError error) {
 	file, err := os.Open(string(path))
 	if err != nil {
 		return nil, err

@@ -37,12 +37,12 @@ func findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]
 		return nil, nil
 	}
 
-	currentParser, err := GetParserBySourceType(currentSource.SourceType)
+	sourceParser, err := GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
-		return nil, err
+		return []article.Article{}, err
 	}
 
-	articles, err := currentParser.ParseSource(currentSource.PathToFile, name)
+	articles, err := sourceParser.Parse(currentSource.PathToFile, name)
 	if err != nil {
 		return nil, err
 	}

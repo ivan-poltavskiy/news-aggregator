@@ -12,8 +12,8 @@ import (
 type Rss struct {
 }
 
-// ParseSource reads and parses a XML (RSS) file specified by the path and returns a slice of articles.
-func (rss Rss) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
+// Parse reads and parses a XML (RSS) file specified by the path and returns a slice of articles.
+func (rss Rss) Parse(path source.PathToFile, name source.Name) ([]article.Article, error) {
 
 	parser := gofeed.NewParser()
 	filename := fmt.Sprintf(string(path))

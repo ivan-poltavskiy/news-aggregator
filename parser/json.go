@@ -12,8 +12,8 @@ import (
 type Json struct {
 }
 
-// ParseSource reads and parses a JSON file specified by the path and returns a slice of articles.
-func (jsonFile Json) ParseSource(path source.PathToFile, name source.Name) ([]article.Article, error) {
+// Parse reads and parses a JSON file specified by the path and returns a slice of articles.
+func (jsonFile Json) Parse(path source.PathToFile, name source.Name) ([]article.Article, error) {
 
 	articleContent, err := os.ReadFile(string(path))
 	if err != nil {

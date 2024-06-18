@@ -18,6 +18,7 @@ func beforeEach() {
 	collector.Initialize()
 }
 
+//go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator
 func TestNews_Aggregate(t *testing.T) {
 	beforeEach()
 	type args struct {

@@ -25,8 +25,6 @@ func New() client.Aggregator {
 // Returns:
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
-//
-//go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator
 func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error) {
 	var sourceNames []source.Name
 
