@@ -4,9 +4,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/Masterminds/sprig/v3"
 	"news_aggregator/constant"
 	"news_aggregator/entity/article"
-	"news_aggregator/entity/source"
 	"news_aggregator/filter"
 	"news_aggregator/validator"
 	"os"
@@ -66,20 +66,18 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 	return articles, nil
 }
 
-// Print prints the provided articles using a template.
 func (cli *commandLineClient) Print(articles []article.Article) {
-	funcMap := template.FuncMap{
-		"emphasise": func(keywords, text string) string {
-			if keywords == "" {
-				return text
-			} else {
-				for _, keyword := range strings.Split(keywords, ",") {
-					re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
-					text = re.ReplaceAllString(text, "//"+keyword+"//")
-				}
-				return text
+	funcMap := sprig.FuncMap()
+	funcMap["emphasise"] = func(keywords, text string) string {
+		if keywords == "" {
+			return text
+		} else {
+			for _, keyword := range strings.Split(keywords, ",") {
+				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
+				text = re.ReplaceAllString(text, "//"+keyword+"//")
 			}
-		},
+			return text
+		}
 	}
 
 	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
@@ -88,23 +86,24 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	}
 
 	type articleData struct {
-		Article  article.Article
-		Keywords string
+		Article          article.Article
+		Keywords         string
+		SortingBySources bool
 	}
 
 	var data []articleData
 	for _, art := range articles {
 		data = append(data, articleData{
-			Article:  art,
-			Keywords: cli.keywords,
+			Article:          art,
+			Keywords:         cli.keywords,
+			SortingBySources: cli.sortingBySources,
 		})
 	}
-
 	outputData := struct {
 		Filters          []string
 		Count            int
 		Articles         []articleData
-		ArticlesBySource map[source.Name][]articleData
+		ArticlesBySource map[string][]articleData
 		SortingBySources bool
 	}{
 		Filters:          []string{cli.keywords, cli.startDateStr, cli.endDateStr},
@@ -114,12 +113,13 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	}
 
 	if cli.sortingBySources {
-		outputData.ArticlesBySource = make(map[source.Name][]articleData)
+		outputData.ArticlesBySource = make(map[string][]articleData)
 		for _, art := range articles {
-			sourceName := art.SourceName
+			sourceName := string(art.SourceName) // Преобразование в строку
 			outputData.ArticlesBySource[sourceName] = append(outputData.ArticlesBySource[sourceName], articleData{
-				Article:  art,
-				Keywords: cli.keywords,
+				Article:          art,
+				Keywords:         cli.keywords,
+				SortingBySources: cli.sortingBySources,
 			})
 		}
 	}

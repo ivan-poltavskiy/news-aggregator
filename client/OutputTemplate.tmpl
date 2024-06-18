@@ -9,13 +9,13 @@ Filters applied:
     {{- end }}
     {{- if (and (index .Filters 1) (index .Filters 2)) }}
 - Date range: {{ index .Filters 1 }} to {{ index .Filters 2 }}
-    {{- end }}
+    {{ end }}
     {{- if .SortingBySources }}
         {{- range $sourceName, $articles := .ArticlesBySource }}
-Source: {{ $sourceName }}
+Source: {{ $sourceName  | indent 1 }}
 Number of articles: {{ len $articles }}
     {{- range $articles }}
-        {{ template "articleWithoutSource" . }}
+        {{ template "article" . }}
     {{- end }}
         {{- end }}
     {{- else }}
@@ -32,19 +32,7 @@ Title: {{ .Article.Title.String | emphasise .Keywords }}
 Description: {{ .Article.Description.String | emphasise .Keywords }}
 Link: {{ .Article.Link }}
 Date: {{ .Article.Date }}
+{{- if not .SortingBySources }}
 SourceName: {{.Article.SourceName}}
-{{end}}
-
-{{- define "articleWithoutSource" -}}
--------------------------------
-Title: {{ .Article.Title.String | emphasise .Keywords }}
-Description: {{ .Article.Description.String | emphasise .Keywords }}
-Link: {{ .Article.Link }}
-Date: {{ .Article.Date }}
-{{end}}
-
-{{- define "source_sorting" -}}
-    {{- range .Articles }}
-        {{ template "articleWithoutSource" . }}
-    {{- end }}
-{{end}}
+{{z- end }}
+{{ end }}
