@@ -64,16 +64,16 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 			}
 		}
 
-		formattedDateStr := parsedDate.Format(constant.DateOutputLayout)
-		formattedDate, err := time.Parse(constant.DateOutputLayout, formattedDateStr)
+		articleDate := parsedDate.Format(constant.DateOutputLayout)
+		formattedArticleDate, err := time.Parse(constant.DateOutputLayout, articleDate)
 		if err != nil {
 			parseError = err
 			return false
 		}
 
-		if formattedDate.Year() < 2000 {
-			formattedDateStr = time.Now().Format(constant.DateOutputLayout)
-			formattedDate, err = time.Parse(constant.DateOutputLayout, formattedDateStr)
+		if formattedArticleDate.Year() < 2000 {
+			articleDate = time.Now().Format(constant.DateOutputLayout)
+			formattedArticleDate, err = time.Parse(constant.DateOutputLayout, articleDate)
 			if err != nil {
 				parseError = err
 				return false
@@ -84,7 +84,7 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 			Title:       article.Title(strings.TrimSpace(title)),
 			Description: article.Description(strings.TrimSpace(description)),
 			Link:        article.Link(strings.TrimSpace(link)),
-			Date:        formattedDate,
+			Date:        formattedArticleDate,
 			SourceName:  name,
 		})
 
