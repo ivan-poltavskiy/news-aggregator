@@ -15,6 +15,12 @@ import (
 // UsaToday reads and parses an USAToday`s file specified by the path and returns a slice of articles.
 type UsaToday struct{}
 
+const (
+	articleLinkSelector         = "main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a"
+	articleDescriptionAttribute = "data-c-br"
+	articleDateSelector         = "div.gnt_m_flm_sbt"
+)
+
 func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (articles []article.Article, parseError error) {
 	file, err := os.Open(string(path))
 	if err != nil {
@@ -33,16 +39,16 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 
 	baseURL := "https://www.usatoday.com"
 
-	doc.Find("main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a").EachWithBreak(func(i int, s *goquery.Selection) bool {
+	doc.Find(articleLinkSelector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		title := s.Text()
-		description, _ := s.Attr("data-c-br")
+		description, _ := s.Attr(articleDescriptionAttribute)
 		link, _ := s.Attr("href")
 
 		if !strings.HasPrefix(link, "http") {
 			link = baseURL + link
 		}
 
-		date, _ := s.Find("div.gnt_m_flm_sbt").Attr("data-c-dt")
+		date, _ := s.Find(articleDateSelector).Attr("data-c-dt")
 		var parsedDate time.Time
 
 		if date != "" {
