@@ -2,7 +2,7 @@ package filter
 
 import (
 	"fmt"
-	"github.com/kljensen/snowball"
+	"github.com/reiver/go-porterstemmer"
 	"news_aggregator/entity/article"
 	"strings"
 )
@@ -17,11 +17,7 @@ type ByKeyword struct {
 func (f ByKeyword) Filter(articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 	for _, keyword := range f.Keywords {
-		stemmedKeyword, err := snowball.Stem(keyword, "english", true)
-		if err != nil {
-			fmt.Printf("Error stemming keyword %s: %v\n", keyword, err)
-			continue
-		}
+		stemmedKeyword := porterstemmer.StemString(strings.ToLower(keyword))
 		matchingArticles = append(matchingArticles, filterNewsByKeyword(stemmedKeyword, articles)...)
 	}
 	return matchingArticles
@@ -32,16 +28,8 @@ func filterNewsByKeyword(keyword string, articles []article.Article) []article.A
 	var matchingArticles []article.Article
 
 	for _, a := range articles {
-		titleStemmed, err := snowball.Stem(strings.ToLower(string(a.Title)), "english", true)
-		if err != nil {
-			fmt.Printf("Error stemming title: %v\n", err)
-			continue
-		}
-		descriptionStemmed, err := snowball.Stem(strings.ToLower(string(a.Description)), "english", true)
-		if err != nil {
-			fmt.Printf("Error stemming description: %v\n", err)
-			continue
-		}
+		titleStemmed := porterstemmer.StemString(strings.ToLower(string(a.Title)))
+		descriptionStemmed := porterstemmer.StemString(strings.ToLower(string(a.Description)))
 
 		if strings.Contains(titleStemmed, keyword) || strings.Contains(descriptionStemmed, keyword) {
 			matchingArticles = append(matchingArticles, a)
