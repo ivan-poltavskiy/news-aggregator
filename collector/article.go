@@ -17,13 +17,13 @@ func New(sources []source.Source) *ArticleCollector {
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
-func (c *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (articleCollector *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundArticles []article.Article
 
 	for _, name := range sourcesNames {
-		for _, currentSourceType := range c.Sources {
-			articles, err := c.findNewsForCurrentSource(currentSourceType, name)
+		for _, currentSourceType := range articleCollector.Sources {
+			articles, err := articleCollector.findNewsForCurrentSource(currentSourceType, name)
 			if err != nil {
 				return nil, err
 			}
@@ -34,7 +34,7 @@ func (c *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) (
 }
 
 // Returns the list of news from the passed source.
-func (c *ArticleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func (articleCollector *ArticleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil
