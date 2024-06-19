@@ -11,8 +11,8 @@ import (
 // Parsers stores the mapping of source types to their corresponding parsers.
 var Parsers map[source.Type]Parser
 
-// Initialize initializes a parser map with available parsers for different file types.
-func Initialize() {
+// InitializeParsers initializes a parser map with available parsers for different file types.
+func InitializeParsers() {
 	Parsers = map[source.Type]Parser{
 		source.RSS:      parser.Rss{},
 		source.JSON:     parser.Json{},

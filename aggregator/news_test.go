@@ -9,13 +9,16 @@ import (
 	"time"
 )
 
+var articleCollector *collector.ArticleCollector
+
 func beforeEach() {
-	collector.InitializeSource([]source.Source{
+	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "UsaToday"},
-	})
-	collector.Initialize()
+	}
+	articleCollector = collector.New(sources)
+	collector.InitializeParsers()
 }
 
 //go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator
@@ -90,7 +93,7 @@ func TestNews_Aggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			na := &news{}
+			na := New(articleCollector)
 			got, _ := na.Aggregate(tt.args.sources, tt.args.filters...)
 			if !reflect.DeepEqual(len(got), tt.wantQuantity) {
 				t.Errorf("Aggregate() got = %v, wantQuantity %v", len(got), tt.wantQuantity)

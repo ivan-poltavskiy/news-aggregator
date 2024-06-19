@@ -6,16 +6,24 @@ import (
 	"strings"
 )
 
-var Sources []source.Source
+type ArticleCollector struct {
+	Sources []source.Source
+}
+
+// New create new instance of collector
+func New(sources []source.Source) *ArticleCollector {
+	InitializeParsers()
+	return &ArticleCollector{Sources: sources}
+}
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
-func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (c *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundArticles []article.Article
 
 	for _, name := range sourcesNames {
-		for _, currentSourceType := range Sources {
-			articles, err := findNewsForCurrentSource(currentSourceType, name)
+		for _, currentSourceType := range c.Sources {
+			articles, err := c.findNewsForCurrentSource(currentSourceType, name)
 			if err != nil {
 				return nil, err
 			}
@@ -25,13 +33,8 @@ func FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, err
 	return foundArticles, nil
 }
 
-// InitializeSource initializes the resources that will be available for parsing.
-func InitializeSource(sources []source.Source) {
-	Sources = sources
-}
-
 // Returns the list of news from the passed source.
-func findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func (c *ArticleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil

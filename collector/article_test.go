@@ -6,15 +6,18 @@ import (
 	"testing"
 )
 
+var articleCollector *ArticleCollector
+
 func beforeEach() {
-	InitializeSource([]source.Source{
+	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
-	})
-	Initialize()
+	}
+	articleCollector = New(sources)
+	InitializeParsers()
 }
 
-func TestFindByResourcesName(t *testing.T) {
+func TestFindNewsByResourcesName(t *testing.T) {
 	beforeEach()
 	type args struct {
 		sourcesNames []source.Name
@@ -56,7 +59,7 @@ func TestFindByResourcesName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := FindNewsByResourcesName(tt.args.sourcesNames)
+			got, _ := articleCollector.FindNewsByResourcesName(tt.args.sourcesNames)
 			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
@@ -64,7 +67,7 @@ func TestFindByResourcesName(t *testing.T) {
 	}
 }
 
-func Test_findForCurrentSource(t *testing.T) {
+func TestFindNewsForCurrentSource(t *testing.T) {
 	beforeEach()
 	type args struct {
 		currentSource source.Source
@@ -93,7 +96,8 @@ func Test_findForCurrentSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := findNewsForCurrentSource(tt.args.currentSource, tt.args.name); !reflect.DeepEqual(len(got), tt.wantQuantity) {
+			got, _ := articleCollector.findNewsForCurrentSource(tt.args.currentSource, tt.args.name)
+			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
 		})
@@ -106,18 +110,18 @@ func TestInitializeSource(t *testing.T) {
 		sources []source.Source
 	}{
 		{
-			name: "Initialize with two sources",
+			name: "InitializeParsers with two sources",
 			sources: []source.Source{
 				{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 			},
 		},
 		{
-			name:    "Initialize with no sources",
+			name:    "InitializeParsers with no sources",
 			sources: []source.Source{},
 		},
 		{
-			name: "Initialize with one source",
+			name: "InitializeParsers with one source",
 			sources: []source.Source{
 				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 			},
@@ -126,9 +130,9 @@ func TestInitializeSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			InitializeSource(tt.sources)
-			if !reflect.DeepEqual(Sources, tt.sources) {
-				t.Errorf("Actual result = %v, expected = %v", Sources, tt.sources)
+			articleCollector = New(tt.sources)
+			if !reflect.DeepEqual(articleCollector.Sources, tt.sources) {
+				t.Errorf("Actual result = %v, expected = %v", articleCollector.Sources, tt.sources)
 			}
 		})
 	}
