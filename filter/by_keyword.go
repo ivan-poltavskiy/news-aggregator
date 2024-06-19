@@ -27,12 +27,10 @@ func (f ByKeyword) Filter(articles []article.Article) []article.Article {
 func filterNewsByKeyword(keyword string, articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 
-	for _, a := range articles {
-		titleStemmed := porterstemmer.StemString(strings.ToLower(string(a.Title)))
-		descriptionStemmed := porterstemmer.StemString(strings.ToLower(string(a.Description)))
+	for _, article := range articles {
 
-		if strings.Contains(titleStemmed, keyword) || strings.Contains(descriptionStemmed, keyword) {
-			matchingArticles = append(matchingArticles, a)
+		if matchesConditions(article, keyword) {
+			matchingArticles = append(matchingArticles, article)
 		}
 	}
 
@@ -41,4 +39,19 @@ func filterNewsByKeyword(keyword string, articles []article.Article) []article.A
 	}
 
 	return matchingArticles
+}
+
+// matchesConditions checks if an article matches at least one condition.
+func matchesConditions(a article.Article, keyword string) bool {
+	conditions := []string{
+		porterstemmer.StemString(strings.ToLower(string(a.Title))),
+		porterstemmer.StemString(strings.ToLower(string(a.Description))),
+	}
+
+	for _, condition := range conditions {
+		if strings.Contains(condition, keyword) {
+			return true
+		}
+	}
+	return false
 }
