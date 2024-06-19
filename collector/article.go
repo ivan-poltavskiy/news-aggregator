@@ -10,9 +10,11 @@ type ArticleCollector struct {
 	Sources []source.Source
 }
 
+var parserManager *Parsers
+
 // New create new instance of collector
 func New(sources []source.Source) *ArticleCollector {
-	InitializeParsers()
+	parserManager = InitParsers()
 	return &ArticleCollector{Sources: sources}
 }
 
@@ -40,7 +42,7 @@ func (articleCollector *ArticleCollector) findNewsForCurrentSource(currentSource
 		return nil, nil
 	}
 
-	sourceParser, err := GetParserBySourceType(currentSource.SourceType)
+	sourceParser, err := parserManager.GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
 		return []article.Article{}, err
 	}

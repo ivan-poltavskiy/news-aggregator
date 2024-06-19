@@ -11,11 +11,11 @@ import (
 
 // news provides methods for aggregating collector articles from various sources.
 type news struct {
-	Collector collector.ArticleCollector
+	collector collector.ArticleCollector
 }
 
 func New(articleCollector *collector.ArticleCollector) client.Aggregator {
-	news := &news{Collector: *articleCollector}
+	news := &news{collector: *articleCollector}
 	return news
 }
 
@@ -40,7 +40,7 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		return nil, err
 	}
 
-	articles, err := aggregator.Collector.FindNewsByResourcesName(sourceNames)
+	articles, err := aggregator.collector.FindNewsByResourcesName(sourceNames)
 	if err != nil {
 		return nil, err
 	}

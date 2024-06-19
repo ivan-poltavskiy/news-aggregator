@@ -14,7 +14,7 @@ func beforeEach() {
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
 	articleCollector = New(sources)
-	InitializeParsers()
+	parserManager = InitParsers()
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
