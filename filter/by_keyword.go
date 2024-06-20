@@ -14,9 +14,9 @@ type ByKeyword struct {
 }
 
 // Filter filters the incoming collector list from different sources by keywords.
-func (f ByKeyword) Filter(articles []article.Article) []article.Article {
+func (keywordFilter ByKeyword) Filter(articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
-	for _, keyword := range f.Keywords {
+	for _, keyword := range keywordFilter.Keywords {
 		stemmedKeyword := porterstemmer.StemString(strings.ToLower(keyword))
 		matchingArticles = append(matchingArticles, filterNewsByKeyword(stemmedKeyword, articles)...)
 	}

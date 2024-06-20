@@ -21,9 +21,9 @@ func (articleCollector *ArticleCollector) FindNewsByResourcesName(sourcesNames [
 
 	var foundArticles []article.Article
 
-	for _, name := range sourcesNames {
-		for _, currentSourceType := range articleCollector.Sources {
-			articles, err := articleCollector.findNewsForCurrentSource(currentSourceType, name)
+	for _, sourceName := range sourcesNames {
+		for _, currentSource := range articleCollector.Sources {
+			articles, err := articleCollector.findNewsForCurrentSource(currentSource, sourceName)
 			if err != nil {
 				return nil, err
 			}

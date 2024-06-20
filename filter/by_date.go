@@ -14,10 +14,10 @@ type ByDate struct {
 }
 
 // Filter filters the incoming list of articles by the date range specified in the ByDate struct.
-func (f ByDate) Filter(articles []article.Article) []article.Article {
+func (dateFilter ByDate) Filter(articles []article.Article) []article.Article {
 	var matchingArticles []article.Article
 	for _, a := range articles {
-		if a.Date.After(f.StartDate) && a.Date.Before(f.EndDate) {
+		if a.Date.After(dateFilter.StartDate) && a.Date.Before(dateFilter.EndDate) {
 			matchingArticles = append(matchingArticles, a)
 		}
 	}
