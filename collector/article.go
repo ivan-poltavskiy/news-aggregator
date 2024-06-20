@@ -8,14 +8,12 @@ import (
 
 type ArticleCollector struct {
 	Sources []source.Source
+	Parsers *Parsers
 }
-
-var parserManager *Parsers
 
 // New create new instance of collector
 func New(sources []source.Source) *ArticleCollector {
-	parserManager = InitParsers()
-	return &ArticleCollector{Sources: sources}
+	return &ArticleCollector{Sources: sources, Parsers: InitParsers()}
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
@@ -42,7 +40,7 @@ func (articleCollector *ArticleCollector) findNewsForCurrentSource(currentSource
 		return nil, nil
 	}
 
-	sourceParser, err := parserManager.GetParserBySourceType(currentSource.SourceType)
+	sourceParser, err := articleCollector.Parsers.GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
 		return []article.Article{}, err
 	}
