@@ -115,7 +115,7 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	if cli.sortingBySources {
 		outputData.ArticlesBySource = make(map[string][]articleData)
 		for _, art := range articles {
-			sourceName := string(art.SourceName) // Преобразование в строку
+			sourceName := string(art.SourceName)
 			outputData.ArticlesBySource[sourceName] = append(outputData.ArticlesBySource[sourceName], articleData{
 				Article:          art,
 				Keywords:         cli.keywords,
