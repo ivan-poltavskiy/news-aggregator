@@ -2,7 +2,7 @@ package client
 
 import (
 	"errors"
-	"news_aggregator/entity/article"
+	"news-aggregator/entity/article"
 	"sort"
 	"strings"
 )

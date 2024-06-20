@@ -3,9 +3,9 @@ package html
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"news_aggregator/constant"
-	"news_aggregator/entity/article"
-	"news_aggregator/entity/source"
+	"news-aggregator/constant"
+	"news-aggregator/entity/article"
+	"news-aggregator/entity/source"
 	"os"
 	"regexp"
 	"strings"

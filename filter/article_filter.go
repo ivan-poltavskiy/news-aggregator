@@ -1,6 +1,6 @@
 package filter
 
-import "news_aggregator/entity/article"
+import "news-aggregator/entity/article"
 
 // ArticleFilter defines a filtering service that can filter a slice of articles based on specific criteria.
 type ArticleFilter interface {

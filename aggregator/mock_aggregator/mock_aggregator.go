@@ -5,8 +5,8 @@
 package mock_aggregator
 
 import (
-	article "news_aggregator/entity/article"
-	filter "news_aggregator/filter"
+	article "news-aggregator/entity/article"
+	filter "news-aggregator/filter"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

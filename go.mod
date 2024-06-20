@@ -1,4 +1,4 @@
-module news_aggregator
+module news-aggregator
 
 go 1.22.3
 

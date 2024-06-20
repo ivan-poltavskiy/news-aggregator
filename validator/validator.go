@@ -3,7 +3,7 @@ package validator
 import (
 	"errors"
 	"fmt"
-	"news_aggregator/entity/source"
+	"news-aggregator/entity/source"
 	"slices"
 	"strings"
 )

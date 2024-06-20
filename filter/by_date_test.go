@@ -1,8 +1,8 @@
 package filter
 
 import (
-	"news_aggregator/constant"
-	"news_aggregator/entity/article"
+	"news-aggregator/constant"
+	"news-aggregator/entity/article"
 	"reflect"
 	"testing"
 	"time"

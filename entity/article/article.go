@@ -1,7 +1,7 @@
 package article
 
 import (
-	"news_aggregator/entity/source"
+	"news-aggregator/entity/source"
 	"time"
 )
 

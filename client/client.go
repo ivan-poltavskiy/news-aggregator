@@ -1,6 +1,6 @@
 package client
 
-import "news_aggregator/entity/article"
+import "news-aggregator/entity/article"
 
 type Client interface {
 	//FetchArticles collect the articles by some rules defined in the implementations.

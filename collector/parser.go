@@ -2,10 +2,10 @@ package collector
 
 import (
 	"errors"
-	"news_aggregator/entity/article"
-	"news_aggregator/entity/source"
-	"news_aggregator/parser"
-	"news_aggregator/parser/html"
+	"news-aggregator/entity/article"
+	"news-aggregator/entity/source"
+	"news-aggregator/parser"
+	"news-aggregator/parser/html"
 )
 
 // Parsers manages the mapping of source types to their corresponding parsers.

@@ -3,7 +3,7 @@ package filter
 import (
 	"fmt"
 	"github.com/reiver/go-porterstemmer"
-	"news_aggregator/entity/article"
+	"news-aggregator/entity/article"
 	"strings"
 )
 

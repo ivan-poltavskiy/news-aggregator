@@ -1,6 +1,6 @@
 package sorter
 
-import "news_aggregator/entity/article"
+import "news-aggregator/entity/article"
 
 // Sorter sorts input data according to specified rules.
 type Sorter interface {

@@ -1,7 +1,7 @@
 package collector
 
 import (
-	"news_aggregator/entity/source"
+	"news-aggregator/entity/source"
 	"reflect"
 	"testing"
 )

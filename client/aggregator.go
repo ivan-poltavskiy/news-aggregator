@@ -1,8 +1,8 @@
 package client
 
 import (
-	"news_aggregator/entity/article"
-	"news_aggregator/filter"
+	"news-aggregator/entity/article"
+	"news-aggregator/filter"
 )
 
 // Aggregator defines an interface for aggregating collector articles.

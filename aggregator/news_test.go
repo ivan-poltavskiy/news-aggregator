@@ -1,9 +1,9 @@
 package aggregator
 
 import (
-	"news_aggregator/collector"
-	"news_aggregator/entity/source"
-	"news_aggregator/filter"
+	"news-aggregator/collector"
+	"news-aggregator/entity/source"
+	"news-aggregator/filter"
 	"reflect"
 	"testing"
 	"time"

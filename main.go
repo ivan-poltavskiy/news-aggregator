@@ -1,10 +1,10 @@
 package main
 
 import (
-	"news_aggregator/aggregator"
-	"news_aggregator/client"
-	"news_aggregator/collector"
-	"news_aggregator/entity/source"
+	"news-aggregator/aggregator"
+	"news-aggregator/client"
+	"news-aggregator/collector"
+	"news-aggregator/entity/source"
 )
 
 func main() {

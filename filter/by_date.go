@@ -2,7 +2,7 @@ package filter
 
 import (
 	"fmt"
-	"news_aggregator/entity/article"
+	"news-aggregator/entity/article"
 	"time"
 )
 

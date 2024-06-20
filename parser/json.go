@@ -3,8 +3,8 @@ package parser
 import (
 	"encoding/json"
 	"errors"
-	"news_aggregator/entity/article"
-	"news_aggregator/entity/source"
+	"news-aggregator/entity/article"
+	"news-aggregator/entity/source"
 	"os"
 )
 

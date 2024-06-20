@@ -1,12 +1,12 @@
 package aggregator
 
 import (
-	"news_aggregator/client"
-	"news_aggregator/collector"
-	"news_aggregator/entity/article"
-	"news_aggregator/entity/source"
-	"news_aggregator/filter"
-	"news_aggregator/validator"
+	"news-aggregator/client"
+	"news-aggregator/collector"
+	"news-aggregator/entity/article"
+	"news-aggregator/entity/source"
+	"news-aggregator/filter"
+	"news-aggregator/validator"
 )
 
 // news provides methods for aggregating articleCollector articles from various sources.
