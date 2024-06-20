@@ -1,6 +1,6 @@
-# News Aggregator 
+# news-aggregator 
 
-### News aggregator - it's an app for parsing news from various sources.
+### news-aggregator - it's an app for parsing news from various sources.
 
 
 ## Main features
