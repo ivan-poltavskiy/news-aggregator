@@ -94,7 +94,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 func TestFetchKeywords(t *testing.T) {
 	cli := &commandLineClient{keywords: "keyword1,keyword2"}
 	var filters []filter.ArticleFilter
-	filters = buildKeywordFilter(cli, filters)
+	filters = buildKeywordFilter(cli.keywords, filters)
 
 	expectedFilters := []filter.ArticleFilter{
 		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
@@ -108,7 +108,7 @@ func TestFetchKeywords(t *testing.T) {
 func TestFetchDateFilters(t *testing.T) {
 	cli := &commandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
 	var filters []filter.ArticleFilter
-	filters, _ = buildDateFilters(cli, filters)
+	filters, _ = buildDateFilters(cli.startDateStr, cli.endDateStr, filters)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)

@@ -1,19 +1,15 @@
 package client
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
-	"news-aggregator/constant"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
-	"news-aggregator/validator"
 	"os"
 	"regexp"
 	"strings"
 	"text/template"
-	"time"
 )
 
 // commandLineClient represents a command line client for the news-aggregator application.
@@ -147,8 +143,8 @@ func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []strin
 	sourceNames := strings.Split(cli.sources, ",")
 	var filters []filter.ArticleFilter
 
-	filters = buildKeywordFilter(cli, filters)
-	filters, err := buildDateFilters(cli, filters)
+	filters = buildKeywordFilter(cli.keywords, filters)
+	filters, err := buildDateFilters(cli.startDateStr, cli.endDateStr, filters)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -156,52 +152,52 @@ func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []strin
 	return filters, uniqueSources, nil
 }
 
-// buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
-func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
-	if cli.keywords != "" {
-		keywords := strings.Split(cli.keywords, ",")
-		uniqueKeywords := checkUnique(keywords)
-		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
-	}
-	return filters
-}
+//// buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
+//func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
+//	if cli.keywords != "" {
+//		keywords := strings.Split(cli.keywords, ",")
+//		uniqueKeywords := checkUnique(keywords)
+//		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
+//	}
+//	return filters
+//}
 
-// buildDateFilters extracts date filters from command line arguments and adds them to the filters.
-func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
-
-	validationErr, isValid := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
-
-	if validationErr != nil {
-		return nil, validationErr
-	}
-	if isValid {
-
-		startDate, err := time.Parse(constant.DateOutputLayout, cli.startDateStr)
-
-		if err != nil {
-			return nil, errors.New("Invalid start date: " + cli.startDateStr)
-		}
-
-		endDate, err := time.Parse(constant.DateOutputLayout, cli.endDateStr)
-
-		if err != nil {
-			return nil, errors.New("Invalid end date: " + cli.endDateStr)
-		}
-
-		return append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate}), nil
-	}
-	return filters, nil
-}
-
-// CheckUnique returns a slice containing only unique strings from the input slice.
-func checkUnique(input []string) []string {
-	uniqueMap := make(map[string]struct{})
-	var uniqueList []string
-	for _, item := range input {
-		if _, ok := uniqueMap[item]; !ok {
-			uniqueMap[item] = struct{}{}
-			uniqueList = append(uniqueList, item)
-		}
-	}
-	return uniqueList
-}
+//// buildDateFilters extracts date filters from command line arguments and adds them to the filters.
+//func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+//
+//	validationErr, isValid := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
+//
+//	if validationErr != nil {
+//		return nil, validationErr
+//	}
+//	if isValid {
+//
+//		startDate, err := time.Parse(constant.DateOutputLayout, cli.startDateStr)
+//
+//		if err != nil {
+//			return nil, errors.New("Invalid start date: " + cli.startDateStr)
+//		}
+//
+//		endDate, err := time.Parse(constant.DateOutputLayout, cli.endDateStr)
+//
+//		if err != nil {
+//			return nil, errors.New("Invalid end date: " + cli.endDateStr)
+//		}
+//
+//		return append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate}), nil
+//	}
+//	return filters, nil
+//}
+//
+//// CheckUnique returns a slice containing only unique strings from the input slice.
+//func checkUnique(input []string) []string {
+//	uniqueMap := make(map[string]struct{})
+//	var uniqueList []string
+//	for _, item := range input {
+//		if _, ok := uniqueMap[item]; !ok {
+//			uniqueMap[item] = struct{}{}
+//			uniqueList = append(uniqueList, item)
+//		}
+//	}
+//	return uniqueList
+//}

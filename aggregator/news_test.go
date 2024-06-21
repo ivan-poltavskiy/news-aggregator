@@ -14,8 +14,8 @@ var articleCollector *collector.ArticleCollector
 func beforeEach() {
 	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
-		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "UsaToday"},
+		{Name: "nbc", PathToFile: "../resources/nbc-News.json", SourceType: "JSON"},
+		{Name: "usatoday", PathToFile: "../resources/usatoday-world-News.html", SourceType: "UsaToday"},
 	}
 	articleCollector = collector.New(sources)
 	collector.InitParsers()

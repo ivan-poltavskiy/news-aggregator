@@ -9,13 +9,13 @@ import (
 	"news-aggregator/validator"
 )
 
-// news provides methods for aggregating articleCollector articles from various sources.
-type news struct {
+// News provides methods for aggregating articleCollector articles from various sources.
+type News struct {
 	articleCollector collector.ArticleCollector
 }
 
 func New(articleCollector *collector.ArticleCollector) client.Aggregator {
-	news := &news{articleCollector: *articleCollector}
+	news := &News{articleCollector: *articleCollector}
 	return news
 }
 
@@ -28,7 +28,7 @@ func New(articleCollector *collector.ArticleCollector) client.Aggregator {
 // Returns:
 // - A slice of articles that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
-func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error) {
+func (aggregator *News) Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error) {
 	var sourceNames []source.Name
 
 	for _, name := range sources {
