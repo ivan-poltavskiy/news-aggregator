@@ -19,6 +19,7 @@ type WebClient struct {
 	help             bool
 }
 
+// NewWebClient creates and initializes a new web client with the provided aggregator.
 func NewWebClient(r http.Request, aggregator Aggregator) Client {
 
 	queryParams := r.URL.Query()
@@ -30,9 +31,11 @@ func NewWebClient(r http.Request, aggregator Aggregator) Client {
 	webClient.endDateStr = queryParams.Get("endDate")
 	webClient.sortBy = queryParams.Get("sortBy")
 	webClient.sortingBySources = queryParams.Get("sortingBySources") == "true"
+	webClient.help = queryParams.Get("help") == "true"
 	return webClient
 }
 
+// FetchArticles retrieves articles based on arguments provided as params.
 func (webClient *WebClient) FetchArticles() ([]article.Article, error) {
 	if webClient.help {
 		webClient.printUsage()

@@ -30,4 +30,5 @@ var NewsSources = []string{
 	"nbc",
 	"usatoday",
 	"washington",
+	"nyt",
 }
