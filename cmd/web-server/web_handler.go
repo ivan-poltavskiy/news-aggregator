@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"news-aggregator/aggregator"
 	"news-aggregator/client"
@@ -20,7 +19,7 @@ import (
 // FetchArticleHandler handles HTTP requests for fetching articles.
 func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 
-	sources, err := LoadSourcesFromFile("./storage/sources-storage.json")
+	sources, err := source.LoadExistingSourcesFromStorage("./storage/sources-storage.json")
 	if err != nil {
 		http.Error(w, "Failed to load sources: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -180,26 +179,4 @@ func addSourceToFile(newSource source.Source) {
 	if err := json.NewEncoder(file).Encode(sources); err != nil {
 		fmt.Println("Error encoding sources to file:", err)
 	}
-}
-
-// LoadSourcesFromFile loads sources from a JSON file
-func LoadSourcesFromFile(filename string) ([]source.Source, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	value, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	var sources []source.Source
-	err = json.Unmarshal(value, &sources)
-	if err != nil {
-		return nil, err
-	}
-
-	return sources, nil
 }

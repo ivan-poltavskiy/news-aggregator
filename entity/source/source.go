@@ -1,5 +1,11 @@
 package source
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+)
+
 // PathToFile describes the path to a specific source in the system
 type PathToFile string
 
@@ -23,12 +29,24 @@ const (
 	UsaToday Type = "UsaToday"
 )
 
-// NewsSources stores name of resources from which news can be obtained.
-var NewsSources = []string{
-	"abc",
-	"bbc",
-	"nbc",
-	"usatoday",
-	"washington",
-	"nyt",
+// LoadExistingSourcesFromStorage loads sources from a JSON file
+func LoadExistingSourcesFromStorage(filename string) ([]Source, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	value, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var sources []Source
+	err = json.Unmarshal(value, &sources)
+	if err != nil {
+		return nil, err
+	}
+
+	return sources, nil
 }

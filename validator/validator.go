@@ -11,16 +11,26 @@ import (
 // ValidateSource checks if the provided list of news articles contains at least one article.
 // If the input slice is empty, the function will return false, indicating that there are no valid news sources.
 func ValidateSource(sources []string) (bool, error) {
+	storage, err := source.LoadExistingSourcesFromStorage("./storage/sources-storage.json")
+	if err != nil {
+		return false, err
+	}
+
+	var storageNames []string
+	for _, s := range storage {
+		storageNames = append(storageNames, string(s.Name))
+	}
+
 	for _, currentSource := range sources {
-		if !slices.Contains(source.NewsSources, strings.ToLower(currentSource)) {
+		if !slices.Contains(storageNames, strings.ToLower(currentSource)) {
 			return false, errors.New("Source " + currentSource + " is not valid. " +
-				"The program supports such news resources:\n" + strings.Join(source.NewsSources, ", "))
+				"The program supports such news resources:\n" + strings.Join(storageNames, ", "))
 		}
 	}
 	if len(sources) == 0 {
 		return false, errors.New(fmt.Sprintf("Please, specify at least one "+
 			"news source. The program supports such news resources:\n%s.",
-			strings.Join(source.NewsSources, ", ")))
+			strings.Join(storageNames, ", ")))
 	}
 	return true, nil
 }
