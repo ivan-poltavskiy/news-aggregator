@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"news-aggregator/aggregator"
 	"news-aggregator/client"
@@ -19,13 +20,10 @@ import (
 // FetchArticleHandler handles HTTP requests for fetching articles.
 func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 
-	sources := []source.Source{
-		{Name: "bbc", PathToFile: "./resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "nbc", PathToFile: "./resources/nbc-news.json", SourceType: "JSON"},
-		{Name: "abc", PathToFile: "./resources/abcnews-international-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "washington", PathToFile: "./resources/washingtontimes-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "usatoday", PathToFile: "./resources/usatoday-world-news.html", SourceType: "UsaToday"},
-		{Name: "nyt", PathToFile: "./feeds/2024-06-24/feed.xml", SourceType: "RSS"},
+	sources, err := LoadSourcesFromFile("./storage/sources-storage.json")
+	if err != nil {
+		http.Error(w, "Failed to load sources: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 	articleCollector := collector.New(sources)
 	newsAggregator := aggregator.New(articleCollector)
@@ -88,7 +86,18 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "RSS feed downloaded and saved to %s", filePath)
+	sourceEntity := source.Source{
+		Name:       source.Name(extractDomainName(url)),
+		PathToFile: source.PathToFile(filePath),
+		SourceType: source.RSS,
+	}
+
+	if !sourceExists(sourceEntity.Name) {
+		addSourceToFile(sourceEntity)
+		fmt.Fprintf(w, "RSS feed downloaded and saved to %s and source added", filePath)
+	} else {
+		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)
+	}
 }
 
 func getRssFeedLink(w http.ResponseWriter, url string) (error, string) {
@@ -126,4 +135,71 @@ func extractDomainName(url string) string {
 	domain := matches[2]
 	domain = strings.Split(domain, ".")[0]
 	return domain
+}
+
+func sourceExists(name source.Name) bool {
+	sources := readSourcesFromFile()
+	for _, s := range sources {
+		if s.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func readSourcesFromFile() []source.Source {
+	file, err := os.Open("./storage/sources-storage.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []source.Source{}
+		}
+		fmt.Println("Error opening sources file:", err)
+		return nil
+	}
+	defer file.Close()
+
+	var sources []source.Source
+	if err := json.NewDecoder(file).Decode(&sources); err != nil {
+		fmt.Println("Error decoding sources file:", err)
+		return nil
+	}
+	return sources
+}
+
+func addSourceToFile(newSource source.Source) {
+	sources := readSourcesFromFile()
+	sources = append(sources, newSource)
+
+	file, err := os.Create("./storage/sources-storage.json")
+	if err != nil {
+		fmt.Println("Error creating sources file:", err)
+		return
+	}
+	defer file.Close()
+
+	if err := json.NewEncoder(file).Encode(sources); err != nil {
+		fmt.Println("Error encoding sources to file:", err)
+	}
+}
+
+// LoadSourcesFromFile loads sources from a JSON file
+func LoadSourcesFromFile(filename string) ([]source.Source, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	value, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var sources []source.Source
+	err = json.Unmarshal(value, &sources)
+	if err != nil {
+		return nil, err
+	}
+
+	return sources, nil
 }
