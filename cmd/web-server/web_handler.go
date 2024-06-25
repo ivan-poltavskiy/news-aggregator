@@ -16,6 +16,14 @@ import (
 	"time"
 )
 
+type addSourceRequest struct {
+	URL string `json:"url"`
+}
+
+type deleteSourceRequest struct {
+	Name string `json:"name"`
+}
+
 // FetchArticleHandler handles HTTP requests for fetching articles.
 func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -43,11 +51,22 @@ func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Query().Get("url")
-	if url == "" {
-		http.Error(w, "URL parameter is missing", http.StatusBadRequest)
+	// Читаем тело запроса
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
+
+	var requestBody addSourceRequest
+	err = json.Unmarshal(body, &requestBody)
+	if err != nil || requestBody.URL == "" {
+		http.Error(w, "Invalid request body or URL parameter is missing", http.StatusBadRequest)
+		return
+	}
+
+	url := requestBody.URL
 
 	err, rssURL := getRssFeedLink(w, url)
 	if rssURL == "" {
@@ -97,6 +116,69 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)
 	}
+}
+
+func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var request deleteSourceRequest
+	err = json.Unmarshal(body, &request)
+	if err != nil || request.Name == "" {
+		http.Error(w, "Invalid request body or name parameter is missing", http.StatusBadRequest)
+		return
+	}
+
+	sources := readSourcesFromFile()
+	var updatedSources []source.Source
+	found := false
+	for _, currentSource := range sources {
+		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(request.Name) {
+			updatedSources = append(updatedSources, currentSource)
+		} else {
+			found = true
+			// Удаление файла
+			err := os.Remove(string(currentSource.PathToFile))
+			if err != nil {
+				http.Error(w, "Failed to delete source file", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+
+	if !found {
+		http.Error(w, "Source not found", http.StatusNotFound)
+		return
+	}
+
+	err = writeSourcesToFile(updatedSources)
+	if err != nil {
+		http.Error(w, "Failed to write updated sources to file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Source deleted successfully"))
+}
+
+func writeSourcesToFile(sources []source.Source) error {
+	file, err := os.Create("./storage/sources-storage.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(&sources)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getRssFeedLink(w http.ResponseWriter, url string) (error, string) {
