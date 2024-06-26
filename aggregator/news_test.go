@@ -2,8 +2,10 @@ package aggregator
 
 import (
 	"news-aggregator/collector"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"news-aggregator/filter"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -12,10 +14,11 @@ import (
 var articleCollector *collector.ArticleCollector
 
 func beforeEach() {
-	sources := []source.Source{
-		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "nbc", PathToFile: "../resources/nbc-News.json", SourceType: "JSON"},
-		{Name: "usatoday", PathToFile: "../resources/usatoday-world-News.html", SourceType: "UsaToday"},
+
+	constant.PathToStorage = filepath.Join("../resources/testdata/test-sources-storage.json")
+	sources, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
+	if err != nil {
+		return
 	}
 	articleCollector = collector.New(sources)
 	collector.InitParsers()
