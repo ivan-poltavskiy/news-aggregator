@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"news-aggregator/cmd/web"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
 	"path/filepath"
@@ -27,6 +27,7 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var requestBody addSourceRequest
+
 	err = json.Unmarshal(body, &requestBody)
 	if err != nil || requestBody.URL == "" {
 		http.Error(w, "Invalid request body or URL parameter is missing", http.StatusBadRequest)
@@ -35,7 +36,7 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 
 	url := requestBody.URL
 
-	err, rssURL := web.GetRssFeedLink(w, url)
+	err, rssURL := GetRssFeedLink(w, url)
 	if rssURL == "" {
 		return
 	}
@@ -47,17 +48,17 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rssResp.Body.Close()
 
-	currentDate := time.Now().Format("2006-01-02")
+	currentDate := time.Now().Format(constant.DateOutputLayout)
 
-	dirPath := filepath.Join("feeds", currentDate)
-	if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+	directoryPath := filepath.Join("feeds", currentDate)
+	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
 		http.Error(w, "Failed to create directory", http.StatusInternalServerError)
 		return
 	}
 
-	fileName := web.ExtractDomainName(url) + ".xml"
+	fileName := ExtractDomainName(url) + ".xml"
 
-	filePath := filepath.Join(dirPath, fileName)
+	filePath := filepath.Join(directoryPath, fileName)
 	outputFile, err := os.Create(filePath)
 	if err != nil {
 		http.Error(w, "Failed to create file", http.StatusInternalServerError)
@@ -72,13 +73,13 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sourceEntity := source.Source{
-		Name:       source.Name(web.ExtractDomainName(url)),
+		Name:       source.Name(ExtractDomainName(url)),
 		PathToFile: source.PathToFile(filePath),
 		SourceType: source.RSS,
 	}
 
-	if !web.SourceExists(sourceEntity.Name) {
-		web.AddSourceToFile(sourceEntity)
+	if !SourceExists(sourceEntity.Name) {
+		AddSourceToFile(sourceEntity)
 		fmt.Fprintf(w, "RSS feed downloaded and saved to %s and source added", filePath)
 	} else {
 		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"news-aggregator/cmd/web"
 	"news-aggregator/entity/source"
 	"os"
 	"strings"
@@ -14,6 +13,7 @@ type deleteSourceRequest struct {
 	Name string `json:"name"`
 }
 
+// DeleteSourceByNameHandler is a handler for removes the source from the storage.
 func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -29,10 +29,9 @@ func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sources := web.ReadSourcesFromFile()
 	var updatedSources []source.Source
 	found := false
-	for _, currentSource := range sources {
+	for _, currentSource := range ReadSourcesFromFile() {
 		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(request.Name) {
 			updatedSources = append(updatedSources, currentSource)
 		} else {
@@ -51,7 +50,7 @@ func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = web.WriteSourcesToFile(updatedSources)
+	err = WriteSourcesToFile(updatedSources)
 	if err != nil {
 		http.Error(w, "Failed to write updated sources to file", http.StatusInternalServerError)
 		return

@@ -6,13 +6,13 @@ import (
 	"news-aggregator/aggregator"
 	"news-aggregator/client"
 	"news-aggregator/collector"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 )
 
 // FetchArticleHandler handles HTTP requests for fetching articles.
 func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
-
-	sources, err := source.LoadExistingSourcesFromStorage("./storage/sources-storage.json")
+	sources, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
 	if err != nil {
 		http.Error(w, "Failed to load sources: "+err.Error(), http.StatusInternalServerError)
 		return

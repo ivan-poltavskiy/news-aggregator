@@ -1,10 +1,11 @@
-package web
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
 	"regexp"
@@ -12,7 +13,7 @@ import (
 )
 
 func WriteSourcesToFile(sources []source.Source) error {
-	file, err := os.Create("./storage/sources-storage.json")
+	file, err := os.Create(constant.PathToStorage)
 	if err != nil {
 		return err
 	}
@@ -28,7 +29,7 @@ func WriteSourcesToFile(sources []source.Source) error {
 }
 
 func ReadSourcesFromFile() []source.Source {
-	file, err := os.Open("./storage/sources-storage.json")
+	file, err := os.Open(constant.PathToStorage)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []source.Source{}
@@ -97,7 +98,7 @@ func AddSourceToFile(newSource source.Source) {
 	sources := ReadSourcesFromFile()
 	sources = append(sources, newSource)
 
-	file, err := os.Create("./storage/sources-storage.json")
+	file, err := os.Create(constant.PathToStorage)
 	if err != nil {
 		fmt.Println("Error creating sources file:", err)
 		return
