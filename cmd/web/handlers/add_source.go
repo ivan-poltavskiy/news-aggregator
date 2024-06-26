@@ -50,7 +50,7 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 
 	currentDate := time.Now().Format(constant.DateOutputLayout)
 
-	directoryPath := filepath.Join("feeds", currentDate)
+	directoryPath := filepath.Join("resources", currentDate)
 	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
 		http.Error(w, "Failed to create directory", http.StatusInternalServerError)
 		return

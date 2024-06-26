@@ -3,6 +3,7 @@ package validator
 import (
 	"errors"
 	"fmt"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"slices"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // ValidateSource checks if the provided list of news articles contains at least one article.
 // If the input slice is empty, the function will return false, indicating that there are no valid news sources.
 func ValidateSource(sources []string) (bool, error) {
-	storage, err := source.LoadExistingSourcesFromStorage("./storage/sources-storage.json")
+	storage, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
 	if err != nil {
 		return false, err
 	}
