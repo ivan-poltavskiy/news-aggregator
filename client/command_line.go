@@ -76,7 +76,7 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 		}
 	}
 
-	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("../../client/OutputTemplate.tmpl")
+	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("./client/OutputTemplate.tmpl")
 	if err != nil {
 		panic(err)
 	}
