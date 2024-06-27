@@ -31,7 +31,7 @@
   },
   {
     "Name": "pravda",
-    "PathToFile": "resources\\2024-06-26\\pravda.xml",
+    "PathToFile": "resources\\pravda\\pravda.xml",
     "SourceType": "RSS"
   }
 ]

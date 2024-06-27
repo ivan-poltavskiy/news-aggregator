@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"news-aggregator/constant"
+	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
+	"news-aggregator/parser"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // addSourceRequest is a structure containing the fields required to add a new source.
@@ -17,63 +17,30 @@ type addSourceRequest struct {
 	URL string `json:"url"`
 }
 
-// AddSourceHandler is a handler for add the new source to the storage.
+// AddSourceHandler is a handler for adding the new source to the storage.
 func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
 
 	var requestBody addSourceRequest
 
-	err = json.Unmarshal(body, &requestBody)
-	if err != nil || requestBody.URL == "" {
-		http.Error(w, "Invalid request body or URL parameter is missing", http.StatusBadRequest)
+	if err := getUrlFromRequest(r, &requestBody); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	url := requestBody.URL
-
-	err, rssURL := GetRssFeedLink(w, url)
-	if rssURL == "" {
-		return
-	}
-
-	rssResp, err := http.Get(rssURL)
-	if err != nil || rssResp.StatusCode != http.StatusOK {
-		http.Error(w, "Failed to download RSS feed", http.StatusInternalServerError)
-		return
-	}
-	defer rssResp.Body.Close()
-
-	currentDate := time.Now().Format(constant.DateOutputLayout)
-
-	directoryPath := filepath.Join("resources", currentDate)
-	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
-		http.Error(w, "Failed to create directory", http.StatusInternalServerError)
-		return
-	}
-
-	fileName := ExtractDomainName(url) + ".xml"
-
-	filePath := filepath.Join(directoryPath, fileName)
-	outputFile, err := os.Create(filePath)
+	rssURL, err := getRssFeedLink(w, requestBody.URL)
 	if err != nil {
-		http.Error(w, "Failed to create file", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer outputFile.Close()
 
-	_, err = io.Copy(outputFile, rssResp.Body)
+	filePath, err := downloadRssFeed(rssURL, requestBody.URL)
 	if err != nil {
-		http.Error(w, "Failed to save RSS feed", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	sourceEntity := source.Source{
-		Name:       source.Name(ExtractDomainName(url)),
+		Name:       source.Name(ExtractDomainName(requestBody.URL)),
 		PathToFile: source.PathToFile(filePath),
 		SourceType: source.RSS,
 	}
@@ -84,4 +51,96 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)
 	}
+
+	if err := parseAndSaveArticles(sourceEntity, requestBody.URL); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "RSS feed parsed and articles saved successfully")
+}
+
+func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read request body")
+	}
+	defer r.Body.Close()
+
+	if err := json.Unmarshal(body, requestBody); err != nil || requestBody.URL == "" {
+		return fmt.Errorf("invalid request body or URL parameter is missing")
+	}
+
+	return nil
+}
+
+func getRssFeedLink(w http.ResponseWriter, url string) (string, error) {
+	err, rssURL := GetRssFeedLink(w, url)
+	if err != nil || rssURL == "" {
+		return "", fmt.Errorf("failed to get RSS feed link")
+	}
+	return rssURL, nil
+}
+
+func downloadRssFeed(rssURL, sourceURL string) (string, error) {
+	rssResp, err := http.Get(rssURL)
+	if err != nil || rssResp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to download RSS feed")
+	}
+	defer rssResp.Body.Close()
+
+	sourceName := ExtractDomainName(sourceURL)
+	directoryPath := filepath.Join("resources", sourceName)
+	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
+		return "", fmt.Errorf("failed to create directory")
+	}
+
+	filePath := filepath.Join(directoryPath, sourceName+".xml")
+	outputFile, err := os.Create(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to create file")
+	}
+	defer outputFile.Close()
+
+	if _, err := io.Copy(outputFile, rssResp.Body); err != nil {
+		return "", fmt.Errorf("failed to save RSS feed")
+	}
+
+	return filePath, nil
+}
+
+func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) error {
+	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
+	if err != nil {
+		return fmt.Errorf("failed to parse RSS feed")
+	}
+
+	jsonFilePath := filepath.Join("resources", ExtractDomainName(sourceURL), ExtractDomainName(sourceURL)+".json")
+
+	var existingArticles []article.Article
+	if _, err := os.Stat(jsonFilePath); err == nil {
+		jsonFile, err := os.Open(jsonFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to open existing JSON file")
+		}
+		defer jsonFile.Close()
+
+		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
+			return fmt.Errorf("failed to decode existing articles from JSON file")
+		}
+	}
+
+	existingArticles = append(existingArticles, articles...)
+
+	jsonFile, err := os.Create(jsonFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to create JSON file")
+	}
+	defer jsonFile.Close()
+
+	if err := json.NewEncoder(jsonFile).Encode(existingArticles); err != nil {
+		return fmt.Errorf("failed to encode articles to JSON file")
+	}
+
+	return nil
 }
