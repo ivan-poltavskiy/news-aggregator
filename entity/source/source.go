@@ -27,6 +27,7 @@ const (
 	RSS      Type = "RSS"
 	JSON     Type = "JSON"
 	UsaToday Type = "UsaToday"
+	STORAGE  Type = "STORAGE"
 )
 
 // LoadExistingSourcesFromStorage loads sources from a JSON file

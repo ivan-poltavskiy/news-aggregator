@@ -20,6 +20,7 @@ func InitParsers() *Parsers {
 			source.RSS:      parser.Rss{},
 			source.JSON:     parser.Json{},
 			source.UsaToday: html.UsaToday{},
+			source.STORAGE:  parser.Storage{},
 		},
 	}
 }

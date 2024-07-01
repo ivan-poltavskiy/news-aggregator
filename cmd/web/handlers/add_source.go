@@ -42,8 +42,17 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	sourceEntity := source.Source{
 		Name:       source.Name(ExtractDomainName(requestBody.URL)),
 		PathToFile: source.PathToFile(filePath),
-		SourceType: source.RSS,
+		SourceType: source.STORAGE,
 	}
+
+	err, jsonPath := parseAndSaveArticles(sourceEntity, requestBody.URL)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
 	if !SourceExists(sourceEntity.Name) {
 		AddSourceToFile(sourceEntity)
@@ -52,14 +61,10 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)
 	}
 
-	if err := parseAndSaveArticles(sourceEntity, requestBody.URL); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	fmt.Fprintf(w, "RSS feed parsed and articles saved successfully")
 }
 
+// get the url of the source from the request
 func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -74,6 +79,7 @@ func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
 	return nil
 }
 
+// get link of rrs feed
 func getRssFeedLink(w http.ResponseWriter, url string) (string, error) {
 	err, rssURL := GetRssFeedLink(w, url)
 	if err != nil || rssURL == "" {
@@ -109,10 +115,11 @@ func downloadRssFeed(rssURL, sourceURL string) (string, error) {
 	return filePath, nil
 }
 
-func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) error {
+// parse rss feed and save the articles from this feed to the storage
+func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) (error, string) {
 	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
 	if err != nil {
-		return fmt.Errorf("failed to parse RSS feed")
+		return fmt.Errorf("failed to parse RSS feed"), ""
 	}
 
 	jsonFilePath := filepath.Join("resources", ExtractDomainName(sourceURL), ExtractDomainName(sourceURL)+".json")
@@ -121,12 +128,12 @@ func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) error {
 	if _, err := os.Stat(jsonFilePath); err == nil {
 		jsonFile, err := os.Open(jsonFilePath)
 		if err != nil {
-			return fmt.Errorf("failed to open existing JSON file")
+			return fmt.Errorf("failed to open existing JSON file"), ""
 		}
 		defer jsonFile.Close()
 
 		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
-			return fmt.Errorf("failed to decode existing articles from JSON file")
+			return fmt.Errorf("failed to decode existing articles from JSON file"), ""
 		}
 	}
 
@@ -134,13 +141,13 @@ func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) error {
 
 	jsonFile, err := os.Create(jsonFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to create JSON file")
+		return fmt.Errorf("failed to create JSON file"), ""
 	}
 	defer jsonFile.Close()
 
 	if err := json.NewEncoder(jsonFile).Encode(existingArticles); err != nil {
-		return fmt.Errorf("failed to encode articles to JSON file")
+		return fmt.Errorf("failed to encode articles to JSON file"), ""
 	}
 
-	return nil
+	return nil, jsonFilePath
 }

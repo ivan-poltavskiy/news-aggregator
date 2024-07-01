@@ -5,11 +5,6 @@
     "SourceType": "RSS"
   },
   {
-    "Name": "nytimes",
-    "PathToFile": "feeds\\2024-06-25\\nytimes.xml",
-    "SourceType": "RSS"
-  },
-  {
     "Name": "nbc",
     "PathToFile": "./resources/nbc-news.json",
     "SourceType": "JSON"
@@ -30,8 +25,13 @@
     "SourceType": "UsaToday"
   },
   {
+    "Name": "nytimes",
+    "PathToFile": "resources\\nytimes\\nytimes.json",
+    "SourceType": "STORAGE"
+  },
+  {
     "Name": "pravda",
-    "PathToFile": "resources\\pravda\\pravda.xml",
-    "SourceType": "RSS"
+    "PathToFile": "resources\\pravda\\pravda.json",
+    "SourceType": "STORAGE"
   }
 ]
