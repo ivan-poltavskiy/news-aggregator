@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"news-aggregator/entity/source"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -13,7 +14,7 @@ type deleteSourceRequest struct {
 	Name string `json:"name"`
 }
 
-// DeleteSourceByNameHandler is a handler for removes the source from the storage.
+// DeleteSourceByNameHandler is a handler for removing the source from the storage.
 func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -36,10 +37,10 @@ func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 			updatedSources = append(updatedSources, currentSource)
 		} else {
 			found = true
-			// Удаление файла
-			err := os.Remove(string(currentSource.PathToFile))
+			directoryPath := filepath.Join("resources", strings.ToLower(request.Name))
+			err := os.RemoveAll(directoryPath)
 			if err != nil {
-				http.Error(w, "Failed to delete source file", http.StatusInternalServerError)
+				http.Error(w, "Failed to delete source directory", http.StatusInternalServerError)
 				return
 			}
 		}
