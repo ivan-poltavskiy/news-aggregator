@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
@@ -19,7 +20,6 @@ type addSourceRequest struct {
 
 // AddSourceHandler is a handler for adding the new source to the storage.
 func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
-
 	var requestBody addSourceRequest
 
 	if err := getUrlFromRequest(r, &requestBody); err != nil {
@@ -46,7 +46,6 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err, jsonPath := parseAndSaveArticles(sourceEntity, requestBody.URL)
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,14 +53,20 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
-	if !SourceExists(sourceEntity.Name) {
-		AddSourceToFile(sourceEntity)
-		fmt.Fprintf(w, "RSS feed downloaded and saved to %s and source added", filePath)
+	if !IsSourceExists(sourceEntity.Name) {
+		AddSourceToStorage(sourceEntity)
+		if _, err := fmt.Fprintf(w, "RSS feed downloaded and saved to %s and source added", filePath); err != nil {
+			log.Printf("Failed to write response: %v", err)
+		}
 	} else {
-		fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath)
+		if _, err := fmt.Fprintf(w, "RSS feed downloaded and saved to %s but source already exists", filePath); err != nil {
+			log.Printf("Failed to write response: %v", err)
+		}
 	}
 
-	fmt.Fprintf(w, "RSS feed parsed and articles saved successfully")
+	if _, err := fmt.Fprintf(w, "RSS feed parsed and articles saved successfully"); err != nil {
+		log.Printf("Failed to write response: %v", err)
+	}
 }
 
 // get the url of the source from the request
@@ -70,7 +75,12 @@ func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
 	if err != nil {
 		return fmt.Errorf("failed to read request body")
 	}
-	defer r.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(r.Body)
 
 	if err := json.Unmarshal(body, requestBody); err != nil || requestBody.URL == "" {
 		return fmt.Errorf("invalid request body or URL parameter is missing")
@@ -93,7 +103,12 @@ func downloadRssFeed(rssURL, sourceURL string) (string, error) {
 	if err != nil || rssResp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to download RSS feed")
 	}
-	defer rssResp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(rssResp.Body)
 
 	sourceName := ExtractDomainName(sourceURL)
 	directoryPath := filepath.Join("resources", sourceName)
@@ -106,7 +121,12 @@ func downloadRssFeed(rssURL, sourceURL string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to create file")
 	}
-	defer outputFile.Close()
+	defer func(outputFile *os.File) {
+		err := outputFile.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(outputFile)
 
 	if _, err := io.Copy(outputFile, rssResp.Body); err != nil {
 		return "", fmt.Errorf("failed to save RSS feed")
@@ -130,7 +150,12 @@ func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) (error, 
 		if err != nil {
 			return fmt.Errorf("failed to open existing JSON file"), ""
 		}
-		defer jsonFile.Close()
+		defer func(jsonFile *os.File) {
+			err := jsonFile.Close()
+			if err != nil {
+				log.Print("Error closing file: ", err)
+			}
+		}(jsonFile)
 
 		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
 			return fmt.Errorf("failed to decode existing articles from JSON file"), ""
@@ -143,7 +168,12 @@ func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) (error, 
 	if err != nil {
 		return fmt.Errorf("failed to create JSON file"), ""
 	}
-	defer jsonFile.Close()
+	defer func(jsonFile *os.File) {
+		err := jsonFile.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(jsonFile)
 
 	if err := json.NewEncoder(jsonFile).Encode(existingArticles); err != nil {
 		return fmt.Errorf("failed to encode articles to JSON file"), ""

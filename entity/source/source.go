@@ -1,8 +1,10 @@
 package source
 
 import (
+	"bufio"
 	"encoding/json"
-	"io/ioutil"
+	"io"
+	"log"
 	"os"
 )
 
@@ -36,15 +38,21 @@ func LoadExistingSourcesFromStorage(filename string) ([]Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(file)
 
-	value, err := ioutil.ReadAll(file)
+	reader := bufio.NewReader(file)
+	content, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
 
 	var sources []Source
-	err = json.Unmarshal(value, &sources)
+	err = json.Unmarshal(content, &sources)
 	if err != nil {
 		return nil, err
 	}

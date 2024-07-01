@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
@@ -17,7 +18,12 @@ func WriteSourcesToFile(sources []source.Source) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(file)
 
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(&sources)
@@ -37,7 +43,12 @@ func ReadSourcesFromFile() []source.Source {
 		fmt.Println("Error opening sources file:", err)
 		return nil
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(file)
 
 	var sources []source.Source
 	if err := json.NewDecoder(file).Decode(&sources); err != nil {
@@ -53,7 +64,12 @@ func GetRssFeedLink(w http.ResponseWriter, url string) (error, string) {
 		http.Error(w, "Failed to download page", http.StatusInternalServerError)
 		return err, ""
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -84,7 +100,7 @@ func ExtractDomainName(url string) string {
 	return domain
 }
 
-func SourceExists(name source.Name) bool {
+func IsSourceExists(name source.Name) bool {
 	sources := ReadSourcesFromFile()
 	for _, s := range sources {
 		if s.Name == name {
@@ -94,16 +110,20 @@ func SourceExists(name source.Name) bool {
 	return false
 }
 
-func AddSourceToFile(newSource source.Source) {
-	sources := ReadSourcesFromFile()
-	sources = append(sources, newSource)
+func AddSourceToStorage(newSource source.Source) {
+	sources := append(ReadSourcesFromFile(), newSource)
 
 	file, err := os.Create(constant.PathToStorage)
 	if err != nil {
 		fmt.Println("Error creating sources file:", err)
 		return
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Print("Error closing file: ", err)
+		}
+	}(file)
 
 	if err := json.NewEncoder(file).Encode(sources); err != nil {
 		fmt.Println("Error encoding sources to file:", err)
