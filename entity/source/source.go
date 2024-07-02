@@ -3,8 +3,8 @@ package source
 import (
 	"bufio"
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"io"
-	"log"
 	"os"
 )
 
@@ -34,6 +34,7 @@ const (
 
 // LoadExistingSourcesFromStorage loads sources from a JSON file
 func LoadExistingSourcesFromStorage(filename string) ([]Source, error) {
+	logrus.Info("Source: Starting loading the existing sources from storage")
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -41,7 +42,7 @@ func LoadExistingSourcesFromStorage(filename string) ([]Source, error) {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Print("Error closing file: ", err)
+			logrus.Error("Source: Error closing file: ", err)
 		}
 	}(file)
 

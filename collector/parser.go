@@ -2,6 +2,7 @@ package collector
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
@@ -15,6 +16,7 @@ type Parsers struct {
 
 // InitParsers initializes a new Parsers with available parsers for different file types.
 func InitParsers() *Parsers {
+	logrus.Info("Starting initialize parsers")
 	return &Parsers{
 		parsers: map[source.Type]Parser{
 			source.RSS:      parser.Rss{},
