@@ -16,7 +16,7 @@ import (
 // commandLineClient represents a command line client for the news-aggregator application.
 type commandLineClient struct {
 	aggregator       Aggregator
-	sources          string
+	sources          []string
 	keywords         string
 	startDateStr     string
 	endDateStr       string
@@ -24,13 +24,15 @@ type commandLineClient struct {
 	sortingBySources bool
 	help             bool
 	DateSorter       DateSorter
+	filters          []filter.ArticleFilter
 }
 
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
 	cli.DateSorter = DateSorter{}
-	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
+	var sourcesStr string
+	flag.StringVar(&sourcesStr, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
@@ -38,7 +40,16 @@ func NewCommandLine(aggregator Aggregator) Client {
 	flag.BoolVar(&cli.sortingBySources, "sortingBySources", false, "Enable sorting articles by sources")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
-	logrus.Info("Command line client initialized")
+
+	cli.sources = checkUnique(strings.Split(sourcesStr, ","))
+	cli.filters = buildKeywordFilter(cli.keywords, cli.filters)
+	var err error
+	cli.filters, err = buildDateFilters(cli.startDateStr, cli.endDateStr, cli.filters)
+	if err != nil {
+		logrus.Error("Command line client: Date filter error: ", err)
+	}
+
+	logrus.Info("Command line client: Initialized with sources: ", cli.sources, " and filters: ", cli.filters)
 	return cli
 }
 
@@ -49,20 +60,14 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, nil
 	}
 
-	filters, uniqueSources, fetchParametersError := cli.fetchParameters()
-	if fetchParametersError != nil {
-		logrus.Error("Command line client: Fetch parameters error: ", fetchParametersError)
-		return nil, fetchParametersError
-	}
-
-	logrus.Info("Command line client: Fetching articles with sources: ", uniqueSources, " and filters: ", filters)
-	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	logrus.Info("Command line client: Fetching articles with sources: ", cli.sources, " and filters: ", cli.filters)
+	articles, err := cli.aggregator.Aggregate(cli.sources, cli.filters...)
 	if err != nil {
 		logrus.Error("Command line client: Aggregation error: ", err)
 		return nil, err
 	}
 
-	articles, fetchParametersError = cli.DateSorter.SortArticle(articles, cli.sortBy)
+	articles, fetchParametersError := cli.DateSorter.SortArticle(articles, cli.sortBy)
 	if fetchParametersError != nil {
 		logrus.Error("Command line client: Date sorting error: ", fetchParametersError)
 		return nil, fetchParametersError
@@ -145,21 +150,4 @@ func (cli *commandLineClient) printUsage() {
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
 		"Date format - yyyy-mm-dd" + "" +
 		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
-}
-
-// fetchParameters extracts and validates command line parameters,
-// including sources and filters, and returns them for use in article fetching.
-func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []string, error) {
-	sourceNames := strings.Split(cli.sources, ",")
-	var filters []filter.ArticleFilter
-
-	filters = buildKeywordFilter(cli.keywords, filters)
-	filters, err := buildDateFilters(cli.startDateStr, cli.endDateStr, filters)
-	if err != nil {
-		logrus.Error("Command line client: Date filter error: ", err)
-		return nil, nil, err
-	}
-	uniqueSources := checkUnique(sourceNames)
-	logrus.Info("Command line client: Parameters fetched with sources: ", uniqueSources, " and filters: ", filters)
-	return filters, uniqueSources, nil
 }

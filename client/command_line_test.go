@@ -22,7 +22,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 
 	type fields struct {
 		aggregator   Aggregator
-		sources      string
+		sources      []string
 		keywords     string
 		startDateStr string
 		endDateStr   string
@@ -38,7 +38,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 			name: "Test with articles",
 			fields: fields{
 				aggregator:   mockAggregator,
-				sources:      "source1,source2",
+				sources:      []string{"source1", "source2"},
 				keywords:     "test",
 				startDateStr: "2023-01-01",
 				endDateStr:   "2023-12-31",
@@ -59,7 +59,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 			name: "Test with error message",
 			fields: fields{
 				aggregator:   mockAggregator,
-				sources:      "",
+				sources:      []string{""},
 				keywords:     "test",
 				startDateStr: "2023-01-01",
 				endDateStr:   "2023-12-31",
@@ -85,7 +85,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 				help:         tt.fields.help,
 			}
 			if got, _ := cli.FetchArticles(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Actual result = %v,expexted %v", got, tt.want)
+				t.Errorf("Actual result = %v, expected %v", got, tt.want)
 			}
 		})
 	}
@@ -118,27 +118,6 @@ func TestFetchDateFilters(t *testing.T) {
 
 	if !reflect.DeepEqual(filters, expectedFilters) {
 		t.Errorf("buildDateFilters() failed, got: %v, want: %v", filters, expectedFilters)
-	}
-}
-
-func TestFetchParameters(t *testing.T) {
-	cli := &commandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	filters, uniqueSources, _ := cli.fetchParameters()
-
-	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
-	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
-	expectedFilters := []filter.ArticleFilter{
-		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
-		filter.ByDate{StartDate: startDate, EndDate: endDate},
-	}
-	expectedSources := []string{"source1", "source2"}
-
-	if !reflect.DeepEqual(filters, expectedFilters) {
-		t.Errorf("fetchParameters() filters failed, got: %v, want: %v", filters, expectedFilters)
-	}
-
-	if !reflect.DeepEqual(uniqueSources, expectedSources) {
-		t.Errorf("fetchParameters() uniqueSources failed, got: %v, want: %v", uniqueSources, expectedSources)
 	}
 }
 
@@ -196,7 +175,7 @@ func TestCheckUnique(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkUnique(tt.args.input); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Actual result %v, expexted %v", got, tt.want)
+				t.Errorf("Actual result %v, expected %v", got, tt.want)
 			}
 		})
 	}
