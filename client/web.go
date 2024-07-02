@@ -17,13 +17,14 @@ type WebClient struct {
 	sortBy           string
 	sortingBySources bool
 	help             bool
+	DateSorter       DateSorter
 }
 
 // NewWebClient creates and initializes a new web client with the provided aggregator.
 func NewWebClient(r http.Request, aggregator Aggregator) Client {
 
 	queryParams := r.URL.Query()
-
+	//fetch params
 	webClient := &WebClient{aggregator: aggregator}
 	webClient.Sources = queryParams.Get("sources")
 	webClient.keywords = queryParams.Get("keywords")
@@ -32,6 +33,7 @@ func NewWebClient(r http.Request, aggregator Aggregator) Client {
 	webClient.sortBy = queryParams.Get("sortBy")
 	webClient.sortingBySources = queryParams.Get("sortingBySources") == "true"
 	webClient.help = queryParams.Get("help") == "true"
+	webClient.DateSorter = DateSorter{}
 	return webClient
 }
 
@@ -51,7 +53,7 @@ func (webClient *WebClient) FetchArticles() ([]article.Article, error) {
 		return nil, err
 	}
 
-	articles, fetchParametersError = DateSorter{}.SortArticle(articles, webClient.sortBy)
+	articles, fetchParametersError = webClient.DateSorter.SortArticle(articles, webClient.sortBy)
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}

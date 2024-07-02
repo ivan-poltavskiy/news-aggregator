@@ -23,11 +23,13 @@ type commandLineClient struct {
 	sortBy           string
 	sortingBySources bool
 	help             bool
+	DateSorter       DateSorter
 }
 
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
+	cli.DateSorter = DateSorter{}
 	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
@@ -60,7 +62,7 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, err
 	}
 
-	articles, fetchParametersError = DateSorter{}.SortArticle(articles, cli.sortBy)
+	articles, fetchParametersError = cli.DateSorter.SortArticle(articles, cli.sortBy)
 	if fetchParametersError != nil {
 		logrus.Error("Command line client: Date sorting error: ", fetchParametersError)
 		return nil, fetchParametersError
