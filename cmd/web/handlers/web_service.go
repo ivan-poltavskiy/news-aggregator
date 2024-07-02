@@ -61,7 +61,7 @@ func ReadSourcesFromFile() []source.Source {
 func GetRssFeedLink(w http.ResponseWriter, url string) (error, string) {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		http.Error(w, "Failed to download page", http.StatusInternalServerError)
+		http.Error(w, "Rss URL not found.", http.StatusInternalServerError)
 		return err, ""
 	}
 	defer func(Body io.ReadCloser) {

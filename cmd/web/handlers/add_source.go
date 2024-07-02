@@ -20,6 +20,7 @@ type addSourceRequest struct {
 
 // AddSourceHandler is a handler for adding the new source to the storage.
 func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
+
 	var requestBody addSourceRequest
 
 	if err := getUrlFromRequest(r, &requestBody); err != nil {
@@ -93,7 +94,7 @@ func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
 func getRssFeedLink(w http.ResponseWriter, url string) (string, error) {
 	err, rssURL := GetRssFeedLink(w, url)
 	if err != nil || rssURL == "" {
-		return "", fmt.Errorf("failed to get RSS feed link")
+		return "", err
 	}
 	return rssURL, nil
 }
@@ -162,7 +163,26 @@ func parseAndSaveArticles(sourceEntity source.Source, sourceURL string) (error, 
 		}
 	}
 
-	existingArticles = append(existingArticles, articles...)
+	// Create a map of existing articles for quick lookup
+	existingTitles := make(map[string]struct{})
+	for _, existingArticle := range existingArticles {
+		existingTitles[existingArticle.Title.String()] = struct{}{}
+	}
+
+	// Filter out duplicate articles
+	var newArticles []article.Article
+	for _, newArticle := range articles {
+		if _, exists := existingTitles[newArticle.Title.String()]; !exists {
+			newArticles = append(newArticles, newArticle)
+		}
+	}
+
+	// If no new articles to add, skip the file update
+	if len(newArticles) == 0 {
+		return nil, jsonFilePath
+	}
+
+	existingArticles = append(existingArticles, newArticles...)
 
 	jsonFile, err := os.Create(jsonFilePath)
 	if err != nil {

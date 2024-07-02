@@ -1,21 +1,21 @@
 package main
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/cmd/web/handlers"
+	"news-aggregator/constant"
 )
 
 func main() {
-	//move
-	const PORT = ":8080"
+
 	http.HandleFunc("GET /articles", handlers.FetchArticleHandler)
 	http.HandleFunc("POST /sources", handlers.AddSourceHandler)
 	http.HandleFunc("DELETE /sources", handlers.DeleteSourceByNameHandler)
-	log.Println("Starting server on " + PORT)
+	logrus.Info("Starting server on " + constant.PORT)
 
-	err := http.ListenAndServe(PORT, nil)
+	err := http.ListenAndServe(constant.PORT, nil)
 	if err != nil {
-		log.Fatalf("Could not start server: %s\n", err.Error())
+		logrus.Fatalf("Could not start server: %s\n", err.Error())
 	}
 }
