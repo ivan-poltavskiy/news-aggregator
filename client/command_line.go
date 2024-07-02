@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
 	"os"
@@ -35,6 +36,7 @@ func NewCommandLine(aggregator Aggregator) Client {
 	flag.BoolVar(&cli.sortingBySources, "sortingBySources", false, "Enable sorting articles by sources")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
+	logrus.Info("Command line client initialized")
 	return cli
 }
 
@@ -47,18 +49,23 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 
 	filters, uniqueSources, fetchParametersError := cli.fetchParameters()
 	if fetchParametersError != nil {
+		logrus.Error("Command line client: Fetch parameters error: ", fetchParametersError)
 		return nil, fetchParametersError
 	}
 
+	logrus.Info("Command line client: Fetching articles with sources: ", uniqueSources, " and filters: ", filters)
 	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
 	if err != nil {
+		logrus.Error("Command line client: Aggregation error: ", err)
 		return nil, err
 	}
 
 	articles, fetchParametersError = DateSorter{}.SortArticle(articles, cli.sortBy)
 	if fetchParametersError != nil {
+		logrus.Error("Command line client: Date sorting error: ", fetchParametersError)
 		return nil, fetchParametersError
 	}
+	logrus.Info("Command line client: Articles fetched and sorted by date with sortBy: ", cli.sortBy)
 	return articles, nil
 }
 
@@ -78,7 +85,7 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 
 	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("./client/OutputTemplate.tmpl")
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Command line client: Template parsing error: ", err)
 	}
 
 	type articleData struct {
@@ -120,9 +127,10 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 		}
 	}
 
+	logrus.Info("Command line client: Printing articles with count: ", outputData.Count)
 	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Command line client: Template execution error: ", err)
 	}
 }
 
@@ -146,8 +154,10 @@ func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []strin
 	filters = buildKeywordFilter(cli.keywords, filters)
 	filters, err := buildDateFilters(cli.startDateStr, cli.endDateStr, filters)
 	if err != nil {
+		logrus.Error("Command line client: Date filter error: ", err)
 		return nil, nil, err
 	}
 	uniqueSources := checkUnique(sourceNames)
+	logrus.Info("Command line client: Parameters fetched with sources: ", uniqueSources, " and filters: ", filters)
 	return filters, uniqueSources, nil
 }
