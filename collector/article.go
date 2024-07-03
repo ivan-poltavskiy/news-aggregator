@@ -23,7 +23,7 @@ func New(sources []source.Source) *ArticleCollector {
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
 func (articleCollector *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
-	logrus.Info("Article collector: Starting to find news by resource names: ", sourcesNames)
+	logrus.Info("Article collector: Start searching for articles by sources names: ", sourcesNames)
 
 	var foundArticles []article.Article
 

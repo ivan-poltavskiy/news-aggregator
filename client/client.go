@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/constant"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
@@ -19,6 +20,7 @@ type Client interface {
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
 func buildKeywordFilter(keywords string, filters []filter.ArticleFilter) []filter.ArticleFilter {
+	logrus.Info("building keywords filter for: " + keywords)
 	if keywords != "" {
 		keywordList := strings.Split(keywords, ",")
 		uniqueKeywords := checkUnique(keywordList)
@@ -29,6 +31,7 @@ func buildKeywordFilter(keywords string, filters []filter.ArticleFilter) []filte
 
 // buildDateFilters extracts date filters from command line arguments and adds them to the filters.
 func buildDateFilters(startDateStr, endDateStr string, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+	logrus.Info("building date filters for start date: " + startDateStr + "and the end date: " + endDateStr)
 	validationErr, isValid := validator.ValidateDate(startDateStr, endDateStr)
 
 	if validationErr != nil {

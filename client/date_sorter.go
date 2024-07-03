@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/article"
 	"sort"
 	"strings"
@@ -13,6 +14,7 @@ type DateSorter struct {
 // SortArticle sorts news by ASC or DESC
 func (DateSorter) SortArticle(articles []article.Article, sortBy string) ([]article.Article, error) {
 
+	logrus.Info("DateSorter: sorting articles by " + sortBy)
 	lowerCaseSortParameter := strings.ToLower(sortBy)
 	if lowerCaseSortParameter == "" {
 		return articles, nil

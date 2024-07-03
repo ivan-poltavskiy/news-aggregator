@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
@@ -34,6 +35,7 @@ func NewWebClient(r http.Request, aggregator Aggregator) Client {
 		fmt.Println(err)
 	}
 	webClient.filters = filters
+	logrus.Info("New web client initialized")
 	return webClient
 }
 
@@ -48,6 +50,7 @@ func (webClient *WebClient) FetchArticles() ([]article.Article, error) {
 	if err != nil {
 		return nil, err
 	}
+	logrus.Info("Web client: articles aggregate successfully. Length: ", len(articles))
 
 	articles, fetchParametersError := webClient.DateSorter.SortArticle(articles, webClient.sortBy)
 	if fetchParametersError != nil {

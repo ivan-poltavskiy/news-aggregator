@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/aggregator"
 	"news-aggregator/client"
@@ -21,9 +22,9 @@ func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 	newsAggregator := aggregator.New(articleCollector)
 
 	webClient := client.NewWebClient(*r, newsAggregator)
-
 	articles, err := webClient.FetchArticles()
 	if err != nil {
+		logrus.Error("Failed to fetch articles ", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -31,6 +32,7 @@ func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(articles)
 	if err != nil {
+		logrus.Error("Failed to encode json ", err)
 		return
 	}
 }
