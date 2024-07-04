@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"news-aggregator/constant"
 	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
@@ -98,7 +99,7 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 		}
 	}(rssResp.Body)
 
-	directoryPath := filepath.Join("resources", domainName)
+	directoryPath := filepath.Join(constant.PathToResources, domainName)
 	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
 		logrus.Error("Failed to create directory: ", err)
 		return "", fmt.Errorf("failed to create directory")
@@ -134,7 +135,7 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 		return err, ""
 	}
 
-	jsonFilePath := filepath.Join("resources", domainName, domainName+".json")
+	jsonFilePath := filepath.Join(constant.PathToResources, domainName, domainName+".json")
 
 	existingArticles, err := readExistingArticles(jsonFilePath)
 	if err != nil {

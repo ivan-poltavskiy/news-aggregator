@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
 	"reflect"
@@ -8,23 +10,42 @@ import (
 )
 
 func setupTestEnvironment(t *testing.T) {
-	storageDir := "./storage"
-	if _, err := os.Stat(storageDir); os.IsNotExist(err) {
-		err = os.Mkdir(storageDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("Failed to create storage directory: %v", err)
-		}
+	// Set up a test environment
+	originalPath := constant.PathToStorage
+	originalPathToResources := constant.PathToResources
+	constant.PathToResources = "../../../resources/testdata/handlers"
+	constant.PathToStorage = "../../../resources/testdata/handlers/sources.json"
+	t.Cleanup(func() {
+		constant.PathToResources = originalPathToResources
+		constant.PathToStorage = originalPath
+	})
+
+	// Create directories and files in the 'resources' directory
+	err := os.MkdirAll(constant.PathToResources, os.ModePerm)
+	if err != nil {
+		t.Fatalf("Failed to create resources directory: %v", err)
+	}
+
+	// Create sample sources.json
+	var sources []source.Source
+	data, err := json.Marshal(sources)
+	if err != nil {
+		t.Fatalf("Failed to marshal sources: %v", err)
+	}
+	err = os.WriteFile(constant.PathToStorage, data, os.ModePerm)
+	if err != nil {
+		t.Fatalf("Failed to write test sources.json: %v", err)
 	}
 }
 
 func cleanupTestEnvironment(t *testing.T) {
 
-	err := os.RemoveAll("resources")
+	err := os.RemoveAll(constant.PathToResources)
 	if err != nil {
 		t.Fatalf("Failed to clean up resources directory: %v", err)
 	}
 
-	err = os.RemoveAll("./storage")
+	err = os.RemoveAll(constant.PathToStorage)
 	if err != nil {
 		t.Fatalf("Failed to clean up storage directory: %v", err)
 	}
@@ -42,9 +63,9 @@ func TestAddSource(t *testing.T) {
 		want    source.Source
 		wantErr bool
 	}{
-		{name: "Add pravda source",
+		{name: "Add pravda rrs source",
 			args:    args{url: "https://www.pravda.com.ua/"},
-			want:    source.Source{Name: "pravda", PathToFile: "resources\\pravda\\pravda.json", SourceType: "STORAGE"},
+			want:    source.Source{Name: "pravda", PathToFile: "..\\..\\..\\resources\\testdata\\handlers\\pravda\\pravda.json", SourceType: "STORAGE"},
 			wantErr: false,
 		},
 	}
