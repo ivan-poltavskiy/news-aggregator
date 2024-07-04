@@ -5,9 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
-	"news-aggregator/entity/source"
-	"os"
-	"path/filepath"
+	"news-aggregator/cmd/web/service"
 	"strings"
 )
 
@@ -17,65 +15,48 @@ type deleteSourceRequest struct {
 
 // DeleteSourceByNameHandler is a handler for removing the source from the storage.
 func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
+
+	var request deleteSourceRequest
 	body, err := io.ReadAll(r.Body)
+
 	if err != nil {
-		logrus.Error("DeleteSourceByNameHandler: Failed to read request body ", err)
+		logrus.Error("Failed to read request body: ", err)
 		http.Error(w, "Failed to read request body", http.StatusBadRequest)
 		return
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			logrus.Error("DeleteSourceByNameHandler: Failed to close request body ", err)
+			logrus.Error("Failed to close request body: ", err)
 		}
 	}(r.Body)
 
-	var request deleteSourceRequest
 	err = json.Unmarshal(body, &request)
 	if err != nil || request.Name == "" {
-		logrus.Error("DeleteSourceByNameHandler: Invalid request body or name parameter is missing")
+		logrus.Error("Invalid request body or name parameter is missing")
 		http.Error(w, "Invalid request body or name parameter is missing", http.StatusBadRequest)
 		return
 	}
-	logrus.Info("DeleteSourceByNameHandler: The name from the request to delete the source was successfully retrieved: ", request.Name)
 
-	var updatedSources []source.Source
-	found := false
-	for _, currentSource := range ReadSourcesFromFile() {
-		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(request.Name) {
-			updatedSources = append(updatedSources, currentSource)
-		} else {
-			found = true
-			directoryPath := filepath.Join("resources", strings.ToLower(request.Name))
-			err := os.RemoveAll(directoryPath)
-			if err != nil {
-				logrus.Error("DeleteSourceByNameHandler: Failed to delete source directory ", err)
-				http.Error(w, "Failed to delete source directory", http.StatusInternalServerError)
-				return
-			}
-			logrus.Info("DeleteSourceByNameHandler: The source directory was successfully deleted: ", directoryPath)
-		}
-	}
+	logrus.Infof("Request to delete source received: %s", request.Name)
 
-	if !found {
-		logrus.Warn("DeleteSourceByNameHandler: Source not found: ", request.Name)
-		http.Error(w, "Source not found", http.StatusNotFound)
-		return
-	}
-
-	err = WriteSourcesToFile(updatedSources)
+	err = service.DeleteAndUpdateSources(request.Name)
 	if err != nil {
-		logrus.Error("DeleteSourceByNameHandler: Failed to write updated sources to file ", err)
-		http.Error(w, "Failed to write updated sources to file", http.StatusInternalServerError)
+		if strings.Contains(err.Error(), "not found") {
+			logrus.Warnf("Source not found: %s", request.Name)
+			http.Error(w, "Source not found", http.StatusNotFound)
+		} else {
+			logrus.Error("Failed to delete source: ", err)
+			http.Error(w, "Failed to delete source", http.StatusInternalServerError)
+		}
 		return
 	}
-	logrus.Info("DeleteSourceByNameHandler: The updated sources were successfully written to the file")
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("Source deleted successfully"))
 	if err != nil {
-		logrus.Error("DeleteSourceByNameHandler: Failed to write response for delete source ", err)
+		logrus.Error("Failed to write response for delete source: ", err)
 		return
 	}
-	logrus.Info("DeleteSourceByNameHandler: Response for delete source was successfully written")
+	logrus.Info("Response for delete source written successfully")
 }

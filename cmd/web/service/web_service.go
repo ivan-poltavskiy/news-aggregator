@@ -1,10 +1,8 @@
-package handlers
+package service
 
 import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
-	"io"
-	"net/http"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
@@ -61,41 +59,6 @@ func ReadSourcesFromFile() []source.Source {
 
 	logrus.Info("ReadSourcesFromFile: Sources were successfully read from file")
 	return sources
-}
-
-func GetRssFeedLink(w http.ResponseWriter, url string) (error, string) {
-	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		logrus.Error("GetRssFeedLink: RSS URL not found ", err)
-		http.Error(w, "RSS URL not found", http.StatusInternalServerError)
-		return err, ""
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			logrus.Error("GetRssFeedLink: Error closing response body ", err)
-		}
-	}(resp.Body)
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		logrus.Error("GetRssFeedLink: Failed to read page content ", err)
-		http.Error(w, "Failed to read page content", http.StatusInternalServerError)
-		return err, ""
-	}
-
-	re := regexp.MustCompile(`(?i)<link[^>]+type="application/rss\+xml"[^>]+href="([^"]+)"`)
-	matches := re.FindStringSubmatch(string(body))
-
-	if len(matches) < 2 {
-		logrus.Warn("GetRssFeedLink: RSS link not found")
-		http.Error(w, "RSS link not found", http.StatusBadRequest)
-		return nil, ""
-	}
-
-	rssURL := matches[1]
-	logrus.Info("GetRssFeedLink: RSS link found: ", rssURL)
-	return nil, rssURL
 }
 
 func ExtractDomainName(url string) string {
