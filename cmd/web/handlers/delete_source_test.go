@@ -29,7 +29,7 @@ func setupTestEnvironment(t *testing.T) {
 	})
 
 	// Create directories and files in the 'resources' directory
-	err := os.MkdirAll("../../../resources/testdata/handlers", os.ModePerm)
+	err := os.MkdirAll(constant.PathToResources, os.ModePerm)
 	if err != nil {
 		t.Fatalf("Failed to create resources directory: %v", err)
 	}
@@ -43,13 +43,13 @@ func setupTestEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to marshal sources: %v", err)
 	}
-	err = os.WriteFile("../../../resources/testdata/handlers/sources.json", data, os.ModePerm)
+	err = os.WriteFile(constant.PathToStorage, data, os.ModePerm)
 	if err != nil {
 		t.Fatalf("Failed to write test sources.json: %v", err)
 	}
 
 	// Create sample source directory
-	err = os.MkdirAll(filepath.Join("../../../resources/testdata/handlers", "testsource1"), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(constant.PathToResources, "testsource1"), os.ModePerm)
 	if err != nil {
 		t.Fatalf("Failed to create test source directory: %v", err)
 	}
@@ -57,7 +57,7 @@ func setupTestEnvironment(t *testing.T) {
 
 func cleanupTestEnvironment(t *testing.T) {
 	// Remove the created directories and files after test
-	err := os.RemoveAll("../../../resources/testdata/handlers")
+	err := os.RemoveAll(constant.PathToResources)
 	if err != nil {
 		t.Fatalf("Failed to clean up resources directory: %v", err)
 	}
@@ -98,7 +98,7 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 				assert.Equal(t, "TestSource2", string(updatedSources[0].Name))
 
 				// Validate the directory removal
-				sourceDir := filepath.Join("../../../resources/testdata/handlers", "testsource1")
+				sourceDir := filepath.Join(constant.PathToResources, "testsource1")
 				if _, err := os.Stat(sourceDir); !os.IsNotExist(err) {
 					t.Errorf("Handler did not remove the source directory")
 				}

@@ -44,11 +44,6 @@ func cleanupTestEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to clean up resources directory: %v", err)
 	}
-
-	err = os.RemoveAll(constant.PathToStorage)
-	if err != nil {
-		t.Fatalf("Failed to clean up storage directory: %v", err)
-	}
 }
 
 func TestAddSource(t *testing.T) {
