@@ -90,7 +90,13 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 		logrus.Error("Failed to download RSS feed: ", err)
 		return "", fmt.Errorf("failed to download RSS feed")
 	}
-	defer rssResp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logrus.Error("Error closing response body ", err)
+			return
+		}
+	}(rssResp.Body)
 
 	directoryPath := filepath.Join("resources", domainName)
 	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
@@ -104,7 +110,13 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 		logrus.Error("Failed to create a file to save the RSS feed to: ", filePath)
 		return "", fmt.Errorf("failed to create file")
 	}
-	defer outputFile.Close()
+	defer func(outputFile *os.File) {
+		err := outputFile.Close()
+		if err != nil {
+			logrus.Error("Failed to close a file to save the RSS feed to: ", filePath)
+			return
+		}
+	}(outputFile)
 
 	if _, err := io.Copy(outputFile, rssResp.Body); err != nil {
 		logrus.Error("Could not download RSS feed: ", err)
@@ -117,44 +129,19 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 
 // parseAndSaveArticles parses RSS feed and saves the articles to the storage
 func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error, string) {
-	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
+	articles, err := parseRssFeed(sourceEntity)
 	if err != nil {
-		logrus.Error("Failed to parse RSS feed: ", err)
-		return fmt.Errorf("failed to parse RSS feed"), ""
+		return err, ""
 	}
 
 	jsonFilePath := filepath.Join("resources", domainName, domainName+".json")
 
-	var existingArticles []article.Article
-	if _, err := os.Stat(jsonFilePath); err == nil {
-		jsonFile, err := os.Open(jsonFilePath)
-		if err != nil {
-			logrus.Error("Failed to open existing JSON file: ", err)
-			return fmt.Errorf("failed to open existing JSON file"), ""
-		}
-		defer jsonFile.Close()
-
-		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
-			logrus.Error("Failed to decode existing articles from JSON file: ", err)
-			return fmt.Errorf("failed to decode existing articles from JSON file"), ""
-		}
+	existingArticles, err := readExistingArticles(jsonFilePath)
+	if err != nil {
+		return err, ""
 	}
 
-	// Create a map of existing articles for quick lookup
-	existingTitles := make(map[string]struct{})
-	for _, existingArticle := range existingArticles {
-		existingTitles[existingArticle.Title.String()] = struct{}{}
-	}
-
-	// Filter out duplicate articles
-	var newArticles []article.Article
-	for _, newArticle := range articles {
-		if _, exists := existingTitles[newArticle.Title.String()]; !exists {
-			newArticles = append(newArticles, newArticle)
-		}
-	}
-
-	// If no new articles to add, skip the file update
+	newArticles := filterNewArticles(articles, existingArticles)
 	if len(newArticles) == 0 {
 		logrus.Info("No new articles to add")
 		return nil, jsonFilePath
@@ -162,18 +149,80 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 
 	existingArticles = append(existingArticles, newArticles...)
 
-	jsonFile, err := os.Create(jsonFilePath)
-	if err != nil {
-		logrus.Error("Failed to create JSON file: ", err)
-		return fmt.Errorf("failed to create JSON file"), ""
-	}
-	defer jsonFile.Close()
-
-	if err := json.NewEncoder(jsonFile).Encode(existingArticles); err != nil {
-		logrus.Error("Failed to encode articles to JSON file: ", err)
-		return fmt.Errorf("failed to encode articles to JSON file"), ""
+	if err := saveArticles(jsonFilePath, existingArticles); err != nil {
+		return err, ""
 	}
 
 	logrus.Info("parseAndSaveArticles: Articles successfully parsed and saved to: ", jsonFilePath)
 	return nil, jsonFilePath
+}
+
+func parseRssFeed(sourceEntity source.Source) ([]article.Article, error) {
+	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
+	if err != nil {
+		logrus.Error("Failed to parse RSS feed: ", err)
+		return nil, fmt.Errorf("failed to parse RSS feed")
+	}
+	return articles, nil
+}
+
+func readExistingArticles(jsonFilePath string) ([]article.Article, error) {
+	var existingArticles []article.Article
+
+	if _, err := os.Stat(jsonFilePath); err == nil {
+		jsonFile, err := os.Open(jsonFilePath)
+		if err != nil {
+			logrus.Error("Failed to open existing JSON file: ", err)
+			return nil, fmt.Errorf("failed to open existing JSON file")
+		}
+		defer func(jsonFile *os.File) {
+			err := jsonFile.Close()
+			if err != nil {
+				logrus.Error("Failed to close the existing JSON file: ", err)
+			}
+		}(jsonFile)
+
+		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
+			logrus.Error("Failed to decode existing articles from JSON file: ", err)
+			return nil, fmt.Errorf("failed to decode existing articles from JSON file")
+		}
+	}
+
+	return existingArticles, nil
+}
+func filterNewArticles(articles []article.Article, existingArticles []article.Article) []article.Article {
+	existingTitles := make(map[string]struct{})
+	for _, existingArticle := range existingArticles {
+		existingTitles[existingArticle.Title.String()] = struct{}{}
+	}
+
+	var newArticles []article.Article
+	for _, newArticle := range articles {
+		if _, exists := existingTitles[newArticle.Title.String()]; !exists {
+			newArticles = append(newArticles, newArticle)
+		}
+	}
+
+	return newArticles
+}
+
+func saveArticles(jsonFilePath string, articles []article.Article) error {
+	jsonFile, err := os.Create(jsonFilePath)
+	if err != nil {
+		logrus.Error("Failed to create JSON file: ", err)
+		return fmt.Errorf("failed to create JSON file")
+	}
+	defer func(jsonFile *os.File) {
+		err := jsonFile.Close()
+		if err != nil {
+			logrus.Error("Failed to close the JSON file: ", err)
+		}
+	}(jsonFile)
+
+	if err := json.NewEncoder(jsonFile).Encode(articles); err != nil {
+		logrus.Error("Failed to encode articles to JSON file: ", err)
+		return fmt.Errorf("failed to encode articles to JSON file")
+	}
+
+	return nil
 }
