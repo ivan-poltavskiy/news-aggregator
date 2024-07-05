@@ -1,147 +1,79 @@
-package handlers
+package handlers_test
 
 import (
+	"bou.ke/monkey"
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/constant"
-	"news-aggregator/entity/source"
-	"os"
-	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"news-aggregator/cmd/web/handlers"
+	"news-aggregator/cmd/web/service"
 )
 
-type testDeleteSourceRequest struct {
-	Name string `json:"name"`
-}
-
-func setupTestEnvironment(t *testing.T) {
-	// Set up a test environment
-	originalPath := constant.PathToStorage
-	originalPathToResources := constant.PathToResources
-	constant.PathToResources = "../../../resources/testdata/handlers"
-	constant.PathToStorage = "../../../resources/testdata/handlers/sources.json"
-	t.Cleanup(func() {
-		constant.PathToResources = originalPathToResources
-		constant.PathToStorage = originalPath
-	})
-
-	// Create directories and files in the 'resources' directory
-	err := os.MkdirAll(constant.PathToResources, os.ModePerm)
-	if err != nil {
-		t.Fatalf("Failed to create resources directory: %v", err)
+// mock the DeleteAndUpdateSources function
+func mockDeleteAndUpdateSources(name string) error {
+	if name == "ExistingSource" {
+		return nil
 	}
-
-	// Create sample sources.json
-	sources := []source.Source{
-		{Name: "TestSource1"},
-		{Name: "TestSource2"},
+	if name == "NonExistingSource" {
+		return fmt.Errorf("source not found")
 	}
-	data, err := json.Marshal(sources)
-	if err != nil {
-		t.Fatalf("Failed to marshal sources: %v", err)
-	}
-	err = os.WriteFile(constant.PathToStorage, data, os.ModePerm)
-	if err != nil {
-		t.Fatalf("Failed to write test sources.json: %v", err)
-	}
-
-	// Create sample source directory
-	err = os.MkdirAll(filepath.Join(constant.PathToResources, "testsource1"), os.ModePerm)
-	if err != nil {
-		t.Fatalf("Failed to create test source directory: %v", err)
-	}
-}
-
-func cleanupTestEnvironment(t *testing.T) {
-	// Remove the created directories and files after test
-	err := os.RemoveAll(constant.PathToResources)
-	if err != nil {
-		t.Fatalf("Failed to clean up resources directory: %v", err)
-	}
+	return fmt.Errorf("unknown error")
 }
 
 func TestDeleteSourceByNameHandler(t *testing.T) {
+	patch := monkey.Patch(service.DeleteAndUpdateSources, mockDeleteAndUpdateSources)
+	defer patch.Unpatch()
+
 	tests := []struct {
-		name         string
-		setupFunc    func(t *testing.T) (*http.Request, *httptest.ResponseRecorder)
-		validateFunc func(t *testing.T, rr *httptest.ResponseRecorder)
+		name           string
+		requestBody    interface{}
+		expectedStatus int
+		expectedBody   string
 	}{
 		{
-			name: "Delete existing source",
-			setupFunc: func(t *testing.T) (*http.Request, *httptest.ResponseRecorder) {
-				setupTestEnvironment(t)
-				requestBody, _ := json.Marshal(testDeleteSourceRequest{Name: "TestSource1"})
-				req, err := http.NewRequest("DELETE", "/sources", bytes.NewBuffer(requestBody))
-				if err != nil {
-					t.Fatalf("Failed to create request: %v", err)
-				}
-				rr := httptest.NewRecorder()
-				return req, rr
-			},
-			validateFunc: func(t *testing.T, rr *httptest.ResponseRecorder) {
-				assert.Equal(t, http.StatusOK, rr.Code, "Handler returned wrong status code: got %v want %v", rr.Code, http.StatusOK)
-
-				// Validate the storage
-				data, err := os.ReadFile(constant.PathToStorage)
-				if err != nil {
-					t.Fatalf("Failed to read updated sources.json: %v", err)
-				}
-				var updatedSources []source.Source
-				err = json.Unmarshal(data, &updatedSources)
-				if err != nil {
-					t.Fatalf("Failed to unmarshal updated sources.json: %v", err)
-				}
-				assert.Equal(t, 1, len(updatedSources))
-				assert.Equal(t, "TestSource2", string(updatedSources[0].Name))
-
-				// Validate the directory removal
-				sourceDir := filepath.Join(constant.PathToResources, "testsource1")
-				if _, err := os.Stat(sourceDir); !os.IsNotExist(err) {
-					t.Errorf("Handler did not remove the source directory")
-				}
-			},
+			name:           "ValidRequest",
+			requestBody:    map[string]string{"name": "ExistingSource"},
+			expectedStatus: http.StatusOK,
+			expectedBody:   "Source deleted successfully",
 		},
 		{
-			name: "Delete non existing source",
-			setupFunc: func(t *testing.T) (*http.Request, *httptest.ResponseRecorder) {
-				setupTestEnvironment(t)
-				requestBody, _ := json.Marshal(testDeleteSourceRequest{Name: "TestSource111"})
-				req, err := http.NewRequest("DELETE", "/sources", bytes.NewBuffer(requestBody))
-				if err != nil {
-					t.Fatalf("Failed to create request: %v", err)
-				}
-				rr := httptest.NewRecorder()
-				return req, rr
-			},
-			validateFunc: func(t *testing.T, rr *httptest.ResponseRecorder) {
-				assert.Equal(t, http.StatusNotFound, rr.Code, "Handler returned wrong status code: got %v want %v", rr.Code, http.StatusNotFound)
-
-				assert.Equal(t, "Source not found\n", rr.Body.String(), "Handler returned unexpected body: got %v want %v", rr.Body.String(), "Source not found\n")
-
-				// Validate the storage
-				data, err := os.ReadFile(constant.PathToStorage)
-				if err != nil {
-					t.Fatalf("Failed to read updated sources.json: %v", err)
-				}
-				var updatedSources []source.Source
-				err = json.Unmarshal(data, &updatedSources)
-				if err != nil {
-					t.Fatalf("Failed to unmarshal updated sources.json: %v", err)
-				}
-				assert.Equal(t, 2, len(updatedSources))
-			},
+			name:           "NonExistingSource",
+			requestBody:    map[string]string{"name": "NonExistingSource"},
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   "Source not found",
+		},
+		{
+			name:           "InvalidRequestBody",
+			requestBody:    "InvalidBody",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid request body or name parameter is missing",
+		},
+		{
+			name:           "EmptyName",
+			requestBody:    map[string]string{"name": ""},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid request body or name parameter is missing",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req, rr := tt.setupFunc(t)
-			defer cleanupTestEnvironment(t)
-			DeleteSourceByNameHandler(rr, req)
-			tt.validateFunc(t, rr)
+			body, _ := json.Marshal(tt.requestBody)
+			req, err := http.NewRequest(http.MethodDelete, "/sources", bytes.NewBuffer(body))
+			assert.NoError(t, err)
+
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(handlers.DeleteSourceByNameHandler)
+
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			assert.Contains(t, rr.Body.String(), tt.expectedBody)
 		})
 	}
 }

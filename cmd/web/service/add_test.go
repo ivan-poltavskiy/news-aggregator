@@ -55,12 +55,12 @@ func TestAddSource(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    source.Source
+		want    source.Name
 		wantErr bool
 	}{
 		{name: "Add pravda rrs source",
 			args:    args{url: "https://www.pravda.com.ua/"},
-			want:    source.Source{Name: "pravda", PathToFile: "..\\..\\..\\resources\\testdata\\handlers\\pravda\\pravda.json", SourceType: "STORAGE"},
+			want:    source.Name("pravda"),
 			wantErr: false,
 		},
 	}

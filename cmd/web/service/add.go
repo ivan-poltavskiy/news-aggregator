@@ -16,11 +16,13 @@ import (
 )
 
 // AddSource processes the source URL and returns the source entity
-func AddSource(url string) (source.Source, error) {
-
+func AddSource(url string) (source.Name, error) {
+	if url == "" {
+		return "", fmt.Errorf("passed url is empty")
+	}
 	rssURL, err := getRssFeedLink(url)
 	if err != nil {
-		return source.Source{}, err
+		return "", err
 	}
 	logrus.Info("AddSource: The URL of feed was successfully retrieved: ", rssURL)
 
@@ -28,7 +30,7 @@ func AddSource(url string) (source.Source, error) {
 
 	filePath, err := downloadRssFeed(rssURL, domainName)
 	if err != nil {
-		return source.Source{}, err
+		return "", err
 	}
 
 	sourceEntity := source.Source{
@@ -39,7 +41,7 @@ func AddSource(url string) (source.Source, error) {
 
 	err, jsonPath := parseAndSaveArticles(sourceEntity, domainName)
 	if err != nil {
-		return source.Source{}, err
+		return "", err
 	}
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
@@ -49,7 +51,7 @@ func AddSource(url string) (source.Source, error) {
 	} else {
 		logrus.Info("Source already exists")
 	}
-	return sourceEntity, nil
+	return sourceEntity.Name, nil
 }
 
 func getRssFeedLink(url string) (string, error) {
