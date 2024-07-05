@@ -5,26 +5,18 @@ import (
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
 
-func setupTestEnvironment(t *testing.T) {
-	// Set up a test environment
-	originalPath := constant.PathToStorage
-	originalPathToResources := constant.PathToResources
-	constant.PathToResources = "../../../resources/testdata/handlers"
-	constant.PathToStorage = "../../../resources/testdata/handlers/sources.json"
-	t.Cleanup(func() {
-		constant.PathToResources = originalPathToResources
-		constant.PathToStorage = originalPath
-	})
+func setupTestEnvironment(t *testing.T) string {
+	// Create a temporary directory for resources
+	resources := t.TempDir()
 
-	// Create directories and files in the 'resources' directory
-	err := os.MkdirAll(constant.PathToResources, os.ModePerm)
-	if err != nil {
-		t.Fatalf("Failed to create resources directory: %v", err)
-	}
+	// Set the paths to the temporary directory
+	constant.PathToResources = resources
+	constant.PathToStorage = filepath.Join(resources, "sources.json")
 
 	// Create sample sources.json
 	var sources []source.Source
@@ -36,37 +28,41 @@ func setupTestEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to write test sources.json: %v", err)
 	}
-}
 
-func cleanupTestEnvironment(t *testing.T) {
-
-	err := os.RemoveAll(constant.PathToResources)
-	if err != nil {
-		t.Fatalf("Failed to clean up resources directory: %v", err)
-	}
+	return resources
 }
 
 func TestAddSource(t *testing.T) {
 	setupTestEnvironment(t)
-	defer cleanupTestEnvironment(t)
-	type args struct {
-		url string
-	}
+
 	tests := []struct {
 		name    string
-		args    args
+		url     string
 		want    source.Name
 		wantErr bool
 	}{
-		{name: "Add pravda rrs source",
-			args:    args{url: "https://www.pravda.com.ua/"},
+		{
+			name:    "Add pravda rrs source",
+			url:     "https://www.pravda.com.ua/",
 			want:    source.Name("pravda"),
 			wantErr: false,
+		},
+		{
+			name:    "Add not rrs source",
+			url:     "https://www.bbc.com",
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Add empty source",
+			url:     "",
+			want:    "",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := AddSource(tt.args.url)
+			got, err := AddSource(tt.url)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AddSource() error = %v, wantErr %v", err, tt.wantErr)
 				return
