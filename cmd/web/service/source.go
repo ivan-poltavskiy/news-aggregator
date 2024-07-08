@@ -10,57 +10,60 @@ import (
 	"strings"
 )
 
-func WriteSourcesToFile(sources []source.Source) error {
+// WriteSourcesToStorage saves the source entity to the storage of sources
+func WriteSourcesToStorage(sources []source.Source) error {
 	file, err := os.Create(constant.PathToStorage)
 	if err != nil {
-		logrus.Error("WriteSourcesToFile: Error creating file ", err)
+		logrus.Error("WriteSourcesToStorage: Error creating file ", err)
 		return err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			logrus.Error("WriteSourcesToFile: Error closing file ", err)
+			logrus.Error("WriteSourcesToStorage: Error closing file ", err)
 		}
 	}(file)
 
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(&sources)
 	if err != nil {
-		logrus.Error("WriteSourcesToFile: Error encoding sources ", err)
+		logrus.Error("WriteSourcesToStorage: Error encoding sources ", err)
 		return err
 	}
 
-	logrus.Info("WriteSourcesToFile: Sources were successfully written to file")
+	logrus.Info("WriteSourcesToStorage: Sources were successfully written to file")
 	return nil
 }
 
-func ReadSourcesFromFile() []source.Source {
+// ReadSourcesFromStorage returns the entities of sources from the storage
+func ReadSourcesFromStorage() []source.Source {
 	file, err := os.Open(constant.PathToStorage)
 	if err != nil {
 		if os.IsNotExist(err) {
-			logrus.Warn("ReadSourcesFromFile: Sources file does not exist")
+			logrus.Warn("ReadSourcesFromStorage: Sources file does not exist")
 			return []source.Source{}
 		}
-		logrus.Error("ReadSourcesFromFile: Error opening sources file ", err)
+		logrus.Error("ReadSourcesFromStorage: Error opening sources file ", err)
 		return nil
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			logrus.Error("ReadSourcesFromFile: Error closing file ", err)
+			logrus.Error("ReadSourcesFromStorage: Error closing file ", err)
 		}
 	}(file)
 
 	var sources []source.Source
 	if err := json.NewDecoder(file).Decode(&sources); err != nil {
-		logrus.Error("ReadSourcesFromFile: Error decoding sources file ", err)
+		logrus.Error("ReadSourcesFromStorage: Error decoding sources file ", err)
 		return nil
 	}
 
-	logrus.Info("ReadSourcesFromFile: Sources were successfully read from file")
+	logrus.Info("ReadSourcesFromStorage: Sources were successfully read from file")
 	return sources
 }
 
+// ExtractDomainName parse the url to get the resource domain
 func ExtractDomainName(url string) string {
 	re := regexp.MustCompile(`https?://(www\.)?([^/]+)`)
 	matches := re.FindStringSubmatch(url)
@@ -75,7 +78,7 @@ func ExtractDomainName(url string) string {
 }
 
 func IsSourceExists(name source.Name) bool {
-	sources := ReadSourcesFromFile()
+	sources := ReadSourcesFromStorage()
 	for _, s := range sources {
 		if s.Name == name {
 			logrus.Info("IsSourceExists: Source exists: ", name)
@@ -86,8 +89,9 @@ func IsSourceExists(name source.Name) bool {
 	return false
 }
 
+// AddSourceToStorage add the entity of source to the storage
 func AddSourceToStorage(newSource source.Source) {
-	sources := append(ReadSourcesFromFile(), newSource)
+	sources := append(ReadSourcesFromStorage(), newSource)
 
 	file, err := os.Create(constant.PathToStorage)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 func DeleteAndUpdateSources(name string) error {
 	var updatedSources []source.Source
 	found := false
-	for _, currentSource := range ReadSourcesFromFile() {
+	for _, currentSource := range ReadSourcesFromStorage() {
 		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(name) {
 			updatedSources = append(updatedSources, currentSource)
 		} else {
@@ -32,7 +32,7 @@ func DeleteAndUpdateSources(name string) error {
 		return fmt.Errorf("source not found: %s", name)
 	}
 
-	if err := WriteSourcesToFile(updatedSources); err != nil {
+	if err := WriteSourcesToStorage(updatedSources); err != nil {
 		logrus.Errorf("Failed to write updated sources to file: %v", err)
 		return err
 	}

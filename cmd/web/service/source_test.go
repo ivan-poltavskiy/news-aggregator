@@ -21,7 +21,7 @@ func TestWriteSourcesToFile(t *testing.T) {
 	resources := t.TempDir()
 	constant.PathToStorage = filepath.Join(resources, "sources.json")
 
-	err := service.WriteSourcesToFile(sources)
+	err := service.WriteSourcesToStorage(sources)
 	assert.NoError(t, err, "Expected no error when writing sources to file")
 
 	file, err := os.Open(constant.PathToStorage)
@@ -47,7 +47,7 @@ func TestReadSourcesFromFile(t *testing.T) {
 	err = os.WriteFile(constant.PathToStorage, data, os.ModePerm)
 	assert.NoError(t, err, "Expected no error when writing sources to file")
 
-	readSources := service.ReadSourcesFromFile()
+	readSources := service.ReadSourcesFromStorage()
 	assert.Equal(t, sources, readSources, "Sources should match")
 }
 
@@ -55,7 +55,7 @@ func TestReadSourcesFromFile_NonExistentFile(t *testing.T) {
 	resources := t.TempDir()
 	constant.PathToStorage = filepath.Join(resources, "sources.json")
 
-	readSources := service.ReadSourcesFromFile()
+	readSources := service.ReadSourcesFromStorage()
 	assert.Empty(t, readSources, "Expected empty sources when file does not exist")
 }
 func TestExtractDomainName(t *testing.T) {

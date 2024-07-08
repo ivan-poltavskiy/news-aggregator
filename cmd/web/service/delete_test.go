@@ -77,7 +77,7 @@ func TestDeleteAndUpdateSources(t *testing.T) {
 				assert.Error(t, err, "Expected error when deleting non-existing source")
 			}
 
-			updatedSources := ReadSourcesFromFile()
+			updatedSources := ReadSourcesFromStorage()
 			assert.Equal(t, len(tt.expectedSources), len(updatedSources), "Number of sources should be as expected")
 			for i, source := range tt.expectedSources {
 				assert.Equal(t, source.Name, updatedSources[i].Name, "Source name should match")
