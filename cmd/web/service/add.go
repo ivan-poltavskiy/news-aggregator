@@ -137,7 +137,7 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 		return err, ""
 	}
 
-	jsonFilePath := filepath.Join(constant.PathToResources, domainName, domainName+".json")
+	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, domainName, domainName+".json"))
 
 	existingArticles, err := readExistingArticles(jsonFilePath)
 	if err != nil {

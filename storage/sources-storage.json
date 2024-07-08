@@ -26,17 +26,17 @@
   },
   {
     "Name": "nytimes",
-    "PathToFile": "resources\\nytimes\\nytimes.json",
+    "PathToFile": "resources/nytimes/nytimes.json",
     "SourceType": "STORAGE"
   },
   {
     "Name": "pravda",
-    "PathToFile": "resources\\pravda\\pravda.json",
+    "PathToFile": "resources/pravda/pravda.json",
     "SourceType": "STORAGE"
   },
   {
     "Name": "kashtan",
-    "PathToFile": "resources\\kashtan\\kashtan.json",
+    "PathToFile": "resources/kashtan/kashtan.json",
     "SourceType": "STORAGE"
   }
 ]
