@@ -23,7 +23,6 @@ type WebClient struct {
 
 // NewWebClient creates and initializes a new web client with the provided aggregator.
 func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) Client {
-
 	queryParams := r.URL.Query()
 	webClient := &WebClient{aggregator: aggregator}
 	webClient.Sources = checkUnique(strings.Split(queryParams.Get("sources"), ","))
@@ -34,7 +33,7 @@ func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) 
 	webClient.filters = buildKeywordFilter(queryParams.Get("keywords"), webClient.filters)
 	filters, err := buildDateFilters(queryParams.Get("startDate"), queryParams.Get("endDate"), webClient.filters)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error("New web client initialization error: ", err)
 	}
 	webClient.filters = filters
 	webClient.output = w
@@ -73,11 +72,16 @@ func (webClient *WebClient) Print(articles []article.Article) {
 
 // printUsage prints the usage instructions
 func (webClient *WebClient) printUsage() {
-	fmt.Println("Usage of news-aggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. " +
-		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
-		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
-		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
-		"Date format - yyyy-mm-dd" + "" +
-		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
+	webClient.output.Header().Set("Content-Type", "text/plain")
+	_, err := fmt.Fprintln(webClient.output, "Usage of news-aggregator:"+
+		"\nType --sources, and then list the resources you want to retrieve information from. "+
+		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n"+
+		"\nType --keywords, and then list the keywords by which you want to filter articles. \n"+
+		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown."+
+		"Date format - yyyy-mm-dd"+
+		"\nType --sortBy to sort by DESC/ASC."+
+		"\nType --sortingBySources to sort by sources.")
+	if err != nil {
+		return
+	}
 }
