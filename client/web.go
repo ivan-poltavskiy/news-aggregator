@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -17,10 +18,11 @@ type WebClient struct {
 	help             bool
 	DateSorter       DateSorter
 	filters          []filter.ArticleFilter
+	output           http.ResponseWriter
 }
 
 // NewWebClient creates and initializes a new web client with the provided aggregator.
-func NewWebClient(r http.Request, aggregator Aggregator) Client {
+func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) Client {
 
 	queryParams := r.URL.Query()
 	webClient := &WebClient{aggregator: aggregator}
@@ -35,6 +37,7 @@ func NewWebClient(r http.Request, aggregator Aggregator) Client {
 		fmt.Println(err)
 	}
 	webClient.filters = filters
+	webClient.output = w
 	logrus.Info("New web client initialized")
 	return webClient
 }
@@ -60,7 +63,12 @@ func (webClient *WebClient) FetchArticles() ([]article.Article, error) {
 }
 
 func (webClient *WebClient) Print(articles []article.Article) {
-
+	webClient.output.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(webClient.output).Encode(articles)
+	if err != nil {
+		logrus.Error("Failed to encode json: ", err)
+		http.Error(webClient.output, "Failed to encode json: "+err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // printUsage prints the usage instructions

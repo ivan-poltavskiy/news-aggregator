@@ -7,3 +7,6 @@ var PathToStorage = "./storage/sources-storage.json"
 const PORT = ":443"
 
 var PathToResources = "resources"
+
+const CertFile = "certificates/server.crt"
+const KeyFile = "certificates/server.key"
