@@ -14,8 +14,8 @@ type news struct {
 }
 
 func New(articleCollector Collector) client.Aggregator {
-	news := &news{newsCollector: articleCollector}
-	return news
+	newsAggregator := &news{newsCollector: articleCollector}
+	return newsAggregator
 }
 
 // Aggregate fetches articles from the provided sources, applies the given
