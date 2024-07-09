@@ -75,8 +75,8 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 			return text
 		} else {
 			for _, keyword := range strings.Split(keywords, ",") {
-				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
 				stemString := porterstemmer.StemString(strings.ToLower(keyword))
+				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(stemString))
 				text = re.ReplaceAllString(text, "//"+stemString+"//")
 			}
 			return text
