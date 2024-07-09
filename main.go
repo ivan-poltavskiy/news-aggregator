@@ -17,14 +17,14 @@ func main() {
 		constant.WashingtonSource,
 		constant.UsaTodaySource,
 	}
-	articleCollector := collector.New(sources)
+	newsCollector := collector.New(sources)
 
-	newsAggregator := aggregator.New(articleCollector)
+	newsAggregator := aggregator.New(newsCollector)
 	cli := client.NewCommandLine(newsAggregator)
-	articles, err := cli.FetchArticles()
+	news, err := cli.FetchNews()
 	if err != nil {
 		println(err.Error())
 	}
-	cli.Print(articles)
+	cli.Print(news)
 
 }

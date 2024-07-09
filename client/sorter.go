@@ -1,9 +1,9 @@
 package client
 
-import "news-aggregator/entity/article"
+import "news-aggregator/entity/news"
 
 // Sorter sorts input data according to specified rules.
 type Sorter interface {
-	//SortArticle allocates input articles.
-	SortArticle(articles []article.Article, sortBy string) ([]article.Article, error)
+	//SortNews allocates input articles.
+	SortNews(articles []news.News, sortBy string) ([]news.News, error)
 }

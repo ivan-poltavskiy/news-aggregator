@@ -5,7 +5,7 @@
 package mock_aggregator
 
 import (
-	article "news-aggregator/entity/article"
+	news "news-aggregator/entity/news"
 	source "news-aggregator/entity/source"
 	reflect "reflect"
 
@@ -36,10 +36,10 @@ func (m *MockCollector) EXPECT() *MockCollectorMockRecorder {
 }
 
 // FindNewsByResourcesName mocks base method.
-func (m *MockCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (m *MockCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]news.News, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindNewsByResourcesName", sourcesNames)
-	ret0, _ := ret[0].([]article.Article)
+	ret0, _ := ret[0].([]news.News)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

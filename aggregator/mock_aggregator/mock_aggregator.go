@@ -5,7 +5,7 @@
 package mock_aggregator
 
 import (
-	article "news-aggregator/entity/article"
+	article "news-aggregator/entity/news"
 	filter "news-aggregator/filter"
 	reflect "reflect"
 
@@ -36,14 +36,14 @@ func (m *MockAggregator) EXPECT() *MockAggregatorMockRecorder {
 }
 
 // Aggregate mocks base method.
-func (m *MockAggregator) Aggregate(arg0 []string, arg1 ...filter.ArticleFilter) ([]article.Article, error) {
+func (m *MockAggregator) Aggregate(arg0 []string, arg1 ...filter.NewsFilter) ([]article.News, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Aggregate", varargs...)
-	ret0, _ := ret[0].([]article.Article)
+	ret0, _ := ret[0].([]article.News)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

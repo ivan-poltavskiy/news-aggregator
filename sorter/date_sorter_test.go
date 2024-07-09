@@ -1,16 +1,16 @@
 package sorter
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"testing"
 	"time"
 )
 
 func TestDateSorter_SortArticle(t *testing.T) {
-	articles := []article.Article{
-		{Title: "Article 1", Date: time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC)},
-		{Title: "Article 2", Date: time.Date(2023, 7, 2, 0, 0, 0, 0, time.UTC)},
-		{Title: "Article 3", Date: time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC)},
+	articles := []news.News{
+		{Title: "News 1", Date: time.Date(2023, 7, 1, 0, 0, 0, 0, time.UTC)},
+		{Title: "News 2", Date: time.Date(2023, 7, 2, 0, 0, 0, 0, time.UTC)},
+		{Title: "News 3", Date: time.Date(2023, 7, 3, 0, 0, 0, 0, time.UTC)},
 	}
 
 	dateSorter := DateSorter{}
@@ -24,12 +24,12 @@ func TestDateSorter_SortArticle(t *testing.T) {
 		{
 			name:   "ascending",
 			sortBy: "asc",
-			want:   []string{"Article 1", "Article 2", "Article 3"},
+			want:   []string{"News 1", "News 2", "News 3"},
 		},
 		{
 			name:   "descending",
 			sortBy: "desc",
-			want:   []string{"Article 3", "Article 2", "Article 1"},
+			want:   []string{"News 3", "News 2", "News 1"},
 		},
 		{
 			name:      "invalid parameter",
@@ -41,7 +41,7 @@ func TestDateSorter_SortArticle(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sortedArticles, err := dateSorter.SortArticle(articles, tt.sortBy)
+			sortedArticles, err := dateSorter.SortNews(articles, tt.sortBy)
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 			}
@@ -55,7 +55,7 @@ func TestDateSorter_SortArticle(t *testing.T) {
 
 			for i, article := range sortedArticles {
 				if string(article.Title) != tt.want[i] {
-					t.Fatalf("expected article title %v, got %v", tt.want[i], article.Title)
+					t.Fatalf("expected news title %v, got %v", tt.want[i], article.Title)
 				}
 			}
 		})

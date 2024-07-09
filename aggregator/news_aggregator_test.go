@@ -2,8 +2,8 @@ package aggregator
 
 import (
 	"github.com/golang/mock/gomock"
-	"news-aggregator/collector/mock_aggregator"
-	"news-aggregator/entity/article"
+	"news-aggregator/aggregator/mock_aggregator"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/filter"
 	"reflect"
@@ -19,7 +19,7 @@ func TestNews_Aggregate(t *testing.T) {
 	mockCollector := mock_aggregator.NewMockCollector(ctrl)
 	type args struct {
 		sources []string
-		filters []filter.ArticleFilter
+		filters []filter.NewsFilter
 	}
 	tests := []struct {
 		name         string
@@ -32,14 +32,14 @@ func TestNews_Aggregate(t *testing.T) {
 			name: "Test with date filter from bbc and nbc sources",
 			args: args{
 				sources: []string{"bbc", "nbc"},
-				filters: []filter.ArticleFilter{filter.ByDate{
+				filters: []filter.NewsFilter{filter.ByDate{
 					StartDate: parseDate("2024-05-17"),
 					EndDate:   parseDate("2024-05-19"),
 				}},
 			},
 			setup: func() {
 				mockCollector.EXPECT().FindNewsByResourcesName([]source.Name{"bbc", "nbc"}).
-					Return([]article.Article{
+					Return([]news.News{
 						{Title: "Test Title", Description: "Test Description", Link: "http://test.com", Date: time.Date(2024, time.May, 18, 0, 0, 0, 0, time.UTC)},
 					}, nil)
 			},
@@ -50,13 +50,13 @@ func TestNews_Aggregate(t *testing.T) {
 			name: "Test with keyword filter from bbc source with rss type",
 			args: args{
 				sources: []string{"bbc"},
-				filters: []filter.ArticleFilter{filter.ByKeyword{
+				filters: []filter.NewsFilter{filter.ByKeyword{
 					Keywords: []string{"Trump"},
 				}},
 			},
 			setup: func() {
 				mockCollector.EXPECT().FindNewsByResourcesName([]source.Name{"bbc"}).
-					Return([]article.Article{
+					Return([]news.News{
 						{Title: "Trump News 1", Description: "Description 1", Link: "http://test1.com", Date: time.Now()},
 						{Title: "Trump News 2", Description: "Description 2", Link: "http://test2.com", Date: time.Now()},
 					}, nil)
@@ -68,13 +68,13 @@ func TestNews_Aggregate(t *testing.T) {
 			name: "Test with keyword filter from Usa Today source with html type",
 			args: args{
 				sources: []string{"usatoday"},
-				filters: []filter.ArticleFilter{filter.ByKeyword{
+				filters: []filter.NewsFilter{filter.ByKeyword{
 					Keywords: []string{"ukr"},
 				}},
 			},
 			setup: func() {
 				mockCollector.EXPECT().FindNewsByResourcesName([]source.Name{"usatoday"}).
-					Return([]article.Article{
+					Return([]news.News{
 						{Title: "Ukraine News 1", Description: "Description 1", Link: "http://test1.com", Date: time.Now()},
 						{Title: "Ukraine News 2", Description: "Description 2", Link: "http://test2.com", Date: time.Now()},
 						{Title: "Ukraine News 3", Description: "Description 3", Link: "http://test3.com", Date: time.Now()},
@@ -88,13 +88,13 @@ func TestNews_Aggregate(t *testing.T) {
 			name: "Test with keyword filter from NBC source with JSON type",
 			args: args{
 				sources: []string{"nbc"},
-				filters: []filter.ArticleFilter{filter.ByKeyword{
+				filters: []filter.NewsFilter{filter.ByKeyword{
 					Keywords: []string{"ukr"},
 				}},
 			},
 			setup: func() {
 				mockCollector.EXPECT().FindNewsByResourcesName([]source.Name{"nbc"}).
-					Return([]article.Article{
+					Return([]news.News{
 						{Title: "Ukraine News from NBC", Description: "Description", Link: "http://test.com", Date: time.Now()},
 					}, nil)
 			},

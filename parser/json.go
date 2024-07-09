@@ -3,7 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"errors"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"os"
 )
@@ -12,26 +12,26 @@ import (
 type Json struct {
 }
 
-// Parse reads and parses a JSON file specified by the path and returns a slice of articles.
-func (jsonFile Json) Parse(path source.PathToFile, name source.Name) ([]article.Article, error) {
+// Parse reads and parses a JSON file specified by the path and returns a slice of news.
+func (jsonFile Json) Parse(path source.PathToFile, name source.Name) ([]news.News, error) {
 
-	articleContent, err := os.ReadFile(string(path))
+	newsContent, err := os.ReadFile(string(path))
 	if err != nil {
 		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
 
-	var articles struct {
-		Articles []article.Article `json:"articles"`
+	var newsData struct {
+		News []news.News `json:"articles"`
 	}
 
-	err = json.Unmarshal(articleContent, &articles)
+	err = json.Unmarshal(newsContent, &newsData)
 	if err != nil {
 		return nil, errors.New("Error with parse JSON content: " + err.Error())
 	}
 
-	for i := range articles.Articles {
-		articles.Articles[i].SourceName = name
+	for i := range newsData.News {
+		newsData.News[i].SourceName = name
 	}
 
-	return articles.Articles, nil
+	return newsData.News, nil
 }

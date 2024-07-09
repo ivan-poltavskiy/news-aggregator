@@ -1,7 +1,7 @@
 package html
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"reflect"
 	"testing"
@@ -16,7 +16,7 @@ func TestUsaToday_ParseSource(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []article.Article
+		want []news.News
 	}{
 		{
 			name: "Parse valid HTML file",
@@ -24,16 +24,16 @@ func TestUsaToday_ParseSource(t *testing.T) {
 				path: "../../resources/testdata/test_usatoday.html",
 				name: "testusatoday",
 			},
-			want: []article.Article{
+			want: []news.News{
 				{
-					Title:       "Test Article 1",
+					Title:       "Test News 1",
 					Description: "Description 1",
 					Link:        "https://www.usatoday.com/story/1",
 					Date:        time.Date(time.Now().Year(), time.June, 1, 0, 0, 0, 0, time.UTC),
 					SourceName:  "testusatoday",
 				},
 				{
-					Title:       "Test Article 2",
+					Title:       "Test News 2",
 					Description: "Description 2",
 					Link:        "https://www.usatoday.com/story/2",
 					Date:        time.Date(time.Now().Year(), time.June, 2, 0, 0, 0, 0, time.UTC),

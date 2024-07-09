@@ -7,7 +7,7 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/reiver/go-porterstemmer"
 	"news-aggregator/constant"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/sorter"
 	"news-aggregator/validator"
@@ -44,8 +44,8 @@ func NewCommandLine(aggregator Aggregator) Client {
 	return cli
 }
 
-// FetchArticles fetches articles based on the command line arguments.
-func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
+// FetchNews fetches news based on the command line arguments.
+func (cli *commandLineClient) FetchNews() ([]news.News, error) {
 	if cli.help {
 		cli.printUsage()
 		return nil, nil
@@ -57,19 +57,19 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, fetchParametersError
 	}
 
-	articles, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	news, err := cli.aggregator.Aggregate(uniqueSources, filters...)
 	if err != nil {
 		return nil, err
 	}
-	articles, fetchParametersError = Sorter.SortArticle(sorter.DateSorter{}, articles, cli.sortBy)
+	news, fetchParametersError = Sorter.SortNews(sorter.DateSorter{}, news, cli.sortBy)
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}
-	return articles, nil
+	return news, nil
 }
 
-// Print outputs the transferred articles.
-func (cli *commandLineClient) Print(articles []article.Article) {
+// Print outputs the transferred news.
+func (cli *commandLineClient) Print(newsForOutput []news.News) {
 	funcMap := sprig.FuncMap()
 	funcMap["emphasise"] = func(keywords, text string) string {
 		if keywords == "" {
@@ -84,21 +84,21 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 		}
 	}
 
-	tmpl, err := template.New("articles").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
+	tmpl, err := template.New("news").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
 	if err != nil {
 		panic(err)
 	}
 
-	type articleData struct {
-		Article          article.Article
+	type newsData struct {
+		News             news.News
 		Keywords         string
 		SortingBySources bool
 	}
 
-	var data []articleData
-	for _, art := range articles {
-		data = append(data, articleData{
-			Article:          art,
+	var data []newsData
+	for _, n := range newsForOutput {
+		data = append(data, newsData{
+			News:             n,
 			Keywords:         cli.keywords,
 			SortingBySources: cli.sortingBySources,
 		})
@@ -106,29 +106,29 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 	outputData := struct {
 		Filters          []string
 		Count            int
-		Articles         []articleData
-		ArticlesBySource map[string][]articleData
+		News             []newsData
+		NewsBySource     map[string][]newsData
 		SortingBySources bool
 	}{
 		Filters:          []string{cli.keywords, cli.startDateStr, cli.endDateStr},
-		Count:            len(articles),
-		Articles:         data,
+		Count:            len(newsForOutput),
+		News:             data,
 		SortingBySources: cli.sortingBySources,
 	}
 
 	if cli.sortingBySources {
-		outputData.ArticlesBySource = make(map[string][]articleData)
-		for _, art := range articles {
-			sourceName := string(art.SourceName)
-			outputData.ArticlesBySource[sourceName] = append(outputData.ArticlesBySource[sourceName], articleData{
-				Article:          art,
+		outputData.NewsBySource = make(map[string][]newsData)
+		for _, n := range newsForOutput {
+			sourceName := string(n.SourceName)
+			outputData.NewsBySource[sourceName] = append(outputData.NewsBySource[sourceName], newsData{
+				News:             n,
 				Keywords:         cli.keywords,
 				SortingBySources: cli.sortingBySources,
 			})
 		}
 	}
 
-	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
+	err = tmpl.ExecuteTemplate(os.Stdout, "news", outputData)
 	if err != nil {
 		panic(err)
 	}
@@ -146,10 +146,10 @@ func (cli *commandLineClient) printUsage() {
 }
 
 // fetchParameters extracts and validates command line parameters,
-// including sources and filters, and returns them for use in article fetching.
-func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, error) {
+// including sources and filters, and returns them for use in news fetching.
+func (cli *commandLineClient) fetchParameters() ([]filter.NewsFilter, error) {
 
-	var filters []filter.ArticleFilter
+	var filters []filter.NewsFilter
 
 	filters = buildKeywordFilter(cli, filters)
 	filters, err := buildDateFilters(cli, filters)
@@ -160,7 +160,7 @@ func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, error) 
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
-func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) []filter.ArticleFilter {
+func buildKeywordFilter(cli *commandLineClient, filters []filter.NewsFilter) []filter.NewsFilter {
 	if cli.keywords != "" {
 		keywords := strings.Split(cli.keywords, ",")
 		uniqueKeywords := checkUnique(keywords)
@@ -170,7 +170,7 @@ func buildKeywordFilter(cli *commandLineClient, filters []filter.ArticleFilter) 
 }
 
 // buildDateFilters extracts date filters from command line arguments and adds them to the filters.
-func buildDateFilters(cli *commandLineClient, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+func buildDateFilters(cli *commandLineClient, filters []filter.NewsFilter) ([]filter.NewsFilter, error) {
 
 	validationErr, isValid := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
 

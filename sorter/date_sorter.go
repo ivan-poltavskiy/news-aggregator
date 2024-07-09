@@ -2,7 +2,7 @@ package sorter
 
 import (
 	"errors"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"sort"
 	"strings"
 )
@@ -10,25 +10,25 @@ import (
 type DateSorter struct {
 }
 
-// SortArticle sorts news by ASC or DESC
-func (DateSorter) SortArticle(articles []article.Article, sortBy string) ([]article.Article, error) {
+// SortNews sorts news by ASC or DESC
+func (DateSorter) SortNews(news []news.News, sortBy string) ([]news.News, error) {
 
 	lowerCaseSortParameter := strings.ToLower(sortBy)
 	if lowerCaseSortParameter == "" {
-		return articles, nil
+		return news, nil
 	}
 
 	var sortingFunctions = map[string]func(i, j int) bool{
 		"asc": func(i, j int) bool {
-			return articles[i].Date.Before(articles[j].Date)
+			return news[i].Date.Before(news[j].Date)
 		},
 		"desc": func(i, j int) bool {
-			return articles[i].Date.After(articles[j].Date)
+			return news[i].Date.After(news[j].Date)
 		},
 	}
 	if sortingFunctions[lowerCaseSortParameter] != nil {
-		sort.Slice(articles, sortingFunctions[lowerCaseSortParameter])
-		return articles, nil
+		sort.Slice(news, sortingFunctions[lowerCaseSortParameter])
+		return news, nil
 	}
 
 	return nil, errors.New("wrong sorting parameter: " + sortBy)

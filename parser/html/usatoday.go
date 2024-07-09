@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"news-aggregator/constant"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"os"
 	"regexp"
@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-// UsaToday reads and parses an USAToday`s file specified by the path and returns a slice of articles.
+// UsaToday reads and parses an USAToday`s file specified by the path and returns a slice of news.
 type UsaToday struct{}
 
 const (
-	articleLinkSelector         = "main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a"
-	articleDescriptionAttribute = "data-c-br"
-	articleDateSelector         = "div.gnt_m_flm_sbt"
+	newsLinkSelector         = "main.gnt_cw div.gnt_m_flm a.gnt_m_flm_a"
+	newsDescriptionAttribute = "data-c-br"
+	newsDateSelector         = "div.gnt_m_flm_sbt"
 )
 
-func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (articles []article.Article, parseError error) {
+func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (newsArticles []news.News, parseError error) {
 	file, err := os.Open(string(path))
 	if err != nil {
 		return nil, err
@@ -39,16 +39,16 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 
 	baseURL := "https://www.usatoday.com"
 
-	doc.Find(articleLinkSelector).EachWithBreak(func(i int, s *goquery.Selection) bool {
+	doc.Find(newsLinkSelector).EachWithBreak(func(i int, s *goquery.Selection) bool {
 		title := s.Text()
-		description, _ := s.Attr(articleDescriptionAttribute)
+		description, _ := s.Attr(newsDescriptionAttribute)
 		link, _ := s.Attr("href")
 
 		if !strings.HasPrefix(link, "http") {
 			link = baseURL + link
 		}
 
-		date, _ := s.Find(articleDateSelector).Attr("data-c-dt")
+		date, _ := s.Find(newsDateSelector).Attr("data-c-dt")
 		var parsedDate time.Time
 
 		if date != "" {
@@ -64,27 +64,27 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 			}
 		}
 
-		articleDate := parsedDate.Format(constant.DateOutputLayout)
-		formattedArticleDate, err := time.Parse(constant.DateOutputLayout, articleDate)
+		newsDate := parsedDate.Format(constant.DateOutputLayout)
+		formattedNewsDate, err := time.Parse(constant.DateOutputLayout, newsDate)
 		if err != nil {
 			parseError = err
 			return false
 		}
 
-		if formattedArticleDate.Year() < 2000 {
-			articleDate = time.Now().Format(constant.DateOutputLayout)
-			formattedArticleDate, err = time.Parse(constant.DateOutputLayout, articleDate)
+		if formattedNewsDate.Year() < 2000 {
+			newsDate = time.Now().Format(constant.DateOutputLayout)
+			formattedNewsDate, err = time.Parse(constant.DateOutputLayout, newsDate)
 			if err != nil {
 				parseError = err
 				return false
 			}
 		}
 
-		articles = append(articles, article.Article{
-			Title:       article.Title(strings.TrimSpace(title)),
-			Description: article.Description(strings.TrimSpace(description)),
-			Link:        article.Link(strings.TrimSpace(link)),
-			Date:        formattedArticleDate,
+		newsArticles = append(newsArticles, news.News{
+			Title:       news.Title(strings.TrimSpace(title)),
+			Description: news.Description(strings.TrimSpace(description)),
+			Link:        news.Link(strings.TrimSpace(link)),
+			Date:        formattedNewsDate,
 			SourceName:  name,
 		})
 
@@ -95,5 +95,5 @@ func (htmlParser UsaToday) Parse(path source.PathToFile, name source.Name) (arti
 		return nil, parseError
 	}
 
-	return articles, nil
+	return newsArticles, nil
 }

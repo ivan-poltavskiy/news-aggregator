@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-var testArticleCollector *news
+var testArticleCollector *newsCollector
 
 func beforeEach() {
 	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
-	testArticleCollector = &news{sources: sources, parsers: GetDefaultParsers()}
+	testArticleCollector = &newsCollector{sources: sources, parsers: GetDefaultParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
@@ -112,7 +112,7 @@ func TestInitializeSource(t *testing.T) {
 			name: "InitializeParsers with two sources",
 			sources: []source.Source{
 				{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
 			},
 		},
 		{
@@ -122,14 +122,14 @@ func TestInitializeSource(t *testing.T) {
 		{
 			name: "InitializeParsers with one source",
 			sources: []source.Source{
-				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testArticleCollector = &news{sources: tt.sources, parsers: GetDefaultParsers()}
+			testArticleCollector = &newsCollector{sources: tt.sources, parsers: GetDefaultParsers()}
 			if !reflect.DeepEqual(testArticleCollector.sources, tt.sources) {
 				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.sources, tt.sources)
 			}

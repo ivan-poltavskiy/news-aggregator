@@ -1,13 +1,13 @@
 package client
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 )
 
-// Aggregator defines an interface for aggregating collector articles.
+// Aggregator defines an interface for aggregating collector news.
 type Aggregator interface {
-	// Aggregate fetches articles from the provided sources,
-	//applies the given filters, and returns the filtered articles.
-	Aggregate(sources []string, filters ...filter.ArticleFilter) ([]article.Article, error)
+	// Aggregate fetches news from the provided sources,
+	//applies the given filters, and returns the filtered news.
+	Aggregate(sources []string, filters ...filter.NewsFilter) ([]news.News, error)
 }

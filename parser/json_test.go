@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"reflect"
 	"testing"
@@ -16,7 +16,7 @@ func TestJson_ParseSource(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []article.Article
+		want []news.News
 	}{
 		{
 			name: "Parse valid JSON file",
@@ -24,9 +24,9 @@ func TestJson_ParseSource(t *testing.T) {
 				path: "../resources/testdata/json_articles.json",
 				name: "testjson",
 			},
-			want: []article.Article{
-				{Title: "Test Article 1", Description: "Description 1", Link: "http://example.com/1", Date: parseDate("2024-06-01"), SourceName: "testjson"},
-				{Title: "Test Article 2", Description: "Description 2", Link: "http://example.com/2", Date: parseDate("2024-06-02"), SourceName: "testjson"},
+			want: []news.News{
+				{Title: "Test News 1", Description: "Description 1", Link: "http://example.com/1", Date: parseDate("2024-06-01"), SourceName: "testjson"},
+				{Title: "Test News 2", Description: "Description 2", Link: "http://example.com/2", Date: parseDate("2024-06-02"), SourceName: "testjson"},
 			},
 		},
 	}

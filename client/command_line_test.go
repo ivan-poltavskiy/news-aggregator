@@ -5,7 +5,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"io"
 	"news-aggregator/aggregator/mock_aggregator"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"os"
 	"reflect"
@@ -32,7 +32,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 		name   string
 		fields fields
 		setup  func()
-		want   []article.Article
+		want   []news.News
 	}{
 		{
 			name: "Test with articles",
@@ -47,11 +47,11 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 			setup: func() {
 				mockAggregator.EXPECT().
 					Aggregate([]string{"source1", "source2"}, gomock.Any()).
-					Return([]article.Article{
+					Return([]news.News{
 						{Title: "Test Title", Description: "Test Description", Link: "http://test.com", Date: time.Date(2023, time.May, 1, 0, 0, 0, 0, time.UTC)},
 					}, nil)
 			},
-			want: []article.Article{
+			want: []news.News{
 				{Title: "Test Title", Description: "Test Description", Link: "http://test.com", Date: time.Date(2023, time.May, 1, 0, 0, 0, 0, time.UTC)},
 			},
 		},
@@ -84,7 +84,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 				endDateStr:   tt.fields.endDateStr,
 				help:         tt.fields.help,
 			}
-			if got, _ := cli.FetchArticles(); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := cli.FetchNews(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Actual result = %v,expexted %v", got, tt.want)
 			}
 		})
@@ -93,10 +93,10 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 
 func TestFetchKeywords(t *testing.T) {
 	cli := &commandLineClient{keywords: "keyword1,keyword2"}
-	var filters []filter.ArticleFilter
+	var filters []filter.NewsFilter
 	filters = buildKeywordFilter(cli, filters)
 
-	expectedFilters := []filter.ArticleFilter{
+	expectedFilters := []filter.NewsFilter{
 		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
 	}
 
@@ -107,12 +107,12 @@ func TestFetchKeywords(t *testing.T) {
 
 func TestFetchDateFilters(t *testing.T) {
 	cli := &commandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	var filters []filter.ArticleFilter
+	var filters []filter.NewsFilter
 	filters, _ = buildDateFilters(cli, filters)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
-	expectedFilters := []filter.ArticleFilter{
+	expectedFilters := []filter.NewsFilter{
 		filter.ByDate{StartDate: startDate, EndDate: endDate},
 	}
 
@@ -128,7 +128,7 @@ func TestFetchParameters(t *testing.T) {
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
-	expectedFilters := []filter.ArticleFilter{
+	expectedFilters := []filter.NewsFilter{
 		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
 		filter.ByDate{StartDate: startDate, EndDate: endDate},
 	}
