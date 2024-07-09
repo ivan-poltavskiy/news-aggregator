@@ -8,13 +8,13 @@ import (
 )
 
 type news struct {
-	Sources []source.Source
-	Parsers *Parsers
+	sources []source.Source
+	parsers *Parsers
 }
 
 // New create new instance of collector
 func New(sources []source.Source) aggregator.Collector {
-	return &news{Sources: sources, Parsers: GetDefaultParsers()}
+	return &news{sources: sources, parsers: GetDefaultParsers()}
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
@@ -23,7 +23,7 @@ func (newsCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) (
 	var foundNews []article.Article
 
 	for _, sourceName := range sourcesNames {
-		for _, currentSource := range newsCollector.Sources {
+		for _, currentSource := range newsCollector.sources {
 			articles, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
 			if err != nil {
 				return nil, err
@@ -41,7 +41,7 @@ func (newsCollector *news) findNewsForCurrentSource(currentSource source.Source,
 		return nil, nil
 	}
 
-	sourceParser, err := newsCollector.Parsers.GetParserBySourceType(currentSource.SourceType)
+	sourceParser, err := newsCollector.parsers.GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
 		return []article.Article{}, err
 	}

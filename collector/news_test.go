@@ -13,7 +13,7 @@ func beforeEach() {
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
-	testArticleCollector = &news{Sources: sources, Parsers: GetDefaultParsers()}
+	testArticleCollector = &news{sources: sources, parsers: GetDefaultParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
@@ -129,9 +129,9 @@ func TestInitializeSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testArticleCollector = &news{Sources: tt.sources, Parsers: GetDefaultParsers()}
-			if !reflect.DeepEqual(testArticleCollector.Sources, tt.sources) {
-				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.Sources, tt.sources)
+			testArticleCollector = &news{sources: tt.sources, parsers: GetDefaultParsers()}
+			if !reflect.DeepEqual(testArticleCollector.sources, tt.sources) {
+				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.sources, tt.sources)
 			}
 		})
 	}
