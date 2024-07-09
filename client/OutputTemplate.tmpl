@@ -1,0 +1,38 @@
+{{- define "news" -}}
+{{- if eq .Count 0 -}}
+   News not found.
+{{- else -}}
+News found: {{.Count}}
+Filters applied:
+    {{- if (index .Filters 0) }}
+- Keywords: {{ index .Filters 0 }}
+    {{- end }}
+    {{- if (and (index .Filters 1) (index .Filters 2)) }}
+- Date range: {{ index .Filters 1 }} to {{ index .Filters 2 }}
+    {{ end }}
+    {{- if .SortingBySources }}
+        {{- range $sourceName, $news := .NewsBySource }}
+Source: {{ $sourceName  | indent 1 }}
+Number of news: {{ len $news }}
+    {{- range $news }}
+        {{ template "newsArticle" . }}
+    {{- end }}
+        {{- end }}
+    {{- else }}
+    {{- range .News }}
+        {{ template "newsArticle" . }}
+    {{- end }}
+    {{- end }}
+{{end}}
+{{- end }}
+
+{{- define "newsArticle" -}}
+-------------------------------
+Title: {{ .News.Title.String | emphasise .Keywords }}
+Description: {{ .News.Description.String | emphasise .Keywords }}
+Link: {{ .News.Link }}
+Date: {{ .News.Date }}
+{{- if not .SortingBySources }}
+SourceName: {{.News.SourceName}}
+{{- end }}
+{{ end }}

@@ -1,0 +1,16 @@
+{
+  "articles": [
+    {
+      "title": "Test News 1",
+      "description": "Description 1",
+      "url": "http://example.com/1",
+      "publishedAt": "2024-06-01T00:00:00Z"
+    },
+    {
+      "title": "Test News 2",
+      "description": "Description 2",
+      "url": "http://example.com/2",
+      "publishedAt": "2024-06-02T00:00:00Z"
+    }
+  ]
+}
