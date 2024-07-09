@@ -46,10 +46,10 @@ func (newsCollector *news) findNewsForCurrentSource(currentSource source.Source,
 		return []article.Article{}, err
 	}
 
-	articles, err := sourceParser.Parse(currentSource.PathToFile, name)
+	foundNews, err := sourceParser.Parse(currentSource.PathToFile, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return articles, nil
+	return foundNews, nil
 }

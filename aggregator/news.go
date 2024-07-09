@@ -39,14 +39,14 @@ func (aggregator *news) Aggregate(sources []string, filters ...filter.ArticleFil
 		return nil, err
 	}
 
-	articles, err := aggregator.newsCollector.FindNewsByResourcesName(sourceNames)
+	newsArticles, err := aggregator.newsCollector.FindNewsByResourcesName(sourceNames)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, f := range filters {
-		articles = f.Filter(articles)
+		newsArticles = f.Filter(newsArticles)
 	}
 
-	return articles, nil
+	return newsArticles, nil
 }

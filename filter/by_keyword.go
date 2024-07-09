@@ -14,31 +14,31 @@ type ByKeyword struct {
 }
 
 // Filter filters the incoming collector list from different sources by keywords.
-func (keywordFilter ByKeyword) Filter(articles []article.Article) []article.Article {
-	var matchingArticles []article.Article
+func (keywordFilter ByKeyword) Filter(newsArticles []article.Article) []article.Article {
+	var matchingNewsArticles []article.Article
 	for _, keyword := range keywordFilter.Keywords {
 		stemmedKeyword := porterstemmer.StemString(strings.ToLower(keyword))
-		matchingArticles = append(matchingArticles, filterNewsByKeyword(stemmedKeyword, articles)...)
+		matchingNewsArticles = append(matchingNewsArticles, filterNewsByKeyword(stemmedKeyword, newsArticles)...)
 	}
-	return matchingArticles
+	return matchingNewsArticles
 }
 
 // filterNewsByKeyword filters the incoming collector list by keyword and returns the filtered list.
-func filterNewsByKeyword(keyword string, articles []article.Article) []article.Article {
-	var matchingArticles []article.Article
+func filterNewsByKeyword(keyword string, newsArticles []article.Article) []article.Article {
+	var matchingNewsArticles []article.Article
 
-	for _, article := range articles {
+	for _, article := range newsArticles {
 
 		if matchesConditions(article, keyword) {
-			matchingArticles = append(matchingArticles, article)
+			matchingNewsArticles = append(matchingNewsArticles, article)
 		}
 	}
 
-	if len(matchingArticles) == 0 {
+	if len(matchingNewsArticles) == 0 {
 		fmt.Println("No matches found for this keyword.")
 	}
 
-	return matchingArticles
+	return matchingNewsArticles
 }
 
 // matchesConditions checks if an article matches at least one condition.
