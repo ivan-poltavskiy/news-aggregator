@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-var testArticleCollector *articleCollector
+var testArticleCollector *news
 
 func beforeEach() {
 	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
-	testArticleCollector = &articleCollector{Sources: sources, Parsers: InitParsers()}
+	testArticleCollector = &news{Sources: sources, Parsers: InitParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
@@ -129,7 +129,7 @@ func TestInitializeSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testArticleCollector = &articleCollector{Sources: tt.sources, Parsers: InitParsers()}
+			testArticleCollector = &news{Sources: tt.sources, Parsers: InitParsers()}
 			if !reflect.DeepEqual(testArticleCollector.Sources, tt.sources) {
 				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.Sources, tt.sources)
 			}

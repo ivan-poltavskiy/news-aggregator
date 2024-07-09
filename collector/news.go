@@ -7,18 +7,18 @@ import (
 	"strings"
 )
 
-type articleCollector struct {
+type news struct {
 	Sources []source.Source
 	Parsers *Parsers
 }
 
 // New create new instance of collector
 func New(sources []source.Source) aggregator.Collector {
-	return &articleCollector{Sources: sources, Parsers: InitParsers()}
+	return &news{Sources: sources, Parsers: InitParsers()}
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
-func (articleCollector *articleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (articleCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundArticles []article.Article
 
@@ -35,7 +35,7 @@ func (articleCollector *articleCollector) FindNewsByResourcesName(sourcesNames [
 }
 
 // Returns the list of news from the passed source.
-func (articleCollector *articleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func (articleCollector *news) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil
