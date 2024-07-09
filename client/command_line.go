@@ -68,6 +68,7 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 	return articles, nil
 }
 
+// Print outputs the transferred articles.
 func (cli *commandLineClient) Print(articles []article.Article) {
 	funcMap := sprig.FuncMap()
 	funcMap["emphasise"] = func(keywords, text string) string {
