@@ -8,6 +8,7 @@ import (
 	"news-aggregator/constant"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
+	"news-aggregator/sorter"
 	"news-aggregator/validator"
 	"os"
 	"regexp"
@@ -58,8 +59,7 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	articles, fetchParametersError = DateSorter{}.SortArticle(articles, cli.sortBy)
+	articles, fetchParametersError = Sorter.SortArticle(sorter.DateSorter{}, articles, cli.sortBy)
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}

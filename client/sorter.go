@@ -1,4 +1,4 @@
-package sorter
+package client
 
 import "news-aggregator/entity/article"
 
