@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-var articleCollector *ArticleCollector
+var testArticleCollector *newsCollector
 
 func beforeEach() {
 	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
-	articleCollector = New(sources)
+	testArticleCollector = &newsCollector{sources: sources, parsers: GetDefaultParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
@@ -58,7 +58,7 @@ func TestFindNewsByResourcesName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := articleCollector.FindNewsByResourcesName(tt.args.sourcesNames)
+			got, _ := testArticleCollector.FindNewsByResourcesName(tt.args.sourcesNames)
 			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
@@ -95,7 +95,7 @@ func TestFindNewsForCurrentSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := articleCollector.findNewsForCurrentSource(tt.args.currentSource, tt.args.name)
+			got, _ := testArticleCollector.findNewsForCurrentSource(tt.args.currentSource, tt.args.name)
 			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
 			}
@@ -112,7 +112,7 @@ func TestInitializeSource(t *testing.T) {
 			name: "InitializeParsers with two sources",
 			sources: []source.Source{
 				{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
 			},
 		},
 		{
@@ -122,16 +122,16 @@ func TestInitializeSource(t *testing.T) {
 		{
 			name: "InitializeParsers with one source",
 			sources: []source.Source{
-				{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			articleCollector = New(tt.sources)
-			if !reflect.DeepEqual(articleCollector.Sources, tt.sources) {
-				t.Errorf("Actual result = %v, expected = %v", articleCollector.Sources, tt.sources)
+			testArticleCollector = &newsCollector{sources: tt.sources, parsers: GetDefaultParsers()}
+			if !reflect.DeepEqual(testArticleCollector.sources, tt.sources) {
+				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.sources, tt.sources)
 			}
 		})
 	}

@@ -2,7 +2,7 @@ package filter
 
 import (
 	"news-aggregator/constant"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"reflect"
 	"testing"
 	"time"
@@ -14,40 +14,40 @@ func TestByDate_Filter(t *testing.T) {
 		EndDate   time.Time
 	}
 	type args struct {
-		articles []article.Article
+		articles []news.News
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
-		want   []article.Article
+		want   []news.News
 	}{
 		{
-			name: "Articles within date range",
+			name: "News within date range",
 			fields: fields{
 				StartDate: parseDate("2023-01-01"),
 				EndDate:   parseDate("2023-12-31"),
 			},
 			args: args{
-				articles: []article.Article{
-					{Title: "Article 1", Date: parseDate("2023-03-15")},
-					{Title: "Article 2", Date: parseDate("2023-06-10")},
-					{Title: "Article 3", Date: parseDate("2024-01-01")},
+				articles: []news.News{
+					{Title: "News 1", Date: parseDate("2023-03-15")},
+					{Title: "News 2", Date: parseDate("2023-06-10")},
+					{Title: "News 3", Date: parseDate("2024-01-01")},
 				},
 			},
-			want: []article.Article{
-				{Title: "Article 1", Date: parseDate("2023-03-15")},
-				{Title: "Article 2", Date: parseDate("2023-06-10")},
+			want: []news.News{
+				{Title: "News 1", Date: parseDate("2023-03-15")},
+				{Title: "News 2", Date: parseDate("2023-06-10")},
 			},
 		},
 		{
-			name: "Empty article list",
+			name: "Empty news list",
 			fields: fields{
 				StartDate: parseDate("2023-01-01"),
 				EndDate:   parseDate("2023-12-31"),
 			},
 			args: args{
-				articles: []article.Article{},
+				articles: []news.News{},
 			},
 			want: nil,
 		},

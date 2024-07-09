@@ -1,7 +1,7 @@
 package filter
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"reflect"
 	"testing"
 )
@@ -11,13 +11,13 @@ func TestByKeyword_Filter(t *testing.T) {
 		Keywords []string
 	}
 	type args struct {
-		articles []article.Article
+		articles []news.News
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
-		want   []article.Article
+		want   []news.News
 	}{
 		{name: "Find by one keyword in the title",
 			fields: fields{
@@ -25,8 +25,8 @@ func TestByKeyword_Filter(t *testing.T) {
 					"ukr"},
 			},
 			args: args{
-				articles: []article.Article{
-					{Title: "Article 1"},
+				articles: []news.News{
+					{Title: "News 1"},
 					{Title: "ukranian"},
 					{Title: "Ukraine"},
 					{Title: "ukr"},
@@ -34,7 +34,7 @@ func TestByKeyword_Filter(t *testing.T) {
 					{Title: "someukrWord"},
 				},
 			},
-			want: []article.Article{
+			want: []news.News{
 				{Title: "ukranian"},
 				{Title: "Ukraine"},
 				{Title: "ukr"},
@@ -48,8 +48,8 @@ func TestByKeyword_Filter(t *testing.T) {
 					"ukr"},
 			},
 			args: args{
-				articles: []article.Article{
-					{Description: "Article 1"},
+				articles: []news.News{
+					{Description: "News 1"},
 					{Description: "ukranian"},
 					{Description: "Ukraine"},
 					{Description: "ukr"},
@@ -57,7 +57,7 @@ func TestByKeyword_Filter(t *testing.T) {
 					{Description: "someukrWord"},
 				},
 			},
-			want: []article.Article{
+			want: []news.News{
 				{Description: "ukranian"},
 				{Description: "Ukraine"},
 				{Description: "ukr"},

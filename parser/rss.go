@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 	"github.com/mmcdole/gofeed"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"os"
 )
@@ -13,7 +13,7 @@ type Rss struct {
 }
 
 // Parse reads and parses a XML (RSS) file specified by the path and returns a slice of articles.
-func (rss Rss) Parse(path source.PathToFile, name source.Name) ([]article.Article, error) {
+func (rss Rss) Parse(path source.PathToFile, name source.Name) ([]news.News, error) {
 
 	parser := gofeed.NewParser()
 	filename := fmt.Sprintf(string(path))
@@ -32,15 +32,15 @@ func (rss Rss) Parse(path source.PathToFile, name source.Name) ([]article.Articl
 		return nil, err
 	}
 
-	var articles []article.Article
+	var newsData []news.News
 	for _, item := range feed.Items {
-		articles = append(articles, article.Article{
-			Title:       article.Title(item.Title),
-			Description: article.Description(item.Description),
-			Link:        article.Link(item.Link),
+		newsData = append(newsData, news.News{
+			Title:       news.Title(item.Title),
+			Description: news.Description(item.Description),
+			Link:        news.Link(item.Link),
 			Date:        *item.PublishedParsed,
 			SourceName:  name,
 		})
 	}
-	return articles, nil
+	return newsData, nil
 }

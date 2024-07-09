@@ -11,7 +11,7 @@ import (
 	"slices"
 )
 
-// ValidateSource checks if the provided list of news articles contains at least one article.
+// ValidateSource checks if the provided list of news articles contains at least one news.
 // If the input slice is empty, the function will return false, indicating that there are no valid news sources.
 func ValidateSource(sources []string) (bool, error) {
 	logrus.Info("Validator: Starting source validation for sources:", sources)

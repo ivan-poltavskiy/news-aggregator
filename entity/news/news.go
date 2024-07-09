@@ -1,12 +1,12 @@
-package article
+package news
 
 import (
 	"news-aggregator/entity/source"
 	"time"
 )
 
-// Article is the set of information about articles in the system.
-type Article struct {
+// News is the set of information about news articles in the system.
+type News struct {
 	Title       Title       `json:"title"`
 	Description Description `json:"description"`
 	Link        Link        `json:"url"`
@@ -14,14 +14,14 @@ type Article struct {
 	SourceName  source.Name
 }
 
-// Description provides brief information about the article.
+// Description provides brief information about the news.
 type Description string
 
 func (d Description) String() string {
 	return string(d)
 }
 
-// Link contains the url of the article.
+// Link contains the url of the news.
 type Link string
 
 type Title string

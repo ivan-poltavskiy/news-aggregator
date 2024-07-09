@@ -17,7 +17,7 @@ type Name string
 // Type describes of the type of document for a particular source
 type Type string
 
-// Source is the set of information about source of article.
+// Source is the set of information about source of news.
 type Source struct {
 	Name       Name
 	PathToFile PathToFile

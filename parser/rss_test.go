@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"reflect"
 	"testing"
@@ -16,7 +16,7 @@ func TestRss_ParseSource(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []article.Article
+		want []news.News
 	}{
 		{
 			name: "Parse valid RSS file",
@@ -24,15 +24,15 @@ func TestRss_ParseSource(t *testing.T) {
 				path: "../resources/testdata/test_rss.xml",
 				name: "testrss",
 			},
-			want: []article.Article{
+			want: []news.News{
 				{
-					Title:       "Test Article 1",
+					Title:       "Test News 1",
 					Description: "Description 1",
 					Link:        "http://example.com/1",
 					Date:        time.Date(2024, time.June, 1, 0, 0, 0, 0, time.UTC),
 					SourceName:  "testrss"},
 				{
-					Title:       "Test Article 2",
+					Title:       "Test News 2",
 					Description: "Description 2",
 					Link:        "http://example.com/2",
 					Date:        time.Date(2024, time.June, 2, 0, 0, 0, 0, time.UTC),

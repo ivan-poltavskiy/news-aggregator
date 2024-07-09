@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"news-aggregator/constant"
 	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/validator"
 	"strings"
@@ -12,10 +13,10 @@ import (
 )
 
 type Client interface {
-	//FetchArticles collect the articles by some rules defined in the implementations.
-	FetchArticles() ([]article.Article, error)
-	//Print outputs the transferred articles.
-	Print(articles []article.Article)
+	//FetchNews collect the news by some rules defined in the implementations.
+	FetchNews() ([]news.News, error)
+	//Print outputs the transferred news.
+	Print(news []news.News)
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.

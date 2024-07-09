@@ -3,13 +3,13 @@
     <channel>
         <title>Test RSS Feed</title>
         <item>
-            <title>Test Article 1</title>
+            <title>Test News 1</title>
             <description>Description 1</description>
             <link>http://example.com/1</link>
             <pubDate>Mon, 01 Jun 2024 00:00:00 +0000</pubDate>
         </item>
         <item>
-            <title>Test Article 2</title>
+            <title>Test News 2</title>
             <description>Description 2</description>
             <link>http://example.com/2</link>
             <pubDate>Tue, 02 Jun 2024 00:00:00 +0000</pubDate>

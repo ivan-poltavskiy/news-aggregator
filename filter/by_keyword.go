@@ -3,46 +3,46 @@ package filter
 import (
 	"fmt"
 	"github.com/reiver/go-porterstemmer"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"strings"
 )
 
-// ByKeyword filters the slice of articles by provided keyword and returns
-// the slice of matching articles.
+// ByKeyword filters the slice of news by provided keyword and returns
+// the slice of matching news.
 type ByKeyword struct {
 	Keywords []string
 }
 
-// Filter filters the incoming collector list from different sources by keywords.
-func (keywordFilter ByKeyword) Filter(articles []article.Article) []article.Article {
-	var matchingArticles []article.Article
+// Filter filters the incoming news from different sources by keywords.
+func (keywordFilter ByKeyword) Filter(newsArticles []news.News) []news.News {
+	var matchingNews []news.News
 	for _, keyword := range keywordFilter.Keywords {
 		stemmedKeyword := porterstemmer.StemString(strings.ToLower(keyword))
-		matchingArticles = append(matchingArticles, filterNewsByKeyword(stemmedKeyword, articles)...)
+		matchingNews = append(matchingNews, filterNewsByKeyword(stemmedKeyword, newsArticles)...)
 	}
-	return matchingArticles
+	return matchingNews
 }
 
-// filterNewsByKeyword filters the incoming collector list by keyword and returns the filtered list.
-func filterNewsByKeyword(keyword string, articles []article.Article) []article.Article {
-	var matchingArticles []article.Article
+// filterNewsByKeyword filters the incoming news by keyword and returns the filtered list.
+func filterNewsByKeyword(keyword string, newsArticles []news.News) []news.News {
+	var matchingNews []news.News
 
-	for _, article := range articles {
+	for _, article := range newsArticles {
 
 		if matchesConditions(article, keyword) {
-			matchingArticles = append(matchingArticles, article)
+			matchingNews = append(matchingNews, article)
 		}
 	}
 
-	if len(matchingArticles) == 0 {
+	if len(matchingNews) == 0 {
 		fmt.Println("No matches found for this keyword.")
 	}
 
-	return matchingArticles
+	return matchingNews
 }
 
-// matchesConditions checks if an article matches at least one condition.
-func matchesConditions(a article.Article, keyword string) bool {
+// matchesConditions checks if news matches at least one condition.
+func matchesConditions(a news.News, keyword string) bool {
 	conditions := []string{
 		porterstemmer.StemString(strings.ToLower(string(a.Title))),
 		porterstemmer.StemString(strings.ToLower(string(a.Description))),

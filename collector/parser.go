@@ -3,7 +3,7 @@ package collector
 import (
 	"errors"
 	"github.com/sirupsen/logrus"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
 	"news-aggregator/parser/html"
@@ -14,8 +14,8 @@ type Parsers struct {
 	parsers map[source.Type]Parser
 }
 
-// InitParsers initializes a new Parsers with available parsers for different file types.
-func InitParsers() *Parsers {
+// GetDefaultParsers initializes and returns a new Parsers with available parsers for different file types.
+func GetDefaultParsers() *Parsers {
 	logrus.Info("Starting initialize parsers")
 	return &Parsers{
 		parsers: map[source.Type]Parser{
@@ -39,6 +39,6 @@ func (pm *Parsers) GetParserBySourceType(typeOfSource source.Type) (Parser, erro
 // A Parser analyzes a source and retrieves a list of articles from that source.
 type Parser interface {
 
-	// Parse returns a list of the source's articles by its path.
-	Parse(path source.PathToFile, name source.Name) ([]article.Article, error)
+	// Parse returns a list of the source's news by its path.
+	Parse(path source.PathToFile, name source.Name) ([]news.News, error)
 }

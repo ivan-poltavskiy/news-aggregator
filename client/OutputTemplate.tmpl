@@ -1,8 +1,8 @@
-{{- define "articles" -}}
+{{- define "news" -}}
 {{- if eq .Count 0 -}}
-   Articles not found.
+   News not found.
 {{- else -}}
-Articles found: {{.Count}}
+News found: {{.Count}}
 Filters applied:
     {{- if (index .Filters 0) }}
 - Keywords: {{ index .Filters 0 }}
@@ -11,28 +11,28 @@ Filters applied:
 - Date range: {{ index .Filters 1 }} to {{ index .Filters 2 }}
     {{ end }}
     {{- if .SortingBySources }}
-        {{- range $sourceName, $articles := .ArticlesBySource }}
+        {{- range $sourceName, $news := .NewsBySource }}
 Source: {{ $sourceName  | indent 1 }}
-Number of articles: {{ len $articles }}
-    {{- range $articles }}
-        {{ template "article" . }}
+Number of news: {{ len $news }}
+    {{- range $news }}
+        {{ template "newsArticle" . }}
     {{- end }}
         {{- end }}
     {{- else }}
-    {{- range .Articles }}
-        {{ template "article" . }}
+    {{- range .News }}
+        {{ template "newsArticle" . }}
     {{- end }}
     {{- end }}
 {{end}}
 {{- end }}
 
-{{- define "article" -}}
+{{- define "newsArticle" -}}
 -------------------------------
-Title: {{ .Article.Title.String | emphasise .Keywords }}
-Description: {{ .Article.Description.String | emphasise .Keywords }}
-Link: {{ .Article.Link }}
-Date: {{ .Article.Date }}
+Title: {{ .News.Title.String | emphasise .Keywords }}
+Description: {{ .News.Description.String | emphasise .Keywords }}
+Link: {{ .News.Link }}
+Date: {{ .News.Date }}
 {{- if not .SortingBySources }}
-SourceName: {{.Article.SourceName}}
+SourceName: {{.News.SourceName}}
 {{- end }}
 {{ end }}
