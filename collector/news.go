@@ -18,30 +18,30 @@ func New(sources []source.Source) aggregator.Collector {
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
-func (articleCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (newsCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
-	var foundArticles []article.Article
+	var foundNews []article.Article
 
 	for _, sourceName := range sourcesNames {
-		for _, currentSource := range articleCollector.Sources {
-			articles, err := articleCollector.findNewsForCurrentSource(currentSource, sourceName)
+		for _, currentSource := range newsCollector.Sources {
+			articles, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
 			if err != nil {
 				return nil, err
 			}
-			foundArticles = append(foundArticles, articles...)
+			foundNews = append(foundNews, articles...)
 		}
 	}
-	return foundArticles, nil
+	return foundNews, nil
 }
 
 // Returns the list of news from the passed source.
-func (articleCollector *news) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func (newsCollector *news) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil
 	}
 
-	sourceParser, err := articleCollector.Parsers.GetParserBySourceType(currentSource.SourceType)
+	sourceParser, err := newsCollector.Parsers.GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
 		return []article.Article{}, err
 	}
