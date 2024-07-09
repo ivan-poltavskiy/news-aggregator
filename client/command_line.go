@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/reiver/go-porterstemmer"
 	"news-aggregator/constant"
 	"news-aggregator/entity/article"
 	"news-aggregator/filter"
@@ -50,7 +51,8 @@ func (cli *commandLineClient) FetchArticles() ([]article.Article, error) {
 		return nil, nil
 	}
 
-	filters, uniqueSources, fetchParametersError := cli.fetchParameters()
+	filters, fetchParametersError := cli.fetchParameters()
+	uniqueSources := checkUnique(strings.Split(cli.sources, ","))
 	if fetchParametersError != nil {
 		return nil, fetchParametersError
 	}
@@ -74,7 +76,8 @@ func (cli *commandLineClient) Print(articles []article.Article) {
 		} else {
 			for _, keyword := range strings.Split(keywords, ",") {
 				re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(keyword))
-				text = re.ReplaceAllString(text, "//"+keyword+"//")
+				stemString := porterstemmer.StemString(strings.ToLower(keyword))
+				text = re.ReplaceAllString(text, "//"+stemString+"//")
 			}
 			return text
 		}
@@ -143,17 +146,16 @@ func (cli *commandLineClient) printUsage() {
 
 // fetchParameters extracts and validates command line parameters,
 // including sources and filters, and returns them for use in article fetching.
-func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, []string, error) {
-	sourceNames := strings.Split(cli.sources, ",")
+func (cli *commandLineClient) fetchParameters() ([]filter.ArticleFilter, error) {
+
 	var filters []filter.ArticleFilter
 
 	filters = buildKeywordFilter(cli, filters)
 	filters, err := buildDateFilters(cli, filters)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	uniqueSources := checkUnique(sourceNames)
-	return filters, uniqueSources, nil
+	return filters, nil
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.

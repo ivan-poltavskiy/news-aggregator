@@ -123,7 +123,8 @@ func TestFetchDateFilters(t *testing.T) {
 
 func TestFetchParameters(t *testing.T) {
 	cli := &commandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	filters, uniqueSources, _ := cli.fetchParameters()
+	filters, _ := cli.fetchParameters()
+	uniqueSources := checkUnique(strings.Split(cli.sources, ","))
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
