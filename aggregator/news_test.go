@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var articleCollector *collector.ArticleCollector
+var articleCollector Collector
 
 func beforeEach() {
 	sources := []source.Source{

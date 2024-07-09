@@ -2,7 +2,6 @@ package aggregator
 
 import (
 	"news-aggregator/client"
-	"news-aggregator/collector"
 	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
 	"news-aggregator/filter"
@@ -11,11 +10,11 @@ import (
 
 // news provides methods for aggregating articleCollector articles from various sources.
 type news struct {
-	articleCollector collector.ArticleCollector
+	articleCollector Collector
 }
 
-func New(articleCollector *collector.ArticleCollector) client.Aggregator {
-	news := &news{articleCollector: *articleCollector}
+func New(articleCollector Collector) client.Aggregator {
+	news := &news{articleCollector: articleCollector}
 	return news
 }
 

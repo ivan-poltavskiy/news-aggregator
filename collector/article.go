@@ -1,23 +1,24 @@
 package collector
 
 import (
+	"news-aggregator/aggregator"
 	"news-aggregator/entity/article"
 	"news-aggregator/entity/source"
 	"strings"
 )
 
-type ArticleCollector struct {
+type articleCollector struct {
 	Sources []source.Source
 	Parsers *Parsers
 }
 
 // New create new instance of collector
-func New(sources []source.Source) *ArticleCollector {
-	return &ArticleCollector{Sources: sources, Parsers: InitParsers()}
+func New(sources []source.Source) aggregator.Collector {
+	return &articleCollector{Sources: sources, Parsers: InitParsers()}
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
-func (articleCollector *ArticleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
+func (articleCollector *articleCollector) FindNewsByResourcesName(sourcesNames []source.Name) ([]article.Article, error) {
 
 	var foundArticles []article.Article
 
@@ -34,7 +35,7 @@ func (articleCollector *ArticleCollector) FindNewsByResourcesName(sourcesNames [
 }
 
 // Returns the list of news from the passed source.
-func (articleCollector *ArticleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
+func (articleCollector *articleCollector) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
 
 	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 		return nil, nil
