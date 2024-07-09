@@ -4,17 +4,18 @@ import (
 	"news-aggregator/aggregator"
 	"news-aggregator/client"
 	"news-aggregator/collector"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 )
 
 func main() {
 
 	sources := []source.Source{
-		{Name: "bbc", PathToFile: "resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "nbc", PathToFile: "resources/nbc-news.json", SourceType: "JSON"},
-		{Name: "abc", PathToFile: "resources/abcnews-international-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "washington", PathToFile: "resources/washingtontimes-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "usatoday", PathToFile: "resources/usatoday-world-news.html", SourceType: "UsaToday"},
+		constant.BbcSource,
+		constant.NbcSource,
+		constant.AbcSource,
+		constant.WashingtonSource,
+		constant.UsaTodaySource,
 	}
 	articleCollector := collector.New(sources)
 
