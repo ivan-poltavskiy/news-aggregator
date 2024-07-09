@@ -13,8 +13,8 @@ type news struct {
 	newsCollector Collector
 }
 
-func New(articleCollector Collector) client.Aggregator {
-	newsAggregator := &news{newsCollector: articleCollector}
+func New(newsCollector Collector) client.Aggregator {
+	newsAggregator := &news{newsCollector: newsCollector}
 	return newsAggregator
 }
 
