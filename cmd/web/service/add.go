@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"news-aggregator/constant"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
 	"os"
@@ -160,7 +160,7 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 	return nil, jsonFilePath
 }
 
-func parseRssFeed(sourceEntity source.Source) ([]article.Article, error) {
+func parseRssFeed(sourceEntity source.Source) ([]news.News, error) {
 	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
 	if err != nil {
 		logrus.Error("Failed to parse RSS feed: ", err)
@@ -169,8 +169,8 @@ func parseRssFeed(sourceEntity source.Source) ([]article.Article, error) {
 	return articles, nil
 }
 
-func readExistingArticles(jsonFilePath string) ([]article.Article, error) {
-	var existingArticles []article.Article
+func readExistingArticles(jsonFilePath string) ([]news.News, error) {
+	var existingArticles []news.News
 
 	if _, err := os.Stat(jsonFilePath); err == nil {
 		jsonFile, err := os.Open(jsonFilePath)
@@ -193,13 +193,13 @@ func readExistingArticles(jsonFilePath string) ([]article.Article, error) {
 
 	return existingArticles, nil
 }
-func filterNewArticles(articles []article.Article, existingArticles []article.Article) []article.Article {
+func filterNewArticles(articles []news.News, existingArticles []news.News) []news.News {
 	existingTitles := make(map[string]struct{})
 	for _, existingArticle := range existingArticles {
 		existingTitles[existingArticle.Title.String()] = struct{}{}
 	}
 
-	var newArticles []article.Article
+	var newArticles []news.News
 	for _, newArticle := range articles {
 		if _, exists := existingTitles[newArticle.Title.String()]; !exists {
 			newArticles = append(newArticles, newArticle)
@@ -209,7 +209,7 @@ func filterNewArticles(articles []article.Article, existingArticles []article.Ar
 	return newArticles
 }
 
-func saveArticles(jsonFilePath string, articles []article.Article) error {
+func saveArticles(jsonFilePath string, articles []news.News) error {
 	jsonFile, err := os.Create(jsonFilePath)
 	if err != nil {
 		logrus.Error("Failed to create JSON file: ", err)

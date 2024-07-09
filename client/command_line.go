@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
 	"github.com/reiver/go-porterstemmer"
-	"news-aggregator/constant"
-	"news-aggregator/entity/news"
 	"github.com/sirupsen/logrus"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/sorter"
-	"news-aggregator/validator"
 	"os"
 	"regexp"
 	"strings"
@@ -28,14 +25,14 @@ type commandLineClient struct {
 	sortBy           string
 	sortingBySources bool
 	help             bool
-	DateSorter       DateSorter
-	filters          []filter.ArticleFilter
+	DateSorter       sorter.DateSorter
+	filters          []filter.NewsFilter
 }
 
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
-	cli.DateSorter = DateSorter{}
+	cli.DateSorter = sorter.DateSorter{}
 	var sourcesStr string
 	flag.StringVar(&sourcesStr, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
@@ -65,18 +62,14 @@ func (cli *commandLineClient) FetchNews() ([]news.News, error) {
 		return nil, nil
 	}
 
-	filters, fetchParametersError := cli.fetchParameters()
-	uniqueSources := checkUnique(strings.Split(cli.sources, ","))
-	if fetchParametersError != nil {
-		return nil, fetchParametersError
-	}
-	logrus.Info("Command line client: Fetching articles with sources: ", cli.sources, " and filters: ", cli.filters)
-	news, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	logrus.Info("Command line client: Fetching news with sources: ", cli.sources, " and filters: ", cli.filters)
+	news, err := cli.aggregator.Aggregate(cli.sources, cli.filters...)
 	if err != nil {
 		logrus.Error("Command line client: Aggregation error: ", err)
 		return nil, err
 	}
-	news, fetchParametersError = Sorter.SortNews(sorter.DateSorter{}, news, cli.sortBy)
+
+	news, fetchParametersError := cli.DateSorter.SortNews(news, cli.sortBy)
 	if fetchParametersError != nil {
 		logrus.Error("Command line client: Date sorting error: ", fetchParametersError)
 		return nil, fetchParametersError

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/sirupsen/logrus"
 	"news-aggregator/constant"
-	"news-aggregator/entity/article"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/validator"
@@ -20,7 +19,7 @@ type Client interface {
 }
 
 // buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
-func buildKeywordFilter(keywords string, filters []filter.ArticleFilter) []filter.ArticleFilter {
+func buildKeywordFilter(keywords string, filters []filter.NewsFilter) []filter.NewsFilter {
 	logrus.Info("building keywords filter for: " + keywords)
 	if keywords != "" {
 		keywordList := strings.Split(keywords, ",")
@@ -31,7 +30,7 @@ func buildKeywordFilter(keywords string, filters []filter.ArticleFilter) []filte
 }
 
 // buildDateFilters extracts date filters from command line arguments and adds them to the filters.
-func buildDateFilters(startDateStr, endDateStr string, filters []filter.ArticleFilter) ([]filter.ArticleFilter, error) {
+func buildDateFilters(startDateStr, endDateStr string, filters []filter.NewsFilter) ([]filter.NewsFilter, error) {
 	logrus.Info("building date filters for start date: " + startDateStr + "and the end date: " + endDateStr)
 	validationErr, isValid := validator.ValidateDate(startDateStr, endDateStr)
 

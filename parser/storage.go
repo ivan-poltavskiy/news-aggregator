@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"news-aggregator/entity/article"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"os"
 )
@@ -12,7 +12,7 @@ import (
 type Storage struct {
 }
 
-func (storage Storage) Parse(path source.PathToFile, name source.Name) ([]article.Article, error) {
+func (storage Storage) Parse(path source.PathToFile, name source.Name) ([]news.News, error) {
 
 	if _, err := os.Stat(string(path)); os.IsNotExist(err) {
 		return nil, fmt.Errorf("JSON file not found for source: %s", path)
@@ -29,7 +29,7 @@ func (storage Storage) Parse(path source.PathToFile, name source.Name) ([]articl
 		return nil, fmt.Errorf("failed to read JSON file: %w", err)
 	}
 
-	var articles []article.Article
+	var articles []news.News
 	if err := json.Unmarshal(byteValue, &articles); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON data: %w", err)
 	}

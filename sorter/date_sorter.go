@@ -3,7 +3,6 @@ package sorter
 import (
 	"errors"
 	"github.com/sirupsen/logrus"
-	"news-aggregator/entity/article"
 	"news-aggregator/entity/news"
 	"sort"
 	"strings"

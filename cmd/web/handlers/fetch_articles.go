@@ -21,7 +21,7 @@ func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
 	newsAggregator := aggregator.New(articleCollector)
 
 	webClient := client.NewWebClient(*r, w, newsAggregator)
-	articles, err := webClient.FetchArticles()
+	articles, err := webClient.FetchNews()
 	if err != nil {
 		logrus.Error("Failed to fetch articles ", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
