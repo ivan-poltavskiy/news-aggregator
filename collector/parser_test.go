@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetParserBySourceType(t *testing.T) {
-	parsers := InitParsers()
+	parsers := GetDefaultParsers()
 
 	tests := []struct {
 		name        string

@@ -13,8 +13,8 @@ type Parsers struct {
 	parsers map[source.Type]Parser
 }
 
-// InitParsers initializes a new Parsers with available parsers for different file types.
-func InitParsers() *Parsers {
+// GetDefaultParsers initializes a new Parsers with available parsers for different file types.
+func GetDefaultParsers() *Parsers {
 	return &Parsers{
 		parsers: map[source.Type]Parser{
 			source.RSS:      parser.Rss{},

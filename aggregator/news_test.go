@@ -18,7 +18,7 @@ func beforeEach() {
 		{Name: "usatoday", PathToFile: "../resources/usatoday-world-news.html", SourceType: "UsaToday"},
 	}
 	articleCollector = collector.New(sources)
-	collector.InitParsers()
+	collector.GetDefaultParsers()
 }
 
 //go:generate mockgen -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news_aggregator/client Aggregator

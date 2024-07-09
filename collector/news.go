@@ -14,7 +14,7 @@ type news struct {
 
 // New create new instance of collector
 func New(sources []source.Source) aggregator.Collector {
-	return &news{Sources: sources, Parsers: InitParsers()}
+	return &news{Sources: sources, Parsers: GetDefaultParsers()}
 }
 
 // FindNewsByResourcesName returns the list of news from the passed sources.
