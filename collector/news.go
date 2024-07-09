@@ -24,11 +24,13 @@ func (newsCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) (
 
 	for _, sourceName := range sourcesNames {
 		for _, currentSource := range newsCollector.sources {
-			articles, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
-			if err != nil {
-				return nil, err
+			if strings.ToLower(string(currentSource.Name)) == strings.ToLower(string(sourceName)) {
+				articles, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
+				if err != nil {
+					return nil, err
+				}
+				foundNews = append(foundNews, articles...)
 			}
-			foundNews = append(foundNews, articles...)
 		}
 	}
 	return foundNews, nil
@@ -36,10 +38,6 @@ func (newsCollector *news) FindNewsByResourcesName(sourcesNames []source.Name) (
 
 // Returns the list of news from the passed source.
 func (newsCollector *news) findNewsForCurrentSource(currentSource source.Source, name source.Name) ([]article.Article, error) {
-
-	if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
-		return nil, nil
-	}
 
 	sourceParser, err := newsCollector.parsers.GetParserBySourceType(currentSource.SourceType)
 	if err != nil {
