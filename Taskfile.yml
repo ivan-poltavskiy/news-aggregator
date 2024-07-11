@@ -1,0 +1,54 @@
+version: '3'
+
+env:
+  DOCKER_IMAGE_NAME: "ivan/news_aggregator"
+  DOCKER_IMAGE_TAG: "v1.0"
+  DOCKERFILE_PATH: ".Dockerfile"
+  DOCKER_PORT: "443"
+  SERVER_EXPOSE_PORT: "443"
+
+output:
+  group:
+    begin: '::group::{{.TASK}}'
+    end: '::endgroup::'
+
+tasks:
+  tidy:
+    desc: "Run go mod tidy"
+    cmd: go mod tidy
+
+  test:
+    desc: "Run all tests in the project."
+    cmd: go test ./...
+
+  fmt:
+    desc: "go fmt on all Go files"
+    cmd: go fmt ./...
+
+  vet:
+    desc: "Run go vet on all Go files"
+    cmd: go vet ./...
+
+  docker-build:
+    desc: "Run docker build"
+    cmd: docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
+
+  docker-run:
+    desc: "Run docker container"
+    cmd: docker run -d -p $DOCKER_PORT:$SERVER_EXPOSE_PORT $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
+  cli-run:
+    desc: "Run the CLI locally"
+    cmd: go run cmd/command-line-client/main.go
+
+  server-run:
+    desc: "Run the web server locally"
+    cmd: go run cmd/web/main.go
+
+  check-all:
+    desc: "Run all checks: mod tidy, fmt, vet, and tests"
+    cmds:
+      - task: tidy
+      - task: fmt
+      - task: vet
+      - task: test
