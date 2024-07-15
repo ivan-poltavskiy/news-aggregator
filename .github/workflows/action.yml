@@ -1,0 +1,37 @@
+name: Go
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    types: [ opened, ready_for_review ]
+    branches: ["**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install Taskfile
+        run: |
+          curl -sL https://taskfile.dev/install.sh | sh
+
+      - name: Run Taskfile tasks
+        run: |
+          task check-all
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
