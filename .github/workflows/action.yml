@@ -24,11 +24,11 @@ jobs:
 
       - name: Install Taskfile
         run: |
-          curl -sL https://taskfile.dev/install.sh | sh
+          sh -c "$(curl -sL https://taskfile.dev/install.sh)"
+          sudo mv ./bin/task /usr/local/bin/task
 
       - name: Run Taskfile tasks
-        run: |
-          task test
+        run: task test
 
       - name: Build
         run: go build -v ./...
