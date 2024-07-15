@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Taskfile tasks
         run: |
-          task check-all
+          task test
 
       - name: Build
         run: go build -v ./...
