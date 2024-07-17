@@ -39,7 +39,7 @@ func TestAddSourceHandler(t *testing.T) {
 			name:           "ValidRequest",
 			requestBody:    addSourceRequest{URL: "https://www.pravda.com.ua/"},
 			expectedStatus: http.StatusOK,
-			expectedBody:   "Articles saved successfully. Name of source: pravda",
+			expectedBody:   "News saved successfully. Name of source: pravda",
 		},
 		{
 			name:           "EmptyURL",
