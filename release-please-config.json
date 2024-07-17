@@ -1,0 +1,9 @@
+{
+  "release-type": "go",
+  "tag-separator": "@",
+  "include-component-in-tag": true,
+  "packages": {
+    ".": {
+    }
+  }
+}
