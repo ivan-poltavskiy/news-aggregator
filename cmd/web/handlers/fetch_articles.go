@@ -10,22 +10,22 @@ import (
 	"news-aggregator/entity/source"
 )
 
-// FetchArticleHandler handles HTTP requests for fetching articles.
-func FetchArticleHandler(w http.ResponseWriter, r *http.Request) {
+// FetchNewsHandler handles requests for fetching news.
+func FetchNewsHandler(w http.ResponseWriter, r *http.Request) {
 	sources, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
 	if err != nil {
 		http.Error(w, "Failed to load sources: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	articleCollector := collector.New(sources)
-	newsAggregator := aggregator.New(articleCollector)
+	newsCollector := collector.New(sources)
+	newsAggregator := aggregator.New(newsCollector)
 
 	webClient := client.NewWebClient(*r, w, newsAggregator)
-	articles, err := webClient.FetchNews()
+	news, err := webClient.FetchNews()
 	if err != nil {
-		logrus.Error("Failed to fetch articles ", err)
+		logrus.Error("Failed to fetch news ", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	webClient.Print(articles)
+	webClient.Print(news)
 }

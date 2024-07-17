@@ -15,8 +15,8 @@ import (
 	"regexp"
 )
 
-// AddSource processes the source URL and returns the source entity
-func AddSource(url string) (source.Name, error) {
+// SaveSource processes the source URL and returns the source entity
+func SaveSource(url string) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -24,7 +24,7 @@ func AddSource(url string) (source.Name, error) {
 	if err != nil {
 		return "", err
 	}
-	logrus.Info("AddSource: The URL of feed was successfully retrieved: ", rssURL)
+	logrus.Info("SaveSource: The URL of feed was successfully retrieved: ", rssURL)
 
 	domainName := ExtractDomainName(url)
 
@@ -37,6 +37,7 @@ func AddSource(url string) (source.Name, error) {
 		Name:       source.Name(domainName),
 		PathToFile: source.PathToFile(filePath),
 		SourceType: source.STORAGE,
+		Link:       source.Link(url),
 	}
 
 	err, jsonPath := parseAndSaveArticles(sourceEntity, domainName)

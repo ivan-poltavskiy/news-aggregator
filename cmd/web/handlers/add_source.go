@@ -23,14 +23,14 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	logrus.Info("AddSourceHandler: The URL from the request to add the source was successfully retrieved: ", requestBody.URL)
 
-	sourceName, err := service.AddSource(requestBody.URL)
+	sourceName, err := service.SaveSource(requestBody.URL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write([]byte("Articles saved successfully. Name of source: " + string(sourceName))); err != nil {
+	if _, err := w.Write([]byte("News saved successfully. Name of source: " + string(sourceName))); err != nil {
 		logrus.Error("Failed to write response: ", err)
 	}
 }

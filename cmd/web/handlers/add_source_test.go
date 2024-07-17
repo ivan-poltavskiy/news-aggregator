@@ -14,8 +14,8 @@ import (
 	"news-aggregator/entity/source"
 )
 
-// mock the AddSource function
-func mockAddSource(url string) (source.Name, error) {
+// mock the SaveSource function
+func mockSaveSource(url string) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -26,7 +26,7 @@ func mockAddSource(url string) (source.Name, error) {
 }
 
 func TestAddSourceHandler(t *testing.T) {
-	patch := monkey.Patch(service.AddSource, mockAddSource)
+	patch := monkey.Patch(service.SaveSource, mockSaveSource)
 	defer patch.Unpatch()
 
 	tests := []struct {

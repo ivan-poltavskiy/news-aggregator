@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	http.HandleFunc("GET /articles", handlers.FetchArticleHandler)
+	http.HandleFunc("GET /news", handlers.FetchNewsHandler)
 	http.HandleFunc("POST /sources", handlers.AddSourceHandler)
 	http.HandleFunc("DELETE /sources", handlers.DeleteSourceByNameHandler)
 	logrus.Info("Starting server on " + constant.PORT)

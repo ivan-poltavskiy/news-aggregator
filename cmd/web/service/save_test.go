@@ -62,13 +62,13 @@ func TestAddSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := AddSource(tt.url)
+			got, err := SaveSource(tt.url)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AddSource() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AddSource() got = %v, want %v", got, tt.want)
+				t.Errorf("SaveSource() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
