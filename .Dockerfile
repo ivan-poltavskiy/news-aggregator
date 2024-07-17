@@ -1,5 +1,5 @@
 # Stage 1: Base
-FROM golang:1.22-alpine AS base
+FROM golang:1.22.3-alpine AS base
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
