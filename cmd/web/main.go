@@ -18,7 +18,9 @@ func main() {
 	http.HandleFunc("/sources", func(w http.ResponseWriter, r *http.Request) {
 		handlers.AddSourceHandler(w, r, sourceStorage)
 	})
-	http.HandleFunc("DELETE /sources", handlers.DeleteSourceByNameHandler)
+	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
+		handlers.DeleteSourceByNameHandler(w, r, sourceStorage)
+	})
 	logrus.Info("Starting server on " + constant.PORT)
 
 	err := http.ListenAndServeTLS(constant.PORT, constant.CertFile, constant.KeyFile, nil)

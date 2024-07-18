@@ -3,10 +3,14 @@ package storage
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type JsonSourceStorage struct {
@@ -92,6 +96,40 @@ func (storage *JsonSourceStorage) GetSources() ([]source.Source, error) {
 
 	return sources, nil
 }
-func (storage *JsonSourceStorage) DeleteSource() {
+func (storage *JsonSourceStorage) DeleteSourceByName(name string) error {
+	var updatedSources []source.Source
+	found := false
+	definedSources, err := storage.GetSources()
+	if err != nil {
+		return err
+	}
+	for _, currentSource := range definedSources {
+		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(name) {
+			updatedSources = append(updatedSources, currentSource)
+		} else {
+			found = true
+			directoryPath := filepath.Join(constant.PathToResources, strings.ToLower(name))
+			err := os.RemoveAll(directoryPath)
+			if err != nil {
+				logrus.Errorf("Failed to delete source directory %s: %v", directoryPath, err)
+				return err
+			}
+			logrus.Infof("Deleted source directory: %s", directoryPath)
+		}
+	}
 
+	if !found {
+		return fmt.Errorf("source not found: %s", name)
+	}
+	for _, s := range updatedSources {
+		err := storage.SaveSource(s)
+		if err != nil {
+			logrus.Errorf("Failed to write updated sources to file: %v", err)
+			return err
+		}
+
+	}
+	logrus.Info("Updated sources written to file successfully")
+
+	return nil
 }

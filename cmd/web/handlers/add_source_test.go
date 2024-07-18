@@ -1,20 +1,20 @@
 package handlers
 
 import (
+	"bou.ke/monkey"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/storage/mock_aggregator"
-	"testing"
-
-	"bou.ke/monkey"
-	"github.com/stretchr/testify/assert"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
 	"news-aggregator/storage"
+	"news-aggregator/storage/mock_aggregator"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // mock the Save function
