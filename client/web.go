@@ -6,7 +6,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/cmd/web/service"
-	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/filter"
@@ -52,10 +51,7 @@ func (webClient *WebClient) FetchNews() ([]news.News, error) {
 		return nil, nil
 	}
 
-	err := updateNewsForInputSources(webClient)
-	if err != nil {
-		return nil, err
-	}
+	updateNewsForInputSources(webClient)
 
 	articles, err := webClient.aggregator.Aggregate(webClient.Sources, webClient.filters...)
 	if err != nil {
@@ -96,11 +92,8 @@ func (webClient *WebClient) printUsage() {
 }
 
 // updateNewsForInputSources updating news for input sources
-func updateNewsForInputSources(webClient *WebClient) error {
-	existingSources, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
-	if err != nil {
-		return err
-	}
+func updateNewsForInputSources(webClient *WebClient) {
+	existingSources := service.ReadSourcesFromStorage()
 
 	existingSourceMap := make(map[string]source.Source)
 	for _, source := range existingSources {
@@ -111,9 +104,8 @@ func updateNewsForInputSources(webClient *WebClient) error {
 		if src, exists := existingSourceMap[sourceName]; exists {
 			_, err := service.SaveSource(string(src.Link))
 			if err != nil {
-				return err
+
 			}
 		}
 	}
-	return err
 }
