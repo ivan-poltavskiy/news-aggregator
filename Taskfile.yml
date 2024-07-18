@@ -1,6 +1,7 @@
 version: '3'
 
 env:
+  #add default values
   DOCKER_IMAGE_NAME: "ivan/news_aggregator"
   DOCKER_IMAGE_TAG: "v1.0"
   DOCKERFILE_PATH: ".Dockerfile"
@@ -47,6 +48,7 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
+    #depen
     cmds:
       - task: tidy
       - task: fmt
