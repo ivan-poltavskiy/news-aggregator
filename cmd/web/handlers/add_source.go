@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"news-aggregator/cmd/web/service"
+	"news-aggregator/storage"
 )
 
 // addSourceRequest is a structure containing the fields required to add a new source.
@@ -14,7 +15,7 @@ type addSourceRequest struct {
 }
 
 // AddSourceHandler is a handler for adding the new source to the storage.
-func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
+func AddSourceHandler(w http.ResponseWriter, r *http.Request, storage storage.Storage) {
 	var requestBody addSourceRequest
 
 	if err := getUrlFromRequest(r, &requestBody); err != nil {
@@ -23,7 +24,7 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	logrus.Info("AddSourceHandler: The URL from the request to add the source was successfully retrieved: ", requestBody.URL)
 
-	sourceName, err := service.SaveSource(requestBody.URL)
+	sourceName, err := service.SaveSource(requestBody.URL, storage)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

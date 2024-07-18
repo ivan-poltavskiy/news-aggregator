@@ -1,12 +1,14 @@
-package service
+package service_test
 
 import (
 	"encoding/json"
+	"github.com/golang/mock/gomock"
+	"news-aggregator/cmd/web/service"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage/mock_aggregator"
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
 )
 
@@ -18,7 +20,6 @@ func setupTestEnvironment(t *testing.T) string {
 	constant.PathToResources = resources
 	constant.PathToStorage = filepath.Join(resources, "sources.json")
 
-	// Create sample sources.json
 	var sources []source.Source
 	data, err := json.Marshal(sources)
 	if err != nil {
@@ -32,23 +33,33 @@ func setupTestEnvironment(t *testing.T) string {
 	return resources
 }
 
-func TestAddSource(t *testing.T) {
+func TestSaveSource(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
 	setupTestEnvironment(t)
+
+	mockStorage := mock_aggregator.NewMockStorage(ctrl)
 
 	tests := []struct {
 		name    string
 		url     string
 		want    source.Name
 		wantErr bool
+		setup   func()
 	}{
 		{
 			name:    "Add pravda rrs source",
 			url:     "https://www.pravda.com.ua/",
-			want:    source.Name("pravda"),
+			want:    "pravda",
 			wantErr: false,
+			setup: func() {
+				// Expectation for successful source save
+				mockStorage.EXPECT().SaveSource(gomock.AssignableToTypeOf(source.Source{})).Return(nil)
+			},
 		},
 		{
-			name:    "Add not rrs source",
+			name:    "Add not rss source",
 			url:     "https://www.bbc.com",
 			want:    "",
 			wantErr: true,
@@ -60,14 +71,19 @@ func TestAddSource(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SaveSource(tt.url)
+			if tt.setup != nil {
+				tt.setup()
+			}
+
+			got, err := service.SaveSource(tt.url, mockStorage)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if err == nil && got != tt.want {
 				t.Errorf("SaveSource() got = %v, want %v", got, tt.want)
 			}
 		})

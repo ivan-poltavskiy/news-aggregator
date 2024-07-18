@@ -4,18 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
+	"news-aggregator/storage/mock_aggregator"
 	"testing"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage"
 )
 
-// mock the SaveSource function
-func mockSaveSource(url string) (source.Name, error) {
+// mock the Save function
+func mockSaveSource(url string, storage storage.Storage) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -26,6 +29,10 @@ func mockSaveSource(url string) (source.Name, error) {
 }
 
 func TestAddSourceHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+
 	patch := monkey.Patch(service.SaveSource, mockSaveSource)
 	defer patch.Unpatch()
 
@@ -62,7 +69,9 @@ func TestAddSourceHandler(t *testing.T) {
 			assert.NoError(t, err)
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(AddSourceHandler)
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				AddSourceHandler(w, r, mockStorage)
+			})
 
 			handler.ServeHTTP(rr, req)
 

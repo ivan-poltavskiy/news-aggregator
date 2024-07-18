@@ -10,13 +10,14 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
+	"news-aggregator/storage"
 	"os"
 	"path/filepath"
 	"regexp"
 )
 
 // SaveSource processes the source URL and returns the source entity
-func SaveSource(url string) (source.Name, error) {
+func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -24,7 +25,7 @@ func SaveSource(url string) (source.Name, error) {
 	if err != nil {
 		return "", err
 	}
-	logrus.Info("SaveSource: The URL of feed was successfully retrieved: ", rssURL)
+	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
 
 	domainName := ExtractDomainName(url)
 
@@ -47,7 +48,10 @@ func SaveSource(url string) (source.Name, error) {
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
 	if !IsSourceExists(sourceEntity.Name) {
-		AddSourceToStorage(sourceEntity)
+		err = sourceStorage.SaveSource(sourceEntity)
+		if err != nil {
+			return "", err
+		}
 		logrus.Info("Source added")
 	} else {
 		logrus.Info("Source already exists")
