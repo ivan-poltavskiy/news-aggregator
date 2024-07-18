@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"news-aggregator/aggregator"
 	"news-aggregator/cmd/web/handlers"
+	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"news-aggregator/storage"
@@ -11,11 +13,13 @@ import (
 
 func main() {
 	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	newsCollector := collector.New(sourceStorage)
+	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handlers.FetchNewsHandler(w, r, sourceStorage)
+		handlers.FetchNewsHandler(w, r, sourceStorage, newsAggregator)
 	})
-	http.HandleFunc("/sources", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
 		handlers.AddSourceHandler(w, r, sourceStorage)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {

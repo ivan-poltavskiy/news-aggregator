@@ -121,15 +121,24 @@ func (storage *JsonSourceStorage) DeleteSourceByName(name string) error {
 	if !found {
 		return fmt.Errorf("source not found: %s", name)
 	}
-	for _, s := range updatedSources {
-		err := storage.SaveSource(s)
-		if err != nil {
-			logrus.Errorf("Failed to write updated sources to file: %v", err)
-			return err
-		}
-
+	file, err := os.Create(string(storage.pathToStorage))
+	if err != nil {
+		logrus.Error("JsonSourceStorage: Failed to create storage file: ", err)
+		return err
 	}
-	logrus.Info("Updated sources written to file successfully")
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			logrus.Error("JsonSourceStorage: Error closing storage file: ", err)
+		}
+	}(file)
 
+	err = json.NewEncoder(file).Encode(updatedSources)
+	if err != nil {
+		logrus.Error("JsonSourceStorage: Failed to encode sources to JSON: ", err)
+		return err
+	}
+
+	logrus.Info("JsonSourceStorage: Source successfully deleted from storage")
 	return nil
 }
