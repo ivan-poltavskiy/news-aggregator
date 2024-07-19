@@ -54,6 +54,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
+        if: ${{ steps.release.outputs.release_created }}
         run: |
           IMAGE_TAG=${{ env.VERSION }}
           echo "Building Docker image with tag: ${IMAGE_TAG}"
