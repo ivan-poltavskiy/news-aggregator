@@ -9,7 +9,6 @@ permissions:
   contents: write
   pull-requests: write
 
-
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -26,6 +25,13 @@ jobs:
           include-component-in-tag: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
+
+      - name: Extract version from release-please output
+        id: extract-version
+        run: |
+          VERSION=$(echo "${{ steps.create-version.outputs.version }}" | sed 's/^v//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -35,14 +41,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-
       - name: Build and push Docker image
-        env:
-          MAJOR_VERSION: 1
-          MINOR_VERSION: 0
-          PATCH_VERSION: 0
         run: |
-          IMAGE_TAG="v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+          IMAGE_TAG=${{ env.VERSION }}
           echo "Building Docker image with tag: ${IMAGE_TAG}"
           docker build -t ${{ secrets.DOCKER_USERNAME }}/news_aggregator:${IMAGE_TAG} -f .Dockerfile .
           docker push ${{ secrets.DOCKER_USERNAME }}/news_aggregator:${IMAGE_TAG}
