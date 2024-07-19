@@ -17,9 +17,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run release-please
-        uses: googleapis/release-please-action@v4
         id: create-version
-
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: go
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract version from release-please output
         id: extract-version
