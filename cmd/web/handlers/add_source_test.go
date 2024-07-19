@@ -1,21 +1,24 @@
 package handlers
 
 import (
+	"bou.ke/monkey"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-
-	"bou.ke/monkey"
-	"github.com/stretchr/testify/assert"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage"
+	"news-aggregator/storage/mock_aggregator"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// mock the AddSource function
-func mockAddSource(url string) (source.Name, error) {
+// mock the Save function
+func mockSaveSource(url string, storage storage.Storage) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -26,7 +29,11 @@ func mockAddSource(url string) (source.Name, error) {
 }
 
 func TestAddSourceHandler(t *testing.T) {
-	patch := monkey.Patch(service.AddSource, mockAddSource)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+
+	patch := monkey.Patch(service.SaveSource, mockSaveSource)
 	defer patch.Unpatch()
 
 	tests := []struct {
@@ -39,7 +46,7 @@ func TestAddSourceHandler(t *testing.T) {
 			name:           "ValidRequest",
 			requestBody:    addSourceRequest{URL: "https://www.pravda.com.ua/"},
 			expectedStatus: http.StatusOK,
-			expectedBody:   "Articles saved successfully. Name of source: pravda",
+			expectedBody:   "News saved successfully. Name of source: pravda",
 		},
 		{
 			name:           "EmptyURL",
@@ -62,7 +69,9 @@ func TestAddSourceHandler(t *testing.T) {
 			assert.NoError(t, err)
 
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(AddSourceHandler)
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				AddSourceHandler(w, r, mockStorage)
+			})
 
 			handler.ServeHTTP(rr, req)
 

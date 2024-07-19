@@ -140,7 +140,7 @@ func (cli *commandLineClient) Print(newsForOutput []news.News) {
 
 	err = tmpl.ExecuteTemplate(os.Stdout, "news", outputData)
 	logrus.Info("Command line client: Printing articles with count: ", outputData.Count)
-	err = tmpl.ExecuteTemplate(os.Stdout, "articles", outputData)
+	err = tmpl.ExecuteTemplate(os.Stdout, "news", outputData)
 	if err != nil {
 		logrus.Fatal("Command line client: Template execution error: ", err)
 	}
