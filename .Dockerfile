@@ -1,30 +1,37 @@
 # Stage 1: Base
-FROM golang:1.22-alpine AS base
+FROM golang:1.22.3-alpine AS base
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
 
 COPY go.mod go.sum ./
 RUN go mod download
+ARG PORT=443
 
-COPY . .
+COPY aggregator/ ./aggregator/
+COPY client/ ./client/
+COPY cmd/ ./cmd/
+COPY collector/ ./collector/
+COPY constant/ ./constant/
+COPY entity/ ./entity/
+COPY filter/ ./filter/
+COPY parser/ ./parser/
+COPY resources/ ./resources/
+COPY sorter/ ./sorter/
+COPY validator/ ./validator/
 
-# Stage 2: Build
-FROM base AS build
-
-ENV PORT = 443
 RUN go build -o /bin/main ./cmd/web/main.go
 
-# Stage 3: Final image
-FROM alpine:latest
+# Stage 2: Build image
+FROM alpine:3.20.1
 # Copy resources
 COPY  resources /resources
+COPY storage /storage
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /bin/main /usr/local/bin/main
+COPY --from=base /bin/main /usr/local/bin/main
 
 COPY certificates /certificates
-COPY . .
 
-EXPOSE 443
+EXPOSE ${PORT}
 
 ENTRYPOINT ["main"]

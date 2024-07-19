@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/news"
+	"news-aggregator/entity/source"
 	"news-aggregator/filter"
 	"news-aggregator/sorter"
+	"news-aggregator/storage"
 	"strings"
 )
 
@@ -20,10 +23,11 @@ type WebClient struct {
 	DateSorter       sorter.DateSorter
 	filters          []filter.NewsFilter
 	output           http.ResponseWriter
+	sourceStorage    storage.Storage
 }
 
 // NewWebClient creates and initializes a new web client with the provided aggregator.
-func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) Client {
+func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator, sourceStorage storage.Storage) Client {
 	queryParams := r.URL.Query()
 	webClient := &WebClient{aggregator: aggregator}
 	webClient.Sources = checkUnique(strings.Split(queryParams.Get("sources"), ","))
@@ -38,6 +42,7 @@ func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) 
 	}
 	webClient.filters = filters
 	webClient.output = w
+	webClient.sourceStorage = sourceStorage
 	logrus.Info("New web client initialized")
 	return webClient
 }
@@ -48,6 +53,8 @@ func (webClient *WebClient) FetchNews() ([]news.News, error) {
 		webClient.printUsage()
 		return nil, nil
 	}
+
+	updateNewsForInputSources(webClient)
 
 	articles, err := webClient.aggregator.Aggregate(webClient.Sources, webClient.filters...)
 	if err != nil {
@@ -84,5 +91,24 @@ func (webClient *WebClient) printUsage() {
 		"\nType --sortingBySources to sort by sources.")
 	if err != nil {
 		return
+	}
+}
+
+// updateNewsForInputSources updating news for input sources
+func updateNewsForInputSources(webClient *WebClient) {
+	existingSources := service.ReadSourcesFromStorage()
+
+	existingSourceMap := make(map[string]source.Source)
+	for _, source := range existingSources {
+		existingSourceMap[string(source.Name)] = source
+	}
+
+	for _, sourceName := range webClient.Sources {
+		if src, exists := existingSourceMap[sourceName]; exists {
+			_, err := service.SaveSource(string(src.Link), webClient.sourceStorage)
+			if err != nil {
+
+			}
+		}
 	}
 }
