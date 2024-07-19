@@ -23,12 +23,25 @@ jobs:
           release-type: go
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug release-please output
+        run: |
+          echo "Release-please outputs:"
+          echo "Version: ${{ steps.create-version.outputs.version }}"
+          echo "Major: ${{ steps.create-version.outputs.major }}"
+          echo "Minor: ${{ steps.create-version.outputs.minor }}"
+          echo "Patch: ${{ steps.create-version.outputs.patch }}"
+          echo "All outputs: ${{ toJson(steps.create-version.outputs) }}"
+
       - name: Extract version from release-please output
         id: extract-version
         run: |
           VERSION=$(echo "${{ steps.create-version.outputs.version }}" | sed 's/^v//')
+          echo "Extracted VERSION: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "version: ${{ steps.create-version.outputs.major}}.${{ steps.create-version.outputs.minor}}.${{ steps.create-version.outputs.patch}}"
+
+      - name: Debug extracted version
+        run: |
+          echo "Extracted version from GITHUB_ENV: ${{ env.VERSION }}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
