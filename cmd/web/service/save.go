@@ -10,21 +10,24 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
+	"news-aggregator/storage"
 	"os"
 	"path/filepath"
 	"regexp"
 )
 
-// AddSource processes the source URL and returns the source entity
-func AddSource(url string) (source.Name, error) {
+// SaveSource processes the source URL and returns the source entity
+func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) {
+
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
+
 	rssURL, err := getRssFeedLink(url)
 	if err != nil {
 		return "", err
 	}
-	logrus.Info("AddSource: The URL of feed was successfully retrieved: ", rssURL)
+	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
 
 	domainName := ExtractDomainName(url)
 
@@ -37,16 +40,20 @@ func AddSource(url string) (source.Name, error) {
 		Name:       source.Name(domainName),
 		PathToFile: source.PathToFile(filePath),
 		SourceType: source.STORAGE,
+		Link:       source.Link(url),
 	}
 
-	err, jsonPath := parseAndSaveArticles(sourceEntity, domainName)
+	err, jsonPath := parseAndSaveNews(sourceEntity, domainName)
 	if err != nil {
 		return "", err
 	}
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
 	if !IsSourceExists(sourceEntity.Name) {
-		AddSourceToStorage(sourceEntity)
+		err = sourceStorage.SaveSource(sourceEntity)
+		if err != nil {
+			return "", err
+		}
 		logrus.Info("Source added")
 	} else {
 		logrus.Info("Source already exists")
@@ -130,8 +137,8 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 	return filePath, nil
 }
 
-// parseAndSaveArticles parses RSS feed and saves the articles to the storage
-func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error, string) {
+// parseAndSaveNews parses RSS feed and saves the news to the storage
+func parseAndSaveNews(sourceEntity source.Source, domainName string) (error, string) {
 	articles, err := parseRssFeed(sourceEntity)
 	if err != nil {
 		return err, ""
@@ -144,7 +151,7 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 		return err, ""
 	}
 
-	newArticles := filterNewArticles(articles, existingArticles)
+	newArticles := newsUnification(articles, existingArticles)
 	if len(newArticles) == 0 {
 		logrus.Info("No new articles to add")
 		return nil, jsonFilePath
@@ -152,11 +159,11 @@ func parseAndSaveArticles(sourceEntity source.Source, domainName string) (error,
 
 	existingArticles = append(existingArticles, newArticles...)
 
-	if err := saveArticles(jsonFilePath, existingArticles); err != nil {
+	if err := saveNews(jsonFilePath, existingArticles); err != nil {
 		return err, ""
 	}
 
-	logrus.Info("parseAndSaveArticles: Articles successfully parsed and saved to: ", jsonFilePath)
+	logrus.Info("parseAndSaveNews: Articles successfully parsed and saved to: ", jsonFilePath)
 	return nil, jsonFilePath
 }
 
@@ -193,7 +200,7 @@ func readExistingArticles(jsonFilePath string) ([]news.News, error) {
 
 	return existingArticles, nil
 }
-func filterNewArticles(articles []news.News, existingArticles []news.News) []news.News {
+func newsUnification(articles []news.News, existingArticles []news.News) []news.News {
 	existingTitles := make(map[string]struct{})
 	for _, existingArticle := range existingArticles {
 		existingTitles[existingArticle.Title.String()] = struct{}{}
@@ -209,7 +216,7 @@ func filterNewArticles(articles []news.News, existingArticles []news.News) []new
 	return newArticles
 }
 
-func saveArticles(jsonFilePath string, articles []news.News) error {
+func saveNews(jsonFilePath string, articles []news.News) error {
 	jsonFile, err := os.Create(jsonFilePath)
 	if err != nil {
 		logrus.Error("Failed to create JSON file: ", err)

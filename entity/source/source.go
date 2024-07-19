@@ -17,11 +17,15 @@ type Name string
 // Type describes of the type of document for a particular source
 type Type string
 
+// Link describe the link to the source
+type Link string
+
 // Source is the set of information about source of news.
 type Source struct {
 	Name       Name
 	PathToFile PathToFile
 	SourceType Type
+	Link       Link
 }
 
 // Stores all types of sources provided.

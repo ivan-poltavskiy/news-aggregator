@@ -6,18 +6,14 @@ import (
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage"
 )
 
 func main() {
 
-	sources, err := source.LoadExistingSourcesFromStorage(constant.PathToStorage)
-	if err != nil {
-		println(err)
-		return
-	}
-	articleCollector := collector.New(sources)
-
-	newsAggregator := aggregator.New(articleCollector)
+	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	newsCollector := collector.New(sourceStorage)
+	newsAggregator := aggregator.New(newsCollector)
 	cli := client.NewCommandLine(newsAggregator)
 	articles, err := cli.FetchNews()
 	if err != nil {
