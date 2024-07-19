@@ -19,14 +19,13 @@ COPY parser/ ./parser/
 COPY resources/ ./resources/
 COPY sorter/ ./sorter/
 COPY validator/ ./validator/
+COPY storage/ ./storage
 
 RUN go build -o /bin/main ./cmd/web/main.go
 
 # Stage 2: Build image
 FROM alpine:3.20.1
 # Copy resources
-COPY  resources /resources
-COPY storage /storage
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=base /bin/main /usr/local/bin/main
 
