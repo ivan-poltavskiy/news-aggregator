@@ -47,8 +47,5 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    cmds:
-      - task: tidy
-      - task: fmt
-      - task: vet
-      - task: test
+    deps: [tidy, fmt, vet, test]
+
