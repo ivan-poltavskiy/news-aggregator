@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.9](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.8...v1.0.9) (2024-07-19)
+
+
+### Bug Fixes
+
+* test Fix release-please.yml ([ee45896](https://github.com/ivan-poltavskiy/news-aggregator/commit/ee4589697db8044c75c99c14103caaa8657249b4))
+
 ## [1.0.8](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.7...v1.0.8) (2024-07-19)
 
 
