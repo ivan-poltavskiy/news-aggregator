@@ -25,7 +25,6 @@ jobs:
           release-type: go
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: ${{ github.ref_name }}
-            echo "version ${{ steps.create-version.outputs.version }}"
 
       - name: Extract version from release-please output
         id: extract-version
