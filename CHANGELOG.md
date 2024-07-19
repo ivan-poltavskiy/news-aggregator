@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.0.3](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.2...v1.0.3) (2024-07-19)
+
+
+### Bug Fixes
+
+* Delete unnecessary step. ([dc6f9e5](https://github.com/ivan-poltavskiy/news-aggregator/commit/dc6f9e5bc82b9a69b0b30e30ed715b4306c54f51))
+* Fix dockerfile. ([aaee796](https://github.com/ivan-poltavskiy/news-aggregator/commit/aaee7962a6069ecd394f7f9fc81822442a3867e0))
+* Fix release-please.yml. ([47bcead](https://github.com/ivan-poltavskiy/news-aggregator/commit/47bceade80177f11c91c4b66abcd9a6823fda974))
+* Fix release-please.yml. ([b7f94d7](https://github.com/ivan-poltavskiy/news-aggregator/commit/b7f94d7699037c5223212d8aa9a9ea7dce174aa9))
+* Fix release-please.yml. ([a1e48fb](https://github.com/ivan-poltavskiy/news-aggregator/commit/a1e48fb01b36fceb093ea5ad67854a36b18bd4e8))
+* Fix release-please.yml. ([66cd10e](https://github.com/ivan-poltavskiy/news-aggregator/commit/66cd10ef28ae64e6a8f8aeb391bc8c7f64f1ac16))
+* Fix release-please.yml. ([114b5c8](https://github.com/ivan-poltavskiy/news-aggregator/commit/114b5c801b75e4d9d5585c8190fe2a01e7a47c09))
+* Fix release-please.yml. ([5ca08f4](https://github.com/ivan-poltavskiy/news-aggregator/commit/5ca08f4a5b1e8974933436f20014e66d56d46e27))
+* Fix release-please.yml. ([bbe9d0a](https://github.com/ivan-poltavskiy/news-aggregator/commit/bbe9d0a34856959e14bb1291b1f17ae0007388e1))
+* Fix release-please.yml. ([8e6f745](https://github.com/ivan-poltavskiy/news-aggregator/commit/8e6f7451139a3eee4ed1cd07c621d0a1f8a4c602))
+* Fix release-please.yml. ([b4f6a42](https://github.com/ivan-poltavskiy/news-aggregator/commit/b4f6a4243f28ad2ff4da8d1f108d3113c7644fdb))
+* Fix release-please.yml. ([757f77a](https://github.com/ivan-poltavskiy/news-aggregator/commit/757f77a5c79fbc761ed6a370f56f6f789ea89231))
+* Fix release-please.yml. ([358d6a7](https://github.com/ivan-poltavskiy/news-aggregator/commit/358d6a7ab1dc897e48b51645505a70bcad20ae55))
+* Fix release-please.yml. ([738c308](https://github.com/ivan-poltavskiy/news-aggregator/commit/738c30857485b1d042a341ea5c41a9bb8e45fb00))
+* Fix release-please.yml. ([bec528b](https://github.com/ivan-poltavskiy/news-aggregator/commit/bec528b94e33c7c9cdde0a9164a3eb734ae0e612))
+* Fix release-please.yml. ([c080a91](https://github.com/ivan-poltavskiy/news-aggregator/commit/c080a91be1cb86384efa59ba5f9a06e9afdab516))
+* Fix release-please.yml. ([679fd44](https://github.com/ivan-poltavskiy/news-aggregator/commit/679fd446198489cf175aa93158c56003e1e25243))
+* Fix release-please.yml. ([be6df6c](https://github.com/ivan-poltavskiy/news-aggregator/commit/be6df6c9eddac2febce87415727ce0483bc71277))
+* Fix release-please.yml. ([7449ebf](https://github.com/ivan-poltavskiy/news-aggregator/commit/7449ebfa5c36a4944e19a3ed6e09bda40fe6476d))
+* Fix release-please.yml. ([cd37205](https://github.com/ivan-poltavskiy/news-aggregator/commit/cd3720500d6983f47534b2245a79ec1e990c6ffc))
+* Fix release-please.yml. ([17a1a79](https://github.com/ivan-poltavskiy/news-aggregator/commit/17a1a793cd44a62c18e46901f9fb81c2a0b6f57a))
+* Fix release-please.yml. ([a1774a3](https://github.com/ivan-poltavskiy/news-aggregator/commit/a1774a3707741f8e563175ae7abf011089645d36))
+* Fix release-please.yml. ([8c56aa9](https://github.com/ivan-poltavskiy/news-aggregator/commit/8c56aa95cf6173254217ebdb62b791560deabe01))
+* Fix release-please.yml. ([7486469](https://github.com/ivan-poltavskiy/news-aggregator/commit/74864694573d9f0a3fbfae353038020416160033))
+* Fix release-please.yml. ([775d7a7](https://github.com/ivan-poltavskiy/news-aggregator/commit/775d7a7e5445b3113ce242d3390b1b90546a3ad6))
+* Fix release-please.yml. ([59aa0b8](https://github.com/ivan-poltavskiy/news-aggregator/commit/59aa0b8cf5b590b8f6cc273babe18b5d3ed901ed))
+* Fix release-please.yml. ([0a2bcba](https://github.com/ivan-poltavskiy/news-aggregator/commit/0a2bcba307b47cffee34048ff498eb7169b6fa4f))
+* Fix release-please.yml. ([59f4c06](https://github.com/ivan-poltavskiy/news-aggregator/commit/59f4c068473782fc535b8f84f373b0c9c2e36575))
+* Fix release-please.yml. ([6cd5431](https://github.com/ivan-poltavskiy/news-aggregator/commit/6cd5431cb6f0ec62bb89ca4aabac60fb0ec8d83b))
+* Fix release-please.yml. ([079e970](https://github.com/ivan-poltavskiy/news-aggregator/commit/079e9702b321152b6e8622d0fdd5a1f6ede8d98b))
+* Fix release-please.yml. ([aa90184](https://github.com/ivan-poltavskiy/news-aggregator/commit/aa90184bf03e1732fe6e427efbae74781a2bef6b))
+
 ## [1.0.2](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.1...v1.0.2) (2024-07-19)
 
 
