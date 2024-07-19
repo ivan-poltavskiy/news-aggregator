@@ -25,6 +25,7 @@ jobs:
           release-type: go
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: ${{ github.ref_name }}
+            VERSION=$(echo "${{ outputs.version }}" | sed 's/^v//')
 
       - name: Extract version from release-please output
         id: extract-version
