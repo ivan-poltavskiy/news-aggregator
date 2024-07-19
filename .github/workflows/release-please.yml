@@ -37,9 +37,9 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          MAJOR_VERSION: ${{ create-version.outputs.major }}
-          MINOR_VERSION: ${{ create-version.outputs.minor }}
-          PATCH_VERSION: ${{ create-version.outputs.patch }}
+          MAJOR_VERSION: 1
+          MINOR_VERSION: 0
+          PATCH_VERSION: 0
         run: |
           IMAGE_TAG="v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
           echo "Building Docker image with tag: ${IMAGE_TAG}"
