@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/aggregator"
@@ -12,6 +13,12 @@ import (
 )
 
 func main() {
+
+	port := flag.String("port", constant.PORT, "port to listen on")
+	pathToCertificate := flag.String("path to certificate", constant.CertFile, "Certificate file path")
+	pathToKey := flag.String("path to key", constant.KeyFile, "Key file path")
+	flag.Parse()
+
 	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
 	newsCollector := collector.New(sourceStorage)
 	newsAggregator := aggregator.New(newsCollector)
@@ -25,9 +32,9 @@ func main() {
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
 		handlers.DeleteSourceByNameHandler(w, r, sourceStorage)
 	})
-	logrus.Info("Starting server on " + constant.PORT)
+	logrus.Info("Starting server on " + *port)
 
-	err := http.ListenAndServeTLS(constant.PORT, constant.CertFile, constant.KeyFile, nil)
+	err := http.ListenAndServeTLS(*port, *pathToCertificate, *pathToKey, nil)
 	if err != nil {
 		logrus.Fatalf("Could not start server: %s\n", err.Error())
 	}
