@@ -12,15 +12,15 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Run release-please
         id: create-version
         uses: googleapis/release-please-action@v4
         with:
           release-type: go
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
 
       - name: Debug release-please output
