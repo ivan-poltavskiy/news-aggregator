@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - add-release-please
-  workflow_dispatch:
+
 permissions:
   contents: write
   pull-requests: write
