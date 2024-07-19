@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - feature/add-realese-please
+  workflow_dispatch:
 permissions:
   contents: write
   pull-requests: write
@@ -13,6 +14,9 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Run release-please
         id: create-version
         uses: googleapis/release-please-action@v4
@@ -21,10 +25,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: ${{ github.ref_name }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-
       - name: Debug release-please output
         run: |
           echo "Release-please outputs:"
@@ -32,7 +32,7 @@ jobs:
           echo "Major: ${{ steps.create-version.outputs.major }}"
           echo "Minor: ${{ steps.create-version.outputs.minor }}"
           echo "Patch: ${{ steps.create-version.outputs.patch }}"
-          echo "All outputs: ${{ toJson(steps.pr.outputs) }}"
+          echo "All outputs: ${{ toJson(steps.create-version.outputs) }}"
 
       - name: Extract version from release-please output
         id: extract-version
