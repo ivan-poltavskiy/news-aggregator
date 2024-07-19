@@ -25,6 +25,7 @@ jobs:
           include-component-in-tag: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Extract version from release-please output
         id: extract-version
         run: |
