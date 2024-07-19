@@ -6,7 +6,6 @@ on:
       - master
       - feature/add-realese-please
   workflow_dispatch:
-
 permissions:
   contents: write
   pull-requests: write
