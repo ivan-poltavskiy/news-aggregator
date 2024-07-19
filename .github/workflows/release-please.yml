@@ -3,7 +3,7 @@ name: release-please
 on:
   push:
     branches:
-      - add-release-please
+      - feature/add-release-please
   workflow_dispatch:
 permissions:
   contents: write
