@@ -25,6 +25,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: ${{ github.ref_name }}
 
+      - name: Debug release-please output
+        run: |
+            echo "Release-please outputs:"
+            echo "Version: ${{ steps.create-version.outputs.version }}"
+            echo "Major: ${{ steps.create-version.outputs.major }}"
+            echo "Minor: ${{ steps.create-version.outputs.minor }}"
+            echo "Patch: ${{ steps.create-version.outputs.patch }}"
+
       - name: Extract version from release-please output
         id: extract-version
         run: |
