@@ -10,6 +10,8 @@ import (
 	"net/http/httptest"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
+	newsStorage "news-aggregator/storage/news"
+	mock_aggregator2 "news-aggregator/storage/news/mock_aggregator"
 	source2 "news-aggregator/storage/source"
 	"news-aggregator/storage/source/mock_aggregator"
 	"testing"
@@ -18,7 +20,7 @@ import (
 )
 
 // mock the Save function
-func mockSaveSource(url string, storage source2.Storage) (source.Name, error) {
+func mockSaveSource(url string, storage source2.Storage, newsStorage newsStorage.NewsStorage) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -32,6 +34,7 @@ func TestAddSourceHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+	newsMockStorage := mock_aggregator2.NewMockNewsStorage(ctrl)
 
 	patch := monkey.Patch(service.SaveSource, mockSaveSource)
 	defer patch.Unpatch()
@@ -70,7 +73,7 @@ func TestAddSourceHandler(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				AddSourceHandler(w, r, mockStorage)
+				AddSourceHandler(w, r, mockStorage, newsMockStorage)
 			})
 
 			handler.ServeHTTP(rr, req)

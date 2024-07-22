@@ -21,7 +21,7 @@ func TestJson_ParseSource(t *testing.T) {
 		{
 			name: "Parse valid JSON file",
 			args: args{
-				path: "../news/testdata/json_articles.json",
+				path: "../resources/testdata/json_articles.json",
 				name: "testjson",
 			},
 			want: []news.News{

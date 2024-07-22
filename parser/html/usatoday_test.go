@@ -21,7 +21,7 @@ func TestUsaToday_ParseSource(t *testing.T) {
 		{
 			name: "Parse valid HTML file",
 			args: args{
-				path: "../../news/testdata/test_usatoday.html",
+				path: "../../resources/testdata/test_usatoday.html",
 				name: "testusatoday",
 			},
 			want: []news.News{
