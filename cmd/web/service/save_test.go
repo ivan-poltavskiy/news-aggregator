@@ -41,16 +41,21 @@ func TestSaveSource(t *testing.T) {
 			want:    "pravda",
 			wantErr: false,
 			setup: func() {
-				mockSourceStorage.EXPECT().IsSourceExists(source.Name("pravda")).Return(true).Times(1)
-				mockNewsStorage.EXPECT().GetNews(gomock.Any()).Return([]news.News{
+				returnsNews := []news.News{
 					{
 						Title:       "Через ракетну небезпеку у Києві та низці областей оголосили повітряну тривогу",
 						Description: "1 липня у Києві та ще низці областей оголосили повітряну тривогу через ракетну небезпеку. \r\nДжерело: Повітряні сили, мапа повітряних тривог \r\nДослівно: \"Увага! Ракетна небезпека для північних областей, де оголошено повітряну тривогу\".",
 						Link:        "https://www.pravda.com.ua/news/2024/07/1/7463435/",
 						SourceName:  "pravda",
 					},
-				}, nil).Times(1)
-				mockNewsStorage.EXPECT().SaveNews(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+				}
+
+				mockSourceStorage.EXPECT().IsSourceExists(gomock.Any()).Return(false).Times(1)
+				mockSourceStorage.EXPECT().SaveSource(gomock.Any()).Return(nil).Times(1)
+				mockNewsStorage.EXPECT().SaveNews(gomock.Any(), gomock.Any()).Return(
+					source.Source{Name: "pravda"},
+					nil).Times(1)
+				mockNewsStorage.EXPECT().GetNewsBySourceName(gomock.Any(), gomock.Any()).Return(returnsNews, nil).Times(1)
 			},
 		},
 		{

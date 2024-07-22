@@ -5,14 +5,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
-	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -34,23 +32,21 @@ func SaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage new
 
 	domainName := ExtractDomainName(url)
 
-	filePath, err := downloadRssFeed(rssURL, domainName)
+	parsedNews, err := parseRssFeed(rssURL, domainName)
 	if err != nil {
 		return "", err
 	}
 
 	sourceEntity := source.Source{
 		Name:       source.Name(domainName),
-		PathToFile: source.PathToFile(filePath),
 		SourceType: source.STORAGE,
 		Link:       source.Link(url),
 	}
 
-	err, jsonPath := parseAndSaveNews(sourceEntity, newsStorage)
+	sourceEntity, err = saveNews(sourceEntity, newsStorage, sourceStorage, parsedNews)
 	if err != nil {
 		return "", err
 	}
-	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
 	if !sourceStorage.IsSourceExists(sourceEntity.Name) {
 		err = sourceStorage.SaveSource(sourceEntity)
@@ -84,7 +80,7 @@ func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePerio
 				wg.Add(1)
 				go func(src source.Source) {
 					defer wg.Done()
-					err := updateSourceNews(src, newsStorage)
+					err := updateSourceNews(src, newsStorage, sourceStorage)
 					if err != nil {
 						logrus.Error("Failed to update news for source: ", src.Name, err)
 					}
@@ -129,89 +125,67 @@ func getRssFeedLink(url string) (string, error) {
 	return rssURL, nil
 }
 
-// downloadRssFeed downloads the RSS feed and returns the file path
-// todo(temp file)
-func downloadRssFeed(rssURL, domainName string) (string, error) {
+// parseRssFeed downloads the RSS feed and returns the parsed news
+func parseRssFeed(rssURL, domainName string) ([]news.News, error) {
 	rssResponse, err := http.Get(rssURL)
 	if err != nil || rssResponse.StatusCode != http.StatusOK {
 		logrus.Error("Failed to download RSS feed: ", err)
-		return "", fmt.Errorf("failed to download RSS feed")
+		return nil, fmt.Errorf("failed to download RSS feed")
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			logrus.Error("Error closing response body ", err)
+			logrus.Error(err)
 			return
 		}
 	}(rssResponse.Body)
 
-	directoryPath := filepath.Join(constant.PathToResources, domainName)
-	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
-		logrus.Error("Failed to create directory: ", err)
-		return "", fmt.Errorf("failed to create directory")
-	}
-
-	filePath := filepath.Join(directoryPath, domainName+".xml")
-	outputFile, err := os.Create(filePath)
+	tempFile, err := os.CreateTemp("", "*.xml")
 	if err != nil {
-		logrus.Error("Failed to create a file to save the RSS feed to: ", filePath)
-		return "", fmt.Errorf("failed to create file")
+		logrus.Error("Failed to create temporary file: ", err)
+		return nil, fmt.Errorf("failed to create temporary file")
 	}
-	defer func(outputFile *os.File) {
-		err := outputFile.Close()
+	defer func(name string) {
+		err := os.Remove(name)
 		if err != nil {
-			logrus.Error("Failed to close a file to save the RSS feed to: ", filePath)
+			logrus.Error(err)
 			return
 		}
-	}(outputFile)
+	}(tempFile.Name())
 
-	if _, err := io.Copy(outputFile, rssResponse.Body); err != nil {
-		logrus.Error("Could not download RSS feed: ", err)
-		return "", fmt.Errorf("failed to save RSS feed")
+	if _, err := io.Copy(tempFile, rssResponse.Body); err != nil {
+		logrus.Error("Failed to save RSS feed to temporary file: ", err)
+		return nil, fmt.Errorf("failed to save RSS feed")
 	}
 
-	logrus.Info("downloadRssFeed: RSS feed successfully downloaded and saved to: ", filePath)
-	return filePath, nil
-}
-
-// parseAndSaveNews parses RSS feed and saves the news to the storage
-func parseAndSaveNews(sourceEntity source.Source, newsStorage newsStorage.NewsStorage) (error, string) {
-	parsedNews, err := parseRssFeed(sourceEntity)
-	if err != nil {
-		return err, ""
-	}
-
-	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(sourceEntity.Name), string(sourceEntity.Name)+".json"))
-
-	existingNews, err := newsStorage.GetNews(jsonFilePath)
-	if err != nil {
-		return err, ""
-	}
-
-	newArticles := newsUnification(parsedNews, existingNews)
-	if len(newArticles) == 0 {
-		logrus.Info("No new parsedNews to add")
-		return nil, jsonFilePath
-	}
-
-	existingNews = append(existingNews, newArticles...)
-
-	if err := newsStorage.SaveNews(jsonFilePath, existingNews); err != nil {
-		return err, ""
-	}
-
-	logrus.Info("parseAndSaveNews: Articles successfully parsed and saved to: ", jsonFilePath)
-	return nil, jsonFilePath
-}
-
-// parseRssFeed parses rss feed from the input site and return the news from it
-func parseRssFeed(sourceEntity source.Source) ([]news.News, error) {
-	parsedNews, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
+	parsedNews, err := parser.Rss{}.Parse(source.PathToFile(tempFile.Name()), source.Name(domainName))
 	if err != nil {
 		logrus.Error("Failed to parse RSS feed: ", err)
 		return nil, fmt.Errorf("failed to parse RSS feed")
 	}
+
 	return parsedNews, nil
+}
+
+// saveNews saves the news to the storage
+func saveNews(sourceEntity source.Source, newsStorage newsStorage.NewsStorage, sourceStorage sourceStorage.Storage, parsedNews []news.News) (source.Source, error) {
+
+	existingNews, err := newsStorage.GetNewsBySourceName(sourceEntity.Name, sourceStorage)
+	if err != nil {
+		return source.Source{}, err
+	}
+
+	newArticles := newsUnification(parsedNews, existingNews)
+	if len(newArticles) == 0 {
+		logrus.Info("No new parsed news to add")
+		return sourceEntity, nil
+	}
+
+	existingNews = append(existingNews, newArticles...)
+
+	sourceEntity, err = newsStorage.SaveNews(sourceEntity, existingNews)
+
+	return sourceEntity, nil
 }
 
 // newsUnification checks whether there are articles from the new feed in the existing news, and if so, removes them
@@ -232,25 +206,22 @@ func newsUnification(articles []news.News, existingArticles []news.News) []news.
 }
 
 // updateSourceNews updating the news of the input source
-func updateSourceNews(inputSource source.Source, newsStorage newsStorage.NewsStorage) error {
+func updateSourceNews(inputSource source.Source, newsStorage newsStorage.NewsStorage, sourceStorage sourceStorage.Storage) error {
 	domainName := ExtractDomainName(string(inputSource.Link))
 	rssURL, err := getRssFeedLink(string(inputSource.Link))
 	if err != nil {
 		return err
 	}
 
-	filePath, err := downloadRssFeed(rssURL, domainName)
+	currentNews, err := parseRssFeed(rssURL, domainName)
 	if err != nil {
 		return err
 	}
 
-	inputSource.PathToFile = source.PathToFile(filePath)
-
-	err, jsonPath := parseAndSaveNews(inputSource, newsStorage)
+	_, err = saveNews(inputSource, newsStorage, sourceStorage, currentNews)
 	if err != nil {
 		return err
 	}
-	inputSource.PathToFile = source.PathToFile(jsonPath)
 
 	return nil
 }

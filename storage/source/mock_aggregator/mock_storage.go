@@ -48,6 +48,21 @@ func (mr *MockStorageMockRecorder) DeleteSourceByName(name interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSourceByName", reflect.TypeOf((*MockStorage)(nil).DeleteSourceByName), name)
 }
 
+// GetSourceByName mocks base method.
+func (m *MockStorage) GetSourceByName(arg0 source.Name) (source.Source, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSourceByName", arg0)
+	ret0, _ := ret[0].(source.Source)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSourceByName indicates an expected call of GetSourceByName.
+func (mr *MockStorageMockRecorder) GetSourceByName(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSourceByName", reflect.TypeOf((*MockStorage)(nil).GetSourceByName), arg0)
+}
+
 // GetSources mocks base method.
 func (m *MockStorage) GetSources() ([]source.Source, error) {
 	m.ctrl.T.Helper()

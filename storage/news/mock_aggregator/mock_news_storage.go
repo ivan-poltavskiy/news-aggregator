@@ -6,6 +6,8 @@ package mock_aggregator
 
 import (
 	news "news-aggregator/entity/news"
+	source "news-aggregator/entity/source"
+	source0 "news-aggregator/storage/source"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,30 +37,46 @@ func (m *MockNewsStorage) EXPECT() *MockNewsStorageMockRecorder {
 }
 
 // GetNews mocks base method.
-func (m *MockNewsStorage) GetNews(jsonFilePath string) ([]news.News, error) {
+func (m *MockNewsStorage) GetNews(path string) ([]news.News, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNews", jsonFilePath)
+	ret := m.ctrl.Call(m, "GetNews", path)
 	ret0, _ := ret[0].([]news.News)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetNews indicates an expected call of GetNews.
-func (mr *MockNewsStorageMockRecorder) GetNews(jsonFilePath interface{}) *gomock.Call {
+func (mr *MockNewsStorageMockRecorder) GetNews(path interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNews", reflect.TypeOf((*MockNewsStorage)(nil).GetNews), jsonFilePath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNews", reflect.TypeOf((*MockNewsStorage)(nil).GetNews), path)
+}
+
+// GetNewsBySourceName mocks base method.
+func (m *MockNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage source0.Storage) ([]news.News, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNewsBySourceName", sourceName, sourceStorage)
+	ret0, _ := ret[0].([]news.News)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNewsBySourceName indicates an expected call of GetNewsBySourceName.
+func (mr *MockNewsStorageMockRecorder) GetNewsBySourceName(sourceName, sourceStorage interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNewsBySourceName", reflect.TypeOf((*MockNewsStorage)(nil).GetNewsBySourceName), sourceName, sourceStorage)
 }
 
 // SaveNews mocks base method.
-func (m *MockNewsStorage) SaveNews(jsonFilePath string, news []news.News) error {
+func (m *MockNewsStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveNews", jsonFilePath, news)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "SaveNews", currentSource, news)
+	ret0, _ := ret[0].(source.Source)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SaveNews indicates an expected call of SaveNews.
-func (mr *MockNewsStorageMockRecorder) SaveNews(jsonFilePath, news interface{}) *gomock.Call {
+func (mr *MockNewsStorageMockRecorder) SaveNews(currentSource, news interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockNewsStorage)(nil).SaveNews), jsonFilePath, news)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockNewsStorage)(nil).SaveNews), currentSource, news)
 }

@@ -161,3 +161,22 @@ func (storage *jsonSourceStorage) IsSourceExists(name source.Name) bool {
 	logrus.Info("IsSourceExists: Source does not exist: ", name)
 	return false
 }
+
+func (storage *jsonSourceStorage) GetSourceByName(name source.Name) (source.Source, error) {
+	logrus.Info("jsonSourceStorage: Starting to get source by name from storage")
+
+	sources, err := storage.GetSources()
+	if err != nil {
+		logrus.Error("jsonSourceStorage: Failed to get sources: ", err)
+		return source.Source{}, err
+	}
+
+	for _, s := range sources {
+		if strings.ToLower(string(s.Name)) == strings.ToLower(string(name)) {
+			logrus.Info("jsonSourceStorage: Source found: ", name)
+			return s, nil
+		}
+	}
+	logrus.Info("jsonSourceStorage: source not found", name)
+	return source.Source{}, nil
+}

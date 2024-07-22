@@ -17,4 +17,6 @@ type Storage interface {
 	GetSources() ([]source.Source, error)
 	// IsSourceExists check, if the source is existed in the storage by name.
 	IsSourceExists(source.Name) bool
+	//GetSourceByName returns the source from storage by provided name. If it not exists, it returns err.
+	GetSourceByName(source.Name) (source.Source, error)
 }
