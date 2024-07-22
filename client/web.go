@@ -8,7 +8,6 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/sorter"
-	"news-aggregator/storage/source"
 	"strings"
 )
 
@@ -21,11 +20,10 @@ type WebClient struct {
 	DateSorter       sorter.DateSorter
 	filters          []filter.NewsFilter
 	output           http.ResponseWriter
-	sourceStorage    source.Storage
 }
 
 // NewWebClient creates and initializes a new web client with the provided aggregator.
-func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator, sourceStorage source.Storage) Client {
+func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator) Client {
 	queryParams := r.URL.Query()
 	webClient := &WebClient{aggregator: aggregator}
 	webClient.Sources = checkUnique(strings.Split(queryParams.Get("sources"), ","))
@@ -40,7 +38,6 @@ func NewWebClient(r http.Request, w http.ResponseWriter, aggregator Aggregator, 
 	}
 	webClient.filters = filters
 	webClient.output = w
-	webClient.sourceStorage = sourceStorage
 	logrus.Info("New web client initialized")
 	return webClient
 }

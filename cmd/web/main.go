@@ -29,7 +29,7 @@ func main() {
 	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handlers.FetchNewsHandler(w, r, sourceStorage, newsAggregator)
+		handlers.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
 		handlers.AddSourceHandler(w, r, sourceStorage, newsStorage)

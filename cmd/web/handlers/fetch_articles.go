@@ -4,13 +4,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/client"
-	"news-aggregator/storage/source"
 )
 
 // FetchNewsHandler handles requests for fetching news.
-func FetchNewsHandler(w http.ResponseWriter, r *http.Request, storage source.Storage, newsAggregator client.Aggregator) {
+func FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
 
-	webClient := client.NewWebClient(*r, w, newsAggregator, storage)
+	webClient := client.NewWebClient(*r, w, newsAggregator)
 	news, err := webClient.FetchNews()
 	if err != nil {
 		logrus.Error("Failed to fetch news ", err)
