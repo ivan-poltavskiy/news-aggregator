@@ -64,8 +64,8 @@ func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) 
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func PeriodicallyUpdateNews(sourceStorage storage.Storage) {
-	ticker := time.NewTicker(20 * time.Second)
+func PeriodicallyUpdateNews(sourceStorage storage.Storage, newsUpdatePeriod time.Duration) {
+	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 
 	for {

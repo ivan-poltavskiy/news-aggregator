@@ -10,3 +10,5 @@ var PathToResources = "resources"
 
 const CertFile = "certificates/server.crt"
 const KeyFile = "certificates/server.key"
+
+const NewsUpdatePeriod = 5

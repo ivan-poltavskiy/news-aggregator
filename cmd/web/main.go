@@ -11,13 +11,15 @@ import (
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	"news-aggregator/storage"
+	"time"
 )
 
 func main() {
 
 	port := flag.String("port", constant.PORT, "port to listen on")
-	pathToCertificate := flag.String("path to certificate", constant.CertFile, "Certificate file path")
-	pathToKey := flag.String("path to key", constant.KeyFile, "Key file path")
+	pathToCertificate := flag.String("pathToCertificate", constant.CertFile, "Certificate file path")
+	pathToKey := flag.String("pathToKey", constant.KeyFile, "Key file path")
+	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriod, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
 	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
@@ -40,6 +42,6 @@ func main() {
 		logrus.Fatalf("Could not start server: %s\n", err.Error())
 	}
 
-	go service.PeriodicallyUpdateNews(sourceStorage)
+	go service.PeriodicallyUpdateNews(sourceStorage, time.Duration(*newsUpdatePeriod)*time.Minute)
 	select {}
 }
