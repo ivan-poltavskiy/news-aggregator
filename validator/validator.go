@@ -32,7 +32,7 @@ func ValidateSource(sources []string) (bool, error) {
 
 	for _, currentSource := range sources {
 		if !slices.Contains(storageNames, strings.ToLower(currentSource)) {
-			errMessage := fmt.Sprintf("Source %s is not valid. The program supports such news resources:\n%s",
+			errMessage := fmt.Sprintf("Source %s is not valid. The program supports such news news:\n%s",
 				currentSource, strings.Join(storageNames, ", "))
 			logrus.WithFields(logrus.Fields{
 				"current_source": currentSource,
@@ -42,7 +42,7 @@ func ValidateSource(sources []string) (bool, error) {
 		}
 	}
 	if len(sources) == 0 {
-		errMessage := fmt.Sprintf("Please, specify at least one news source. The program supports such news resources:\n%s.",
+		errMessage := fmt.Sprintf("Please, specify at least one news source. The program supports such news news:\n%s.",
 			strings.Join(storageNames, ", "))
 		logrus.WithFields(logrus.Fields{
 			"valid_sources": storageNames,

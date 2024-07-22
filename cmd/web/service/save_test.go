@@ -5,7 +5,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/constant"
+	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
+	newsStorage_mock_aggregator "news-aggregator/storage/news/mock_aggregator"
 	"news-aggregator/storage/source/mock_aggregator"
 	"os"
 	"path/filepath"
@@ -13,7 +15,7 @@ import (
 )
 
 func setupTestEnvironment(t *testing.T) string {
-	// Create a temporary directory for resources
+	// Create a temporary directory for news
 	resources := t.TempDir()
 
 	// Set the paths to the temporary directory
@@ -39,7 +41,8 @@ func TestSaveSource(t *testing.T) {
 
 	setupTestEnvironment(t)
 
-	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+	mockSourceStorage := mock_aggregator.NewMockStorage(ctrl)
+	mockNewsStorage := newsStorage_mock_aggregator.NewMockNewsStorage(ctrl)
 
 	tests := []struct {
 		name    string
@@ -54,8 +57,14 @@ func TestSaveSource(t *testing.T) {
 			want:    "pravda",
 			wantErr: false,
 			setup: func() {
-				mockStorage.EXPECT().GetSources().Return([]source.Source{}, nil)
-				mockStorage.EXPECT().SaveSource(gomock.AssignableToTypeOf(source.Source{})).Return(nil)
+				mockSourceStorage.EXPECT().GetSources().Return([]source.Source{}, nil)
+				mockSourceStorage.EXPECT().SaveSource(gomock.AssignableToTypeOf(source.Source{})).Return(nil)
+				mockNewsStorage.EXPECT().GetNews("pravda").Return([]news.News{
+					{
+						Title: "test",
+					},
+				}, nil)
+				mockNewsStorage.EXPECT().SaveNews("pravda", news.News{}).Return(nil)
 			},
 		},
 		{
@@ -78,7 +87,7 @@ func TestSaveSource(t *testing.T) {
 				tt.setup()
 			}
 
-			got, err := service.SaveSource(tt.url, mockStorage)
+			got, err := service.SaveSource(tt.url, mockSourceStorage, mockNewsStorage)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)
 				return

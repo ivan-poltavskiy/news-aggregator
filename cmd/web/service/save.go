@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -10,7 +9,8 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
-	source2 "news-aggregator/storage/source"
+	newsStorage "news-aggregator/storage/news"
+	sourceStorage "news-aggregator/storage/source"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,7 +19,7 @@ import (
 )
 
 // SaveSource processes the source URL and returns the source entity
-func SaveSource(url string, sourceStorage source2.Storage) (source.Name, error) {
+func SaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage newsStorage.NewsStorage) (source.Name, error) {
 
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
@@ -45,7 +45,7 @@ func SaveSource(url string, sourceStorage source2.Storage) (source.Name, error) 
 		Link:       source.Link(url),
 	}
 
-	err, jsonPath := parseAndSaveNews(sourceEntity, domainName)
+	err, jsonPath := parseAndSaveNews(sourceEntity, domainName, newsStorage)
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +64,7 @@ func SaveSource(url string, sourceStorage source2.Storage) (source.Name, error) 
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func PeriodicallyUpdateNews(sourceStorage source2.Storage, newsUpdatePeriod time.Duration) {
+func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePeriod time.Duration, newsStorage newsStorage.NewsStorage) {
 	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 
@@ -83,7 +83,7 @@ func PeriodicallyUpdateNews(sourceStorage source2.Storage, newsUpdatePeriod time
 				wg.Add(1)
 				go func(src source.Source) {
 					defer wg.Done()
-					err := updateSourceNews(src)
+					err := updateSourceNews(src, newsStorage)
 					if err != nil {
 						logrus.Error("Failed to update news for source: ", src.Name, err)
 					}
@@ -172,7 +172,7 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 }
 
 // parseAndSaveNews parses RSS feed and saves the news to the storage
-func parseAndSaveNews(sourceEntity source.Source, domainName string) (error, string) {
+func parseAndSaveNews(sourceEntity source.Source, domainName string, newsStorage newsStorage.NewsStorage) (error, string) {
 	articles, err := parseRssFeed(sourceEntity)
 	if err != nil {
 		return err, ""
@@ -180,7 +180,7 @@ func parseAndSaveNews(sourceEntity source.Source, domainName string) (error, str
 
 	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, domainName, domainName+".json"))
 
-	existingArticles, err := readExistingArticles(jsonFilePath)
+	existingArticles, err := newsStorage.GetNews(jsonFilePath)
 	if err != nil {
 		return err, ""
 	}
@@ -193,7 +193,7 @@ func parseAndSaveNews(sourceEntity source.Source, domainName string) (error, str
 
 	existingArticles = append(existingArticles, newArticles...)
 
-	if err := saveNews(jsonFilePath, existingArticles); err != nil {
+	if err := newsStorage.SaveNews(jsonFilePath, existingArticles); err != nil {
 		return err, ""
 	}
 
@@ -210,30 +210,6 @@ func parseRssFeed(sourceEntity source.Source) ([]news.News, error) {
 	return articles, nil
 }
 
-func readExistingArticles(jsonFilePath string) ([]news.News, error) {
-	var existingArticles []news.News
-
-	if _, err := os.Stat(jsonFilePath); err == nil {
-		jsonFile, err := os.Open(jsonFilePath)
-		if err != nil {
-			logrus.Error("Failed to open existing JSON file: ", err)
-			return nil, fmt.Errorf("failed to open existing JSON file")
-		}
-		defer func(jsonFile *os.File) {
-			err := jsonFile.Close()
-			if err != nil {
-				logrus.Error("Failed to close the existing JSON file: ", err)
-			}
-		}(jsonFile)
-
-		if err := json.NewDecoder(jsonFile).Decode(&existingArticles); err != nil {
-			logrus.Error("Failed to decode existing articles from JSON file: ", err)
-			return nil, fmt.Errorf("failed to decode existing articles from JSON file")
-		}
-	}
-
-	return existingArticles, nil
-}
 func newsUnification(articles []news.News, existingArticles []news.News) []news.News {
 	existingTitles := make(map[string]struct{})
 	for _, existingArticle := range existingArticles {
@@ -250,28 +226,7 @@ func newsUnification(articles []news.News, existingArticles []news.News) []news.
 	return newArticles
 }
 
-func saveNews(jsonFilePath string, articles []news.News) error {
-	jsonFile, err := os.Create(jsonFilePath)
-	if err != nil {
-		logrus.Error("Failed to create JSON file: ", err)
-		return fmt.Errorf("failed to create JSON file")
-	}
-	defer func(jsonFile *os.File) {
-		err := jsonFile.Close()
-		if err != nil {
-			logrus.Error("Failed to close the JSON file: ", err)
-		}
-	}(jsonFile)
-
-	if err := json.NewEncoder(jsonFile).Encode(articles); err != nil {
-		logrus.Error("Failed to encode articles to JSON file: ", err)
-		return fmt.Errorf("failed to encode articles to JSON file")
-	}
-
-	return nil
-}
-
-func updateSourceNews(src source.Source) error {
+func updateSourceNews(src source.Source, newsStorage newsStorage.NewsStorage) error {
 	domainName := ExtractDomainName(string(src.Link))
 	rssURL, err := getRssFeedLink(string(src.Link))
 	if err != nil {
@@ -285,7 +240,7 @@ func updateSourceNews(src source.Source) error {
 
 	src.PathToFile = source.PathToFile(filePath)
 
-	err, jsonPath := parseAndSaveNews(src, domainName)
+	err, jsonPath := parseAndSaveNews(src, domainName, newsStorage)
 	if err != nil {
 		return err
 	}
