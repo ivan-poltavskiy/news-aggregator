@@ -1,4 +1,4 @@
-# news-aggregator 
+# news-aggregator
 
 ### news-aggregator - it's an app for parsing news from various sources.
 
@@ -23,14 +23,25 @@ Start the application with the required flags.
 
 For example:
 ```bash
-go run main.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
+go run cmd/command-line-client/main.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
 ```
 
 Parameters
-- --sources (**mandatory**): Specify the names of news sites, separated by commas.
-- --keywords (**optional**): Specify comma-separated keywords for news filtering.
-- --startDate and --endDate (**optional**): Specify the start and end date for 
-news filtering in YYYYY-MM-DD format.
+- --sources (mandatory): Specify the names of news sites, separated by commas.
+- --keywords (optional): Specify comma-separated keywords for news filtering.
+- --startDate and --endDate (optional): Specify the start and end date for
+  news filtering in YYYYY-MM-DD format.
+- --sortBy: Sorts news by ASC/DESK
+- --sortingBySources (work only with CLI version): sorting the articles by sources.
+- --help: print the help info.
 
-### More detailed description of the API of the project can be found in the file Specification.txt.
+It is possible to run the aggregator on a web server. To do this, run main.go from the news-aggregator/cmd/web directory or use the command:
+```bash
+go run cmd/web/main.go
+```
+By default, the server uses HTTPS, listens on port 443 and uses a self-signed certificate and key, but these can be changed with the --port, --pathToCertificate and --pathToKey flags respectively.
+
+It is also possible to run the server in a container using Docker. The configuration is written in the .Dockerfile file.
+
+The aggregator has auto news updates every 5 minutes for the server, but this time can also be changed using the --newsUpdatePeriod flag at server startup.
 
