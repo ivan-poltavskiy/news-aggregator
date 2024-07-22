@@ -13,8 +13,8 @@ type jsonResourcesStorage struct {
 	pathToStorage source.PathToFile
 }
 
-// NewJsonResourcesStorage create new instance of storage in JSON file
-func NewJsonResourcesStorage(pathToStorage source.PathToFile) NewsStorage {
+// NewJsonNewsStorage create new instance of storage in JSON file
+func NewJsonNewsStorage(pathToStorage source.PathToFile) NewsStorage {
 	if pathToStorage == "" {
 		panic("pathToStorage is empty")
 	}

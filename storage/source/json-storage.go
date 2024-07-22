@@ -146,3 +146,18 @@ func (storage *jsonSourceStorage) DeleteSourceByName(name string) error {
 	logrus.Info("jsonSourceStorage: Source successfully deleted from storage")
 	return nil
 }
+func (storage *jsonSourceStorage) IsSourceExists(name source.Name) bool {
+	sources, err := storage.GetSources()
+	if err != nil {
+		logrus.Error("IsSourceExists: ", err)
+		return false
+	}
+	for _, s := range sources {
+		if s.Name == name {
+			logrus.Info("IsSourceExists: Source exists: ", name)
+			return true
+		}
+	}
+	logrus.Info("IsSourceExists: Source does not exist: ", name)
+	return false
+}

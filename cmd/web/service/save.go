@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 )
@@ -51,7 +52,7 @@ func SaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage new
 	}
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
-	if !IsSourceExists(sourceEntity.Name, sourceStorage) {
+	if !sourceStorage.IsSourceExists(sourceEntity.Name) {
 		err = sourceStorage.SaveSource(sourceEntity)
 		if err != nil {
 			return "", err
@@ -129,6 +130,7 @@ func getRssFeedLink(url string) (string, error) {
 }
 
 // downloadRssFeed downloads the RSS feed and returns the file path
+// todo(temp file)
 func downloadRssFeed(rssURL, domainName string) (string, error) {
 	rssResponse, err := http.Get(rssURL)
 	if err != nil || rssResponse.StatusCode != http.StatusOK {
@@ -251,4 +253,18 @@ func updateSourceNews(inputSource source.Source, newsStorage newsStorage.NewsSto
 	inputSource.PathToFile = source.PathToFile(jsonPath)
 
 	return nil
+}
+
+// ExtractDomainName parse the url to get the resource domain
+func ExtractDomainName(url string) string {
+	re := regexp.MustCompile(`https?://(www\.)?([^/]+)`)
+	matches := re.FindStringSubmatch(url)
+	if len(matches) < 3 {
+		logrus.Warn("ExtractDomainName: Failed to extract domain name from URL: ", url)
+		return "unknown"
+	}
+	domain := matches[2]
+	domain = strings.Split(domain, ".")[0]
+	logrus.Info("ExtractDomainName: Extracted domain name: ", domain)
+	return domain
 }

@@ -15,4 +15,6 @@ type Storage interface {
 	// GetSources returns the slice of the sources which are provided in the storage.
 	// Returns the empty slice an error if the getting process fails.
 	GetSources() ([]source.Source, error)
+	// IsSourceExists check, if the source is existed in the storage by name.
+	IsSourceExists(source.Name) bool
 }

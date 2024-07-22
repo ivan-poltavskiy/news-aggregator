@@ -23,7 +23,7 @@ func main() {
 	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
-	newsStorage := newsStorage.NewJsonResourcesStorage(source.PathToFile(constant.PathToResources))
+	newsStorage := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
 	sourceStorage := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
 	newsCollector := collector.New(sourceStorage)
 	newsAggregator := aggregator.New(newsCollector)

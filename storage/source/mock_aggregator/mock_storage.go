@@ -63,6 +63,20 @@ func (mr *MockStorageMockRecorder) GetSources() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockStorage)(nil).GetSources))
 }
 
+// IsSourceExists mocks base method.
+func (m *MockStorage) IsSourceExists(arg0 source.Name) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsSourceExists", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsSourceExists indicates an expected call of IsSourceExists.
+func (mr *MockStorageMockRecorder) IsSourceExists(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSourceExists", reflect.TypeOf((*MockStorage)(nil).IsSourceExists), arg0)
+}
+
 // SaveSource mocks base method.
 func (m *MockStorage) SaveSource(source source.Source) error {
 	m.ctrl.T.Helper()

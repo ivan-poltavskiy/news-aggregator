@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 
@@ -19,10 +20,8 @@ func TestSaveSource(t *testing.T) {
 	mockSourceStorage := sourceStorage_mock.NewMockStorage(ctrl)
 	mockNewsStorage := newsStorage_mock.NewMockNewsStorage(ctrl)
 
-	// Define a path to the test resources directory
 	testResourcesDir := "resources"
 
-	// Ensure the test resources directory is removed after tests
 	defer func() {
 		if err := os.RemoveAll(testResourcesDir); err != nil {
 			t.Errorf("Failed to remove test resources directory: %v", err)
@@ -42,9 +41,7 @@ func TestSaveSource(t *testing.T) {
 			want:    "pravda",
 			wantErr: false,
 			setup: func() {
-				// Set up expectations for the valid RSS source
-				mockSourceStorage.EXPECT().GetSources().Return([]source.Source{}, nil).Times(1)
-				mockSourceStorage.EXPECT().SaveSource(gomock.Any()).Return(nil).Times(1)
+				mockSourceStorage.EXPECT().IsSourceExists(source.Name("pravda")).Return(true).Times(1)
 				mockNewsStorage.EXPECT().GetNews(gomock.Any()).Return([]news.News{
 					{
 						Title:       "Через ракетну небезпеку у Києві та низці областей оголосили повітряну тривогу",
@@ -88,6 +85,26 @@ func TestSaveSource(t *testing.T) {
 			if err == nil && got != tt.want {
 				t.Errorf("SaveSource() got = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestExtractDomainName(t *testing.T) {
+	tests := []struct {
+		url          string
+		expectedName string
+	}{
+		{"https://www.example.com/path", "example"},
+		{"http://example.com/path", "example"},
+		{"https://example.com", "example"},
+		{"https://sub.example.com/path", "sub"},
+		{"invalid-url", "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.url, func(t *testing.T) {
+			domain := service.ExtractDomainName(tt.url)
+			assert.Equal(t, tt.expectedName, domain, "Expected domain name to match")
 		})
 	}
 }
