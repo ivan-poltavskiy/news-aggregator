@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage"
+	source2 "news-aggregator/storage/source"
 	"os"
 	"testing"
 )
@@ -34,7 +34,7 @@ func beforeEach() {
 		log.Fatalf("Failed to write to temp file: %v", err)
 	}
 
-	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(file.Name()))
+	sourceStorage := source2.NewJsonSourceStorage(source.PathToFile(file.Name()))
 	testArticleCollector = &newsCollector{sourceStorage: sourceStorage, parsers: GetDefaultParsers()}
 }
 

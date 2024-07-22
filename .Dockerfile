@@ -31,6 +31,7 @@ COPY --from=base /bin/main /usr/local/bin/main
 
 # Copy storage to the root directory
 COPY --from=base /src/storage /storage
+COPY --from=base /src/resources /resources
 
 COPY certificates /certificates
 

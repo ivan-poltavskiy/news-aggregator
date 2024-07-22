@@ -3,7 +3,7 @@ package service_test
 import (
 	"github.com/golang/mock/gomock"
 	"news-aggregator/cmd/web/service"
-	"news-aggregator/storage/mock_aggregator"
+	"news-aggregator/storage/source/mock_aggregator"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

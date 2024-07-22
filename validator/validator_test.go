@@ -2,13 +2,12 @@ package validator
 
 import (
 	"news-aggregator/constant"
-	"path/filepath"
 	"testing"
 )
 
 func TestCheckSource(t *testing.T) {
 
-	constant.PathToStorage = filepath.Join("../storage/sources-storage.json")
+	constant.PathToStorage = "." + constant.PathToStorage
 
 	type args struct {
 		sources []string

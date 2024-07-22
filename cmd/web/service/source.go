@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage"
+	source2 "news-aggregator/storage/source"
 	"regexp"
 	"strings"
 )
@@ -22,7 +22,7 @@ func ExtractDomainName(url string) string {
 	return domain
 }
 
-func IsSourceExists(name source.Name, sourceStorage storage.Storage) bool {
+func IsSourceExists(name source.Name, sourceStorage source2.Storage) bool {
 	sources, err := sourceStorage.GetSources()
 	if err != nil {
 		logrus.Error("IsSourceExists: ", err)

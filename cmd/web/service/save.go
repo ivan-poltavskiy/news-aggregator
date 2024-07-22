@@ -10,7 +10,7 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
-	"news-aggregator/storage"
+	source2 "news-aggregator/storage/source"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,7 +19,7 @@ import (
 )
 
 // SaveSource processes the source URL and returns the source entity
-func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) {
+func SaveSource(url string, sourceStorage source2.Storage) (source.Name, error) {
 
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
@@ -64,7 +64,7 @@ func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) 
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func PeriodicallyUpdateNews(sourceStorage storage.Storage, newsUpdatePeriod time.Duration) {
+func PeriodicallyUpdateNews(sourceStorage source2.Storage, newsUpdatePeriod time.Duration) {
 	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 

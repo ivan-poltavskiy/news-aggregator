@@ -10,15 +10,15 @@ import (
 	"net/http/httptest"
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage"
-	"news-aggregator/storage/mock_aggregator"
+	source2 "news-aggregator/storage/source"
+	"news-aggregator/storage/source/mock_aggregator"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 // mock the Save function
-func mockSaveSource(url string, storage storage.Storage) (source.Name, error) {
+func mockSaveSource(url string, storage source2.Storage) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}

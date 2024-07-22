@@ -4,17 +4,17 @@ import (
 	"news-aggregator/aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage"
+	source2 "news-aggregator/storage/source"
 	"strings"
 )
 
 type newsCollector struct {
-	sourceStorage storage.Storage
+	sourceStorage source2.Storage
 	parsers       *Parsers
 }
 
 // New create new instance of collector
-func New(sourceStorage storage.Storage) aggregator.Collector {
+func New(sourceStorage source2.Storage) aggregator.Collector {
 	return &newsCollector{sourceStorage: sourceStorage, parsers: GetDefaultParsers()}
 }
 

@@ -6,7 +6,7 @@ import (
 	"news-aggregator/cmd/web/service"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
+	"news-aggregator/storage/source/mock_aggregator"
 	"os"
 	"path/filepath"
 	"testing"

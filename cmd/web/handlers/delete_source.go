@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 	"news-aggregator/cmd/web/service"
-	"news-aggregator/storage"
+	"news-aggregator/storage/source"
 	"strings"
 )
 
@@ -15,7 +15,7 @@ type deleteSourceRequest struct {
 }
 
 // DeleteSourceByNameHandler is a handler for removing the source from the storage.
-func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceStorage storage.Storage) {
+func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceStorage source.Storage) {
 
 	var request deleteSourceRequest
 	body, err := io.ReadAll(r.Body)

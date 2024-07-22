@@ -10,7 +10,7 @@ import (
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage"
+	sourceStorage "news-aggregator/storage/source"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func main() {
 	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
-	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	sourceStorage := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
 	newsCollector := collector.New(sourceStorage)
 	newsAggregator := aggregator.New(newsCollector)
 

@@ -1,4 +1,4 @@
-package storage
+package source
 
 import "news-aggregator/entity/source"
 
