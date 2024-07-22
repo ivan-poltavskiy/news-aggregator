@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.13](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.12...v1.0.13) (2024-07-22)
+
+
+### Bug Fixes
+
+* Update release please config ([5dd9531](https://github.com/ivan-poltavskiy/news-aggregator/commit/5dd9531a2376ee85a424ce92fea1e76de669ad2e))
+
 ## [1.0.12](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.11...v1.0.12) (2024-07-20)
 
 
