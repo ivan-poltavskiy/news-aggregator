@@ -8,7 +8,7 @@ const PORT = ":443"
 
 var PathToResources = "resources"
 
-const CertFile = "certificates/server.crt"
-const KeyFile = "certificates/server.key"
+const PathToCertFile = "certificates/server.crt"
+const PathToKeyFile = "certificates/server.key"
 
-const NewsUpdatePeriod = 5
+const NewsUpdatePeriodIOnMinutes = 5

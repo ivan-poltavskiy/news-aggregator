@@ -10,31 +10,6 @@ import (
 	"strings"
 )
 
-// WriteSourcesToStorage saves the source entity to the storage of sources
-func WriteSourcesToStorage(sources []source.Source) error {
-	file, err := os.Create(constant.PathToStorage)
-	if err != nil {
-		logrus.Error("WriteSourcesToStorage: Error creating file ", err)
-		return err
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			logrus.Error("WriteSourcesToStorage: Error closing file ", err)
-		}
-	}(file)
-
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(&sources)
-	if err != nil {
-		logrus.Error("WriteSourcesToStorage: Error encoding sources ", err)
-		return err
-	}
-
-	logrus.Info("WriteSourcesToStorage: Sources were successfully written to file")
-	return nil
-}
-
 // ReadSourcesFromStorage returns the entities of sources from the storage
 func ReadSourcesFromStorage() []source.Source {
 	file, err := os.Open(constant.PathToStorage)

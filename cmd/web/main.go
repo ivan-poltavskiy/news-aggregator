@@ -17,9 +17,9 @@ import (
 func main() {
 
 	port := flag.String("port", constant.PORT, "port to listen on")
-	pathToCertificate := flag.String("pathToCertificate", constant.CertFile, "Certificate file path")
-	pathToKey := flag.String("pathToKey", constant.KeyFile, "Key file path")
-	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriod, "Period of time in minutes for periodically news updating")
+	pathToCertificate := flag.String("pathToCertificate", constant.PathToCertFile, "Certificate file path")
+	pathToKey := flag.String("pathToKey", constant.PathToKeyFile, "Key file path")
+	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
 	sourceStorage := storage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
@@ -37,11 +37,17 @@ func main() {
 	})
 	logrus.Info("Starting server on " + *port)
 
-	err := http.ListenAndServeTLS(*port, *pathToCertificate, *pathToKey, nil)
-	if err != nil {
-		logrus.Fatalf("Could not start server: %s\n", err.Error())
-	}
+	go func() {
+		err := http.ListenAndServeTLS(*port, *pathToCertificate, *pathToKey, nil)
+		if err != nil {
+			logrus.Fatalf("Could not start server: %s\n", err.Error())
+		}
+	}()
+
+	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
 
 	go service.PeriodicallyUpdateNews(sourceStorage, time.Duration(*newsUpdatePeriod)*time.Minute)
+
 	select {}
+
 }

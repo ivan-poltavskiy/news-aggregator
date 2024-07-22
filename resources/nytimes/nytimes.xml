@@ -7,8 +7,8 @@
     <description></description>
     <language>en-us</language>
     <copyright>Copyright 2024 The New York Times Company</copyright>
-    <lastBuildDate>Mon, 22 Jul 2024 07:19:59 +0000</lastBuildDate>
-    <pubDate>Mon, 22 Jul 2024 07:01:53 +0000</pubDate>
+    <lastBuildDate>Mon, 22 Jul 2024 08:28:50 +0000</lastBuildDate>
+    <pubDate>Mon, 22 Jul 2024 07:30:17 +0000</pubDate>
     <image>
       <title>NYT &gt; Top Stories</title>
       <url>https://static01.nyt.com/images/misc/NYT_logo_rss_250x40.png</url>
@@ -178,6 +178,25 @@
       <media:description>A fire at an oil storage facility on Saturday after Israeli strikes in the Houthi-held port city of Hudaydah in Yemen.</media:description>
     </item>
     <item>
+      <title>Israeli Strike on Yemeni Port Will Harm Civilians, Not Houthis, Experts Say</title>
+      <link>https://www.nytimes.com/2024/07/21/world/middleeast/israel-yemen-hudaydah-port.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/world/middleeast/israel-yemen-hudaydah-port.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/world/middleeast/israel-yemen-hudaydah-port.html" rel="standout"></atom:link>
+      <description>Israel’s counterattack on the Houthis, which set a vital Yemeni port ablaze, will do little to deter the militia, Yemeni and international experts said.</description>
+      <dc:creator>Vivian Nereim and Shuaib Almosawa</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 15:52:13 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Yemen</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Houthis</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Israel</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Al Hudaydah (Yemen)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Israel-Gaza War (2023- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Defense and Military Forces</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Civilian Casualties</category>
+      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21yemen-houthis-1-hkzj/21yemen-houthis-1-hkzj-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Agence France-Presse — Getty Images</media:credit>
+      <media:description>A fire at an oil-storage building on Saturday after Israel struck Hudaydah, a port city in Yemen that the Houthis hold.</media:description>
+    </item>
+    <item>
       <title>Corvette Bucked a Sports Cars Decline. Can It Thrive in an E.V. Era?</title>
       <link>https://www.nytimes.com/2024/07/21/business/chevrolet-corvette-electric-vehicles.html</link>
       <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/business/chevrolet-corvette-electric-vehicles.html</guid>
@@ -305,7 +324,7 @@
       <atom:link href="https://www.nytimes.com/2024/07/22/business/delta-global-tech-outage-pete-buttigieg.html" rel="standout"></atom:link>
       <description>Transportation Secretary Pete Buttigieg singled out the airline on Sunday for continued disruptions and “unacceptable” customer service as it canceled another 1,300 flights.</description>
       <dc:creator>Yan Zhuang</dc:creator>
-      <pubDate>Mon, 22 Jul 2024 07:01:09 +0000</pubDate>
+      <pubDate>Mon, 22 Jul 2024 07:30:17 +0000</pubDate>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Airlines and Airplanes</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Computer Network Outages</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Delays (Transportation)</category>
