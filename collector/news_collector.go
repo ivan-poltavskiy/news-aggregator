@@ -4,17 +4,17 @@ import (
 	"news-aggregator/aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	source2 "news-aggregator/storage/source"
+	sourceStorage "news-aggregator/storage/source"
 	"strings"
 )
 
 type newsCollector struct {
-	sourceStorage source2.Storage
+	sourceStorage sourceStorage.Storage
 	parsers       *Parsers
 }
 
 // New create new instance of collector
-func New(sourceStorage source2.Storage) aggregator.Collector {
+func New(sourceStorage sourceStorage.Storage) aggregator.Collector {
 	return &newsCollector{sourceStorage: sourceStorage, parsers: GetDefaultParsers()}
 }
 
@@ -28,11 +28,11 @@ func (newsCollector *newsCollector) FindNewsByResourcesName(sourcesNames []sourc
 	for _, sourceName := range sourcesNames {
 		for _, currentSource := range sources {
 			if strings.ToLower(string(currentSource.Name)) == strings.ToLower(string(sourceName)) {
-				news, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
+				newsArticles, err := newsCollector.findNewsForCurrentSource(currentSource, sourceName)
 				if err != nil {
 					return nil, err
 				}
-				foundNews = append(foundNews, news...)
+				foundNews = append(foundNews, newsArticles...)
 			}
 		}
 	}

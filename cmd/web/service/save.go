@@ -45,7 +45,7 @@ func SaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage new
 		Link:       source.Link(url),
 	}
 
-	err, jsonPath := parseAndSaveNews(sourceEntity, domainName, newsStorage)
+	err, jsonPath := parseAndSaveNews(sourceEntity, newsStorage)
 	if err != nil {
 		return "", err
 	}
@@ -95,6 +95,7 @@ func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePerio
 	}
 }
 
+// getRssFeedLink takes link of rss feed from the input site
 func getRssFeedLink(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
@@ -129,8 +130,8 @@ func getRssFeedLink(url string) (string, error) {
 
 // downloadRssFeed downloads the RSS feed and returns the file path
 func downloadRssFeed(rssURL, domainName string) (string, error) {
-	rssResp, err := http.Get(rssURL)
-	if err != nil || rssResp.StatusCode != http.StatusOK {
+	rssResponse, err := http.Get(rssURL)
+	if err != nil || rssResponse.StatusCode != http.StatusOK {
 		logrus.Error("Failed to download RSS feed: ", err)
 		return "", fmt.Errorf("failed to download RSS feed")
 	}
@@ -140,7 +141,7 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 			logrus.Error("Error closing response body ", err)
 			return
 		}
-	}(rssResp.Body)
+	}(rssResponse.Body)
 
 	directoryPath := filepath.Join(constant.PathToResources, domainName)
 	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
@@ -162,7 +163,7 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 		}
 	}(outputFile)
 
-	if _, err := io.Copy(outputFile, rssResp.Body); err != nil {
+	if _, err := io.Copy(outputFile, rssResponse.Body); err != nil {
 		logrus.Error("Could not download RSS feed: ", err)
 		return "", fmt.Errorf("failed to save RSS feed")
 	}
@@ -172,28 +173,28 @@ func downloadRssFeed(rssURL, domainName string) (string, error) {
 }
 
 // parseAndSaveNews parses RSS feed and saves the news to the storage
-func parseAndSaveNews(sourceEntity source.Source, domainName string, newsStorage newsStorage.NewsStorage) (error, string) {
-	articles, err := parseRssFeed(sourceEntity)
+func parseAndSaveNews(sourceEntity source.Source, newsStorage newsStorage.NewsStorage) (error, string) {
+	parsedNews, err := parseRssFeed(sourceEntity)
 	if err != nil {
 		return err, ""
 	}
 
-	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, domainName, domainName+".json"))
+	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(sourceEntity.Name), string(sourceEntity.Name)+".json"))
 
-	existingArticles, err := newsStorage.GetNews(jsonFilePath)
+	existingNews, err := newsStorage.GetNews(jsonFilePath)
 	if err != nil {
 		return err, ""
 	}
 
-	newArticles := newsUnification(articles, existingArticles)
+	newArticles := newsUnification(parsedNews, existingNews)
 	if len(newArticles) == 0 {
-		logrus.Info("No new articles to add")
+		logrus.Info("No new parsedNews to add")
 		return nil, jsonFilePath
 	}
 
-	existingArticles = append(existingArticles, newArticles...)
+	existingNews = append(existingNews, newArticles...)
 
-	if err := newsStorage.SaveNews(jsonFilePath, existingArticles); err != nil {
+	if err := newsStorage.SaveNews(jsonFilePath, existingNews); err != nil {
 		return err, ""
 	}
 
@@ -201,15 +202,17 @@ func parseAndSaveNews(sourceEntity source.Source, domainName string, newsStorage
 	return nil, jsonFilePath
 }
 
+// parseRssFeed parses rss feed from the input site and return the news from it
 func parseRssFeed(sourceEntity source.Source) ([]news.News, error) {
-	articles, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
+	parsedNews, err := parser.Rss{}.Parse(sourceEntity.PathToFile, sourceEntity.Name)
 	if err != nil {
 		logrus.Error("Failed to parse RSS feed: ", err)
 		return nil, fmt.Errorf("failed to parse RSS feed")
 	}
-	return articles, nil
+	return parsedNews, nil
 }
 
+// newsUnification checks whether there are articles from the new feed in the existing news, and if so, removes them
 func newsUnification(articles []news.News, existingArticles []news.News) []news.News {
 	existingTitles := make(map[string]struct{})
 	for _, existingArticle := range existingArticles {
@@ -226,9 +229,10 @@ func newsUnification(articles []news.News, existingArticles []news.News) []news.
 	return newArticles
 }
 
-func updateSourceNews(src source.Source, newsStorage newsStorage.NewsStorage) error {
-	domainName := ExtractDomainName(string(src.Link))
-	rssURL, err := getRssFeedLink(string(src.Link))
+// updateSourceNews updating the news of the input source
+func updateSourceNews(inputSource source.Source, newsStorage newsStorage.NewsStorage) error {
+	domainName := ExtractDomainName(string(inputSource.Link))
+	rssURL, err := getRssFeedLink(string(inputSource.Link))
 	if err != nil {
 		return err
 	}
@@ -238,13 +242,13 @@ func updateSourceNews(src source.Source, newsStorage newsStorage.NewsStorage) er
 		return err
 	}
 
-	src.PathToFile = source.PathToFile(filePath)
+	inputSource.PathToFile = source.PathToFile(filePath)
 
-	err, jsonPath := parseAndSaveNews(src, domainName, newsStorage)
+	err, jsonPath := parseAndSaveNews(inputSource, newsStorage)
 	if err != nil {
 		return err
 	}
-	src.PathToFile = source.PathToFile(jsonPath)
+	inputSource.PathToFile = source.PathToFile(jsonPath)
 
 	return nil
 }

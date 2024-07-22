@@ -21,6 +21,7 @@ func NewJsonResourcesStorage(pathToStorage source.PathToFile) NewsStorage {
 	return &jsonResourcesStorage{pathToStorage}
 }
 
+// SaveNews saves the provided news articles to the specified JSON file.
 func (jsonStorage *jsonResourcesStorage) SaveNews(jsonFilePath string, news []news.News) error {
 	jsonFile, err := os.Create(jsonFilePath)
 	if err != nil {
@@ -42,6 +43,7 @@ func (jsonStorage *jsonResourcesStorage) SaveNews(jsonFilePath string, news []ne
 	return nil
 }
 
+// GetNews retrieves news articles from the specified JSON file.
 func (jsonStorage *jsonResourcesStorage) GetNews(jsonFilePath string) ([]news.News, error) {
 	var existingArticles []news.News
 
