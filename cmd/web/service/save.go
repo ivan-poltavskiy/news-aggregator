@@ -14,6 +14,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sync"
+	"time"
 )
 
 // SaveSource processes the source URL and returns the source entity
@@ -59,6 +61,38 @@ func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) 
 		logrus.Info("Source already exists")
 	}
 	return sourceEntity.Name, nil
+}
+
+// PeriodicallyUpdateNews updates news for all sources.
+func PeriodicallyUpdateNews(sourceStorage storage.Storage) {
+	ticker := time.NewTicker(20 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			logrus.Info("Starting periodic update of news")
+			sources, err := sourceStorage.GetSources()
+			if err != nil {
+				logrus.Error("Failed to retrieve sources: ", err)
+				continue
+			}
+
+			var wg sync.WaitGroup
+			for _, src := range sources {
+				wg.Add(1)
+				go func(src source.Source) {
+					defer wg.Done()
+					err := updateSourceNews(src)
+					if err != nil {
+						logrus.Error("Failed to update news for source: ", src.Name, err)
+					}
+				}(src)
+			}
+			wg.Wait()
+			logrus.Info("Periodic update of news completed")
+		}
+	}
 }
 
 func getRssFeedLink(url string) (string, error) {
@@ -233,6 +267,29 @@ func saveNews(jsonFilePath string, articles []news.News) error {
 		logrus.Error("Failed to encode articles to JSON file: ", err)
 		return fmt.Errorf("failed to encode articles to JSON file")
 	}
+
+	return nil
+}
+
+func updateSourceNews(src source.Source) error {
+	domainName := ExtractDomainName(string(src.Link))
+	rssURL, err := getRssFeedLink(string(src.Link))
+	if err != nil {
+		return err
+	}
+
+	filePath, err := downloadRssFeed(rssURL, domainName)
+	if err != nil {
+		return err
+	}
+
+	src.PathToFile = source.PathToFile(filePath)
+
+	err, jsonPath := parseAndSaveNews(src, domainName)
+	if err != nil {
+		return err
+	}
+	src.PathToFile = source.PathToFile(jsonPath)
 
 	return nil
 }

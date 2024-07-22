@@ -7,405 +7,387 @@
     <description></description>
     <language>en-us</language>
     <copyright>Copyright 2024 The New York Times Company</copyright>
-    <lastBuildDate>Mon, 01 Jul 2024 08:29:27 +0000</lastBuildDate>
-    <pubDate>Mon, 01 Jul 2024 08:10:39 +0000</pubDate>
+    <lastBuildDate>Mon, 22 Jul 2024 07:19:59 +0000</lastBuildDate>
+    <pubDate>Mon, 22 Jul 2024 07:01:53 +0000</pubDate>
     <image>
       <title>NYT &gt; Top Stories</title>
       <url>https://static01.nyt.com/images/misc/NYT_logo_rss_250x40.png</url>
       <link>https://www.nytimes.com</link>
     </image>
     <item>
-      <title>France’s Far Right Scores Big in First Round of Elections, Polling Suggests</title>
-      <link>https://www.nytimes.com/2024/06/30/world/europe/france-elections.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/world/europe/france-elections.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/world/europe/france-elections.html" rel="standout"></atom:link>
-      <description>A surprise decision by President Emmanuel Macron to hold a snap election appears to have backfired badly, giving the National Rally a decisive victory.</description>
-      <dc:creator>Roger Cohen</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 07:37:16 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">France</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Elections</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">National Rally (France)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Macron, Emmanuel (1977- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Le Pen, Marine</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bardella, Jordan (1995- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">France Unbowed (Political Party)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">National Front (France)</category>
-      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30france-election-bqpv/30france-election-bqpv-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Francois Lo Presti/Agence France-Presse — Getty Images</media:credit>
-      <media:description>Marine Le Pen, leader of the National Rally, giving a speech Sunday evening in Hénin-Beaumont, France.</media:description>
-    </item>
-    <item>
-      <title>Four Takeaways From France’s Snap Election</title>
-      <link>https://www.nytimes.com/2024/07/01/world/europe/france-election-takeaways.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/07/01/world/europe/france-election-takeaways.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/07/01/world/europe/france-election-takeaways.html" rel="standout"></atom:link>
-      <description>It was a big day for the far-right National Rally. Just how big will not be clear until a second round of voting is over.</description>
-      <dc:creator>Aurelien Breeden</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 08:07:16 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">France</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Elections</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">National Rally (France)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Macron, Emmanuel (1977- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Politics and Government</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Attal, Gabriel</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bardella, Jordan (1995- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Le Pen, Marine</category>
-      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30france-election-takeaways-vjgc/30france-election-takeaways-vjgc-mediumSquareAt3X-v3.jpg" width="1800"></media:content>
-      <media:credit>Fabrizio Bensch/Reuters</media:credit>
-      <media:description>French voters are choosing representatives in the 577-seat National Assembly, the country’s lower and more prominent house of Parliament.</media:description>
-    </item>
-    <item>
-      <title>Biden’s Family Tells Him to Keep Fighting as They Huddle at Camp David</title>
-      <link>https://www.nytimes.com/2024/06/30/us/politics/biden-debate-anxious-democrats.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/us/politics/biden-debate-anxious-democrats.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/us/politics/biden-debate-anxious-democrats.html" rel="standout"></atom:link>
-      <description>President Biden is trying to figure out how to tamp down Democratic anxiety after last week’s disastrous debate performance.</description>
-      <dc:creator>Katie Rogers and Peter Baker</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 01:19:26 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Debates (Political)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Polls and Public Opinion</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidents and Presidency (US)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Camp David (Md)</category>
+      <title>Kamala Harris Rapidly Picks Up Democratic Support as 2024 Race Is Reborn</title>
+      <link>https://www.nytimes.com/2024/07/21/us/politics/harris-democrats-campaign-nominee-biden.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/politics/harris-democrats-campaign-nominee-biden.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/politics/harris-democrats-campaign-nominee-biden.html" rel="standout"></atom:link>
+      <description>Endorsements cascaded in as the vice president took swift control of the Biden campaign in a transformed contest, though Democrats including Barack Obama did not immediately back her.</description>
+      <dc:creator>Lisa Lerer, Shane Goldmacher, Katie Glueck and Reid J. Epstein</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 02:38:28 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Harris, Kamala D</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Klain, Ronald A</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Dunn, Anita</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Hunter</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30dc-biden1-cqjf/30dc-biden1-cqjf-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Democratic National Convention</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Appointments and Executive Changes</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic National Committee</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21pol-dems-topart-lbcw/21pol-dems-topart-lbcw-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Erin Schaff/The New York Times</media:credit>
+      <media:description>Vice President Kamala Harris will now control President Biden’s campaign, which had $96 million on hand at the end of June, giving her a major financial advantage over any Democratic challengers. None have emerged yet. </media:description>
+    </item>
+    <item>
+      <title>Timeline: Inside the Weekend When Biden Decided to Withdraw</title>
+      <link>https://www.nytimes.com/2024/07/21/us/politics/biden-withdrawal-timeline.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/politics/biden-withdrawal-timeline.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/politics/biden-withdrawal-timeline.html" rel="standout"></atom:link>
+      <description>President Biden did not tell most of his staff until a minute before making his announcement to the world on social media on Sunday. Vice President Kamala Harris, whom Mr. Biden went on to endorse, also learned of his decision on Sunday.</description>
+      <dc:creator>Katie Rogers, Michael D. Shear, Peter Baker and Zolan Kanno-Youngs</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 01:54:44 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Donilon, Mike</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Ricchetti, Steven</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+      <media:content height="1721" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21dc-reconstruct-hbwg/21dc-reconstruct-hbwg-mediumSquareAt3X.jpg" width="1721"></media:content>
       <media:credit>Haiyun Jiang for The New York Times</media:credit>
-      <media:description>President Biden on Saturday with the first lady, Jill Biden, and his granddaughters Finnegan and Natalie Biden.</media:description>
+      <media:description>From right to left, the Biden advisers Mike Donilon, Steve Ricchetti and Jen O’Malley Dillon leaving a meeting with Senate Democrats in Washington earlier this month.</media:description>
     </item>
     <item>
-      <title>Nothing to See Here? White House Portrays Biden’s Debate Performance as a Blip</title>
-      <link>https://www.nytimes.com/2024/06/30/us/politics/biden-debate-trump-reaction.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/us/politics/biden-debate-trump-reaction.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/us/politics/biden-debate-trump-reaction.html" rel="standout"></atom:link>
-      <description>Critics of the approach say it risks making President Biden and his campaign seem woefully out of touch with the voters they need to win.</description>
-      <dc:creator>Michael D. Shear</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 18:26:09 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Polls and Public Opinion</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Debates (Political)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
+      <title>On the Trail With Trump, Vance Shows He Knows His Place: Offstage, Mostly</title>
+      <link>https://www.nytimes.com/2024/07/21/us/politics/vance-trump-campaign-rally.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/politics/vance-trump-campaign-rally.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/politics/vance-trump-campaign-rally.html" rel="standout"></atom:link>
+      <description>JD Vance, the Republican nominee for vice president, was a mere warm-up act to Donald J. Trump at their first joint rally.</description>
+      <dc:creator>Shawn McCreesh</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 19:36:00 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Vance, J D</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30dc-memo1-hqvt/30dc-memo1-hqvt-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Kenny Holston/The New York Times</media:credit>
-      <media:description>President Biden is not trying to convince voters that he won the debate or that his performance was something to brag about. But he has spent the past three days downplaying its impact.</media:description>
-    </item>
-    <item>
-      <title>Democrats Roll Out a Post-Debate Playbook to Help Biden Recover</title>
-      <link>https://www.nytimes.com/2024/06/30/us/politics/clyburn-graham-cnn.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/us/politics/clyburn-graham-cnn.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/us/politics/clyburn-graham-cnn.html" rel="standout"></atom:link>
-      <description>Surrogates on Sunday made the case for the president, who spent the weekend reassuring donors and supporters, with a message focused on his record and that of Donald J. Trump.</description>
-      <dc:creator>Maggie Astor and Jennifer Medina</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 18:48:41 +0000</pubDate>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30pol-swiper-clayburn-ctpk/30pol-swiper-clayburn-ctpk-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Kenny Holston/The New York Times</media:credit>
-      <media:description>President Biden and Representative James E. Clyburn of South Carolina. “He’s done a great job of leading for the last three and a half years,” Mr. Clyburn said of Mr. Biden.</media:description>
-    </item>
-    <item>
-      <title>Can Japan’s First Same-Sex Dating Reality Show Change Hearts and Minds?</title>
-      <link>https://www.nytimes.com/2024/06/30/world/asia/the-boyfriend-netflix.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/world/asia/the-boyfriend-netflix.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/world/asia/the-boyfriend-netflix.html" rel="standout"></atom:link>
-      <description>Producers of “The Boyfriend” on Netflix hope it will encourage broader acceptance of the L.G.B.T.Q. community in Japan, which still has not legalized same-sex unions.</description>
-      <dc:creator>Motoko Rich and Kiuko Notoya</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 15:01:09 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Reality Television</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Homosexuality and Bisexuality</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Dating and Relationships</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_ttl">The Boyfriend (TV Program)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Netflix Inc</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Japan</category>
-    </item>
-    <item>
-      <title>U.S.A. Gymnastics Uses Therapy Dogs at Olympic Trials to Help Athletes’ Mental Health</title>
-      <link>https://www.nytimes.com/2024/06/28/us/olympics-gymnastics-therapy-dogs-mental-health.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/28/us/olympics-gymnastics-therapy-dogs-mental-health.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/28/us/olympics-gymnastics-therapy-dogs-mental-health.html" rel="standout"></atom:link>
-      <description>Beacon, a golden retriever, began working with U.S.A. Gymnastics last year as part of the organization’s efforts to transform the sport’s toxic culture. More dogs quickly followed.</description>
-      <dc:creator>Juliet Macur and Desiree Rios</dc:creator>
-      <pubDate>Fri, 28 Jun 2024 15:27:43 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Olympic Games (2024)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Gymnastics</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">USA Gymnastics</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Service Dogs and Other Animals</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Dogs</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Mental Health and Disorders</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">USA Swimming</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Anxiety and Stress</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Olympic Games (2020)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Psychology and Psychologists</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Athletics and Sports</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biles, Simone</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Jones, Shilese (2002- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Leung, Li Li</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Nassar, Lawrence G (1963- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Fort Worth (Tex)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Minneapolis (Minn)</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/28/multimedia/28nat-oly-dog-09-gwpb/28nat-oly-dog-09-gwpb-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:description>At the U.S. National Gymnastics Championships in Fort Worth this year, nearly 20 dog-and-handler teams were available to athletes.</media:description>
-    </item>
-    <item>
-      <title>Iranians Say Elections Bring Little Change, So Why Vote?</title>
-      <link>https://www.nytimes.com/2024/06/30/world/middleeast/iran-election-president-voters.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/world/middleeast/iran-election-president-voters.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/world/middleeast/iran-election-president-voters.html" rel="standout"></atom:link>
-      <description>In Tehran, many Iranians said they didn’t see the point in voting in Friday’s first-round presidential election since all the candidates had been vetted by the government.</description>
-      <dc:creator>Alissa J. Rubin</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 21:00:31 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Elections</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Women and Girls</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Muslim Veiling</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Guardian Council (Iran)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Jalili, Saeed</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Pezeshkian, Masoud</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Khamenei, Ali</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Iran</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Tehran (Iran)</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30iran-reaction-tpzm/30iran-reaction-tpzm-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Arash Khamooshi for The New York Times</media:credit>
-      <media:description>Iranians passing a huge ballot box in Tehran on Saturday.</media:description>
-    </item>
-    <item>
-      <title>How Science Went to the Dogs (and Cats)</title>
-      <link>https://www.nytimes.com/2024/06/30/science/pets-research-dogs-cats.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/science/pets-research-dogs-cats.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/science/pets-research-dogs-cats.html" rel="standout"></atom:link>
-      <description>Pets were once dismissed as trivial scientific subjects. Today, companion animal science is hot.</description>
-      <dc:creator>Emily Anthes</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 07:00:23 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Pets</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Dogs</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Cats</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Animal Behavior</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Animal Cognition</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Genetics and Heredity</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Research</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Veterinary Medicine</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Laboratories and Scientific Equipment</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">your-feed-science</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">your-feed-animals</category>
-      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30sp-scipet-manifesto-vzjw/30sp-scipet-manifesto-vzjw-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>M. Scott Brauer for The New York Times</media:credit>
-      <media:description>Max, a 2-year-old German shepherd, Belgian Malinois and husky mix, was photographed in Greenlake Park in Seattle this month. A stray who was rescued in an emaciated condition, Max is a participant in Darwin’s Ark, a community science initiative that investigates animal genetics and behavior.</media:description>
-    </item>
-    <item>
-      <title>Boeing Agrees to Buy Spirit AeroSystems, a Longtime Supplier</title>
-      <link>https://www.nytimes.com/2024/07/01/business/boeing-spirit-aerosystems-acquisition.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/07/01/business/boeing-spirit-aerosystems-acquisition.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/07/01/business/boeing-spirit-aerosystems-acquisition.html" rel="standout"></atom:link>
-      <description>The multibillion-dollar deal will reverse a decision the plane maker made two decades ago to outsource production of key parts to independent suppliers.</description>
-      <dc:creator>Niraj Chokshi</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 04:53:32 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Airlines and Airplanes</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Mergers, Acquisitions and Divestitures</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Factories and Manufacturing</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Outsourcing</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Aviation Accidents, Safety and Disasters</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Boeing 737 Max Groundings and Safety Concerns (2019)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Boeing Company</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Spirit AeroSystems Inc</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/25/multimedia/00boeing-spirit-wkgt/00boeing-spirit-wkgt-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Nick Oxford/Reuters</media:credit>
-      <media:description>In buying Spirit AeroSystems, Boeing hopes to improve quality problems that have plagued the supplier in recent years.</media:description>
-    </item>
-    <item>
-      <title>U.S. Said to Seek Boeing Guilty Plea to Avoid Trial in 737 Max Crashes</title>
-      <link>https://www.nytimes.com/2024/06/30/business/boeing-max-justice-department.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/business/boeing-max-justice-department.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/business/boeing-max-justice-department.html" rel="standout"></atom:link>
-      <description>The Justice Department told victims’ families that it would propose a nearly $244 million fine and three years of company oversight to settle a fraud charge.</description>
-      <dc:creator>Niraj Chokshi</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 23:19:29 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Airlines and Airplanes</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Aviation Accidents, Safety and Disasters</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Deaths (Fatalities)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Compensation for Damages (Law)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Factories and Manufacturing</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Boeing Company</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Federal Aviation Administration</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Justice Department</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">National Transportation Safety Board</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/00boeing-doj-wmph/00boeing-doj-wmph-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Pool photo by Jennifer Buchanan</media:credit>
-      <media:description>An assembly line for 737 Max aircraft at the Boeing factory in Renton, Wash.</media:description>
-    </item>
-    <item>
-      <title>Soma Golden Behr, 84, Dies; Inspired Enterprising Journalism at The Times</title>
-      <link>https://www.nytimes.com/2024/06/30/business/media/soma-golden-behr-dead.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/business/media/soma-golden-behr-dead.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/business/media/soma-golden-behr-dead.html" rel="standout"></atom:link>
-      <description>The first woman to serve as the paper’s national editor, she focused on issues of race, class and poverty, drawing prizes, and rose to the newsroom’s top echelon.</description>
-      <dc:creator>Trip Gabriel</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 04:26:52 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Behr, Soma Golden</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Deaths (Obituaries)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Women and Girls</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">New York Times</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Income Inequality</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">News and News Media</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Business Week</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30behr-fpgk/30behr-fpgk-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Michelle V. Agins/The New York Times</media:credit>
-      <media:description>Soma Golden Behr in 2007, hosting an event for The New York Times Scholarship Program. As the newspaper’s national editor and an assistant managing editor, she helped shepherd Pulitzer Prize-winning series.</media:description>
-    </item>
-    <item>
-      <title>This Isn’t All Joe Biden’s Fault</title>
-      <link>https://www.nytimes.com/2024/06/30/opinion/biden-debate-convention.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/opinion/biden-debate-convention.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/opinion/biden-debate-convention.html" rel="standout"></atom:link>
-      <description>What is the Democratic Party for if not for dealing with a situation like this?</description>
-      <dc:creator>Ezra Klein</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 12:36:58 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Polls and Public Opinion</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Debates (Political)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2020</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Newsom, Gavin</category>
-      <media:content height="1777" medium="image" url="https://static01.nyt.com/images/2024/06/30/opinion/30klein/30klein-mediumSquareAt3X.jpg" width="1777"></media:content>
-      <media:credit>Photographs by Kenny Holston/The New York Times and Damon Winter/The New York Times</media:credit>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Grand Rapids (Mich)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Pence, Mike</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Vice Presidents and Vice Presidency (US)</category>
+      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21pol-trump-chemistry-lzkb/21pol-trump-chemistry-lzkb-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Doug Mills/The New York Times</media:credit>
+      <media:description>Former President Donald J. Trump and his vice-presidential candidate, Senator JD Vance, during a campaign rally in Grand Rapids, Mich., on Saturday.</media:description>
     </item>
     <item>
-      <title>The Ghastly vs. the Ghostly</title>
-      <link>https://www.nytimes.com/2024/06/29/opinion/biden-debate-president-exit.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/29/opinion/biden-debate-president-exit.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/29/opinion/biden-debate-president-exit.html" rel="standout"></atom:link>
-      <description>Do the Democrats really want to stop Trump? What are they prepared to do?</description>
-      <dc:creator>Maureen Dowd</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 00:18:54 +0000</pubDate>
+      <title>Inside the ‘Gangster’ Image of Donald Trump</title>
+      <link>https://www.nytimes.com/2024/07/21/us/politics/donald-trump-hiphop.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/politics/donald-trump-hiphop.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/politics/donald-trump-hiphop.html" rel="standout"></atom:link>
+      <description>Former President Donald J. Trump has an aggressive — and some argue offensive — campaign using hip-hop and rap to reach young Black and Latino voters.</description>
+      <dc:creator>Jennifer Medina</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 09:00:46 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Rap and Hip-Hop</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Death Row Records</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Republican Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">50 Cent</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Chambers, Tegan (Sleepy Hallow)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Harris, Michael (Harry-O)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Ice Cube (1969- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Lil Pump (Rapper)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Lil Wayne</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Master P (Rapper)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Obama, Barack</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Debates (Political)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Age, Chronological</category>
-      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/29dowd-kgqc/29dowd-kgqc-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Damon Winter/The New York Times</media:credit>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Williams, Michael (Artist)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">West, Kanye</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Vanilla Ice</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Snoop Dogg</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Octave, Dieuson (Kodak Black)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Rose, Amber (1983- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Sexyy Red (Rapper)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Sheff G (Rapper)</category>
+      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/07/19/multimedia/00pol-trump-hiphop-cpmf/00pol-trump-hiphop-cpmf-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Maddie McGarvey for The New York Times</media:credit>
+      <media:description>Former President Donald J. Trump has played up a macho invincibility in his messaging, railing against his felony convictions and casting himself as an outlaw.</media:description>
     </item>
     <item>
-      <title>To Serve His Country, President Biden Should Leave the Race</title>
-      <link>https://www.nytimes.com/2024/06/28/opinion/biden-election-debate-trump.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/28/opinion/biden-election-debate-trump.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/28/opinion/biden-election-debate-trump.html" rel="standout"></atom:link>
-      <description>The president’s inadequate performance in the debate made it clear he is not the man he was four years ago.</description>
-      <dc:creator>The Editorial Board</dc:creator>
-      <pubDate>Sat, 29 Jun 2024 02:05:34 +0000</pubDate>
+      <title>Trump’s Conviction and Biden’s Poor Debate Sent Big Money Into the Race</title>
+      <link>https://www.nytimes.com/2024/07/20/us/politics/trump-biden-fundraising.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/20/us/politics/trump-biden-fundraising.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/20/us/politics/trump-biden-fundraising.html" rel="standout"></atom:link>
+      <description>The Biden campaign also spent six times as much as the Trump campaign did in June, allowing Republicans to gain a financial advantage.</description>
+      <dc:creator>Theodore Schleifer and Albert Sun</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 06:20:35 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic National Committee</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">ActBlue</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Federal Election Commission</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Republican National Committee</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Republican Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">WinRed</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Debates (Political)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Kennedy, Robert F Jr</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/28Biden1-tbqm/28Biden1-tbqm-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Damon Winter/The New York Times</media:credit>
-    </item>
-    <item>
-      <title>The ‘Bad Debate’ Nonsense</title>
-      <link>https://www.nytimes.com/live/2024/06/25/opinion/thepoint/biden-debate-cognitive-decline</link>
-      <guid isPermaLink="true">https://www.nytimes.com/live/2024/06/25/opinion/thepoint/biden-debate-cognitive-decline</guid>
-      <atom:link href="https://www.nytimes.com/live/2024/06/25/opinion/thepoint/biden-debate-cognitive-decline" rel="standout"></atom:link>
-      <description>Biden’s problems are far more serious than a single night’s poor performance.</description>
-      <dc:creator>Bret Stephens</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 13:17:35 +0000</pubDate>
-    </item>
-    <item>
-      <title>Hurricane Beryl Threatens the Caribbean as a Category 3 Storm</title>
-      <link>https://www.nytimes.com/article/tropical-storm-beryl-hurricane.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/article/tropical-storm-beryl-hurricane.html</guid>
-      <atom:link href="https://www.nytimes.com/article/tropical-storm-beryl-hurricane.html" rel="standout"></atom:link>
-      <description>The tropical cyclone was the earliest in a season to strengthen to a Category 4 hurricane in the Atlantic. It later weakened slightly.</description>
-      <dc:creator>Judson Jones and Aimee Ortiz</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 07:37:22 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Hurricanes and Tropical Storms</category>
-      <category domain="">Beryl</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Wind</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Caribbean Area</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">St Vincent and the Grenadines</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Grenada</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Barbados</category>
-      <media:content height="1000" medium="image" url="https://static01.nyt.com/images/2024/06/28/world/two-satellite-map-satellite_map/two-satellite-map-satellite_map-mediumSquareAt3X-v98.jpg" width="1000"></media:content>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Campaign Finance</category>
+      <media:content height="1000" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/2024-07-19-trump-biden-campfin-quarterly-index/2024-07-19-trump-biden-campfin-quarterly-index-mediumSquareAt3X.png" width="1000"></media:content>
       <media:credit>The New York Times</media:credit>
     </item>
     <item>
-      <title>China Dangled Rebates to Lure People to Spend. It’s Not Enough.</title>
-      <link>https://www.nytimes.com/2024/07/01/business/china-cash-for-clunkers.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/07/01/business/china-cash-for-clunkers.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/07/01/business/china-cash-for-clunkers.html" rel="standout"></atom:link>
-      <description>China’s leaders vowed to kick-start spending by offering subsidies for households to buy cars and appliances. But many consumers aren’t biting.</description>
-      <dc:creator>Keith Bradsher</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 04:01:10 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">China</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Economic Conditions and Trends</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Jingdezhen (China)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Nanchang (China)</category>
+      <title>Homeland Security Announces Panel on Trump Assassination Attempt</title>
+      <link>https://www.nytimes.com/2024/07/21/us/politics/panel-trump-assassination-attempt.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/politics/panel-trump-assassination-attempt.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/politics/panel-trump-assassination-attempt.html" rel="standout"></atom:link>
+      <description>Secretary Alejandro N. Mayorkas said the bipartisan group of experts would get to the bottom of decisions that allowed a gunman to wound the former president at a rally in Pennsylvania.</description>
+      <dc:creator>Hamed Aleaziz and Zolan Kanno-Youngs</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 01:04:55 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Assassinations and Attempted Assassinations</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Homeland Security Department</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Secret Service</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Cheatle, Kimberly A</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Mayorkas, Alejandro</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Butler (Pa)</category>
+      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21DC-SECRETSERVICE1-pfqk/21DC-SECRETSERVICE1-pfqk-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Michael A. McCoy for The New York Times</media:credit>
+      <media:description>Alejandro N. Mayorkas, the homeland security secretary, is under scrutiny for his handling of the events surrounding the assassination attempt, especially whether he has been able to get adequate answers from the director of the Secret Service.</media:description>
+    </item>
+    <item>
+      <title>Campus Protests Led to More Than 3,100 Arrests, but Many Charges Have Been Dropped</title>
+      <link>https://www.nytimes.com/2024/07/21/us/campus-protests-arrests.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/campus-protests-arrests.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/campus-protests-arrests.html" rel="standout"></atom:link>
+      <description>The spate of pro-Palestinian protests and encampments engulfed academic institutions of all sizes in nearly every part of the country.</description>
+      <dc:creator>Isabelle Taft, Alex Lemonides, Lazaro Gamio and Anna Betts</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 02:20:58 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Pro-Palestinian Campus Protests (2023- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Colleges and Universities</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Demonstrations, Protests and Riots</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Columbia University</category>
+      <media:content height="1000" medium="image" url="https://static01.nyt.com/images/2024/07/19/multimedia/2024-05-22-campus-protests-breakdown-index/2024-05-22-campus-protests-breakdown-index-mediumSquareAt3X.jpg" width="1000"></media:content>
+      <media:credit>The New York Times</media:credit>
+    </item>
+    <item>
+      <title>Israel Intercepts Missile Fired From Yemen as Conflict With Houthis Continues</title>
+      <link>https://www.nytimes.com/2024/07/21/world/middleeast/israel-houthis-missile-yemen.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/world/middleeast/israel-houthis-missile-yemen.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/world/middleeast/israel-houthis-missile-yemen.html" rel="standout"></atom:link>
+      <description>The missile launch suggested that the Yemen-based Houthi militia, which is backed by Iran, would keep up its attacks despite Israeli airstrikes on a port it controls.</description>
+      <dc:creator>Gabby Sobelman and Matthew Mpoke Bigg</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 20:00:24 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Israel-Gaza War (2023- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Missiles and Missile Defense Systems</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Houthis</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Eilat (Israel)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Sana (Yemen)</category>
+      <media:content height="1684" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21israel-yemen-1-tqfc/21israel-yemen-1-tqfc-mediumSquareAt3X.jpg" width="1684"></media:content>
+      <media:credit>Agence France-Presse — Getty Images</media:credit>
+      <media:description>A fire at an oil storage facility on Saturday after Israeli strikes in the Houthi-held port city of Hudaydah in Yemen.</media:description>
+    </item>
+    <item>
+      <title>Corvette Bucked a Sports Cars Decline. Can It Thrive in an E.V. Era?</title>
+      <link>https://www.nytimes.com/2024/07/21/business/chevrolet-corvette-electric-vehicles.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/business/chevrolet-corvette-electric-vehicles.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/business/chevrolet-corvette-electric-vehicles.html" rel="standout"></atom:link>
+      <description>The General Motors sports car, which enjoyed strong sales after a big design change, now has a hybrid version and may get a fully electric model that may turn off some gas-loving customers.</description>
+      <dc:creator>Lawrence Ulrich</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 09:01:44 +0000</pubDate>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Automobiles</category>
       <category domain="http://www.nytimes.com/namespaces/keywords/des">Electric and Hybrid Vehicles</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Factories and Manufacturing</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Consumer Behavior</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/06/25/multimedia/00China-Clunkers-01-bcwm/00China-Clunkers-01-bcwm-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Keith Bradsher/The New York Times</media:credit>
-      <media:description>A Shanghai Electric factory that makes air-conditioner compressors in Nanchang, China. Domestic spending is weak, so factories are chasing more customers overseas.</media:description>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">General Motors</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Fuel Efficiency</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Chevrolet Division of General Motors Corp</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Engines</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Sports Utility Vehicles and Light Trucks</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Batteries</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Juechter, Tadge</category>
+      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/07/17/multimedia/00corvette-jfzh/00corvette-jfzh-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Stacy Kranitz for The New York Times</media:credit>
+      <media:description>The 2024 Corvette E-Ray is the first hybrid version of the model and one of the first among mass produced sports cars.</media:description>
     </item>
     <item>
-      <title>Along the Hollywood Walk of Fame, a Struggle to Make a Living</title>
-      <link>https://www.nytimes.com/2024/06/29/business/economy/hollywood-street-vendors.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/29/business/economy/hollywood-street-vendors.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/29/business/economy/hollywood-street-vendors.html" rel="standout"></atom:link>
-      <description>Los Angeles lifted restrictions that had forced street vendors, mostly immigrants, on Hollywood Boulevard to dodge citations. Other challenges remain.</description>
-      <dc:creator>Kurtis Lee, Ana Facio-Krajcer and Adam Perez</dc:creator>
-      <pubDate>Sat, 29 Jun 2024 09:01:00 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Food Trucks and Vendors</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Hispanic-Americans</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Law and Legislation</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Suits and Litigation (Civil)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Economic Conditions and Trends</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Hollywood (Calif)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Los Angeles (Calif)</category>
-      <media:content height="1440" medium="image" url="https://static01.nyt.com/images/2024/06/03/multimedia/00street-vendors02-02-jzvh/00street-vendors02-02-jzvh-mediumSquareAt3X.jpg" width="1440"></media:content>
-      <media:credit>Adam Perez for The New York Times</media:credit>
+      <title>Parts of Oregon, Washington and Idaho Under Extreme Heat Warning</title>
+      <link>https://www.nytimes.com/2024/07/21/us/heat-wave-forecast-washington-oregon-idaho.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/heat-wave-forecast-washington-oregon-idaho.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/heat-wave-forecast-washington-oregon-idaho.html" rel="standout"></atom:link>
+      <description>After a blistering weekend, particularly in inland areas farther from the coast, cooler temperatures are expected beginning early this week.</description>
+      <dc:creator>Isabelle Taft</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 03:23:36 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Heat and Heat Waves</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Weather</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Global Warming</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Boise (Idaho)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Idaho</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Nevada</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Oregon</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Pacific Northwestern States (US)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Portland (Ore)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Spokane (Wash)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Washington (State)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Seattle (Wash)</category>
+      <media:content height="1644" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/00nat-pnw-heat-zvcw/00nat-pnw-heat-zvcw-mediumSquareAt3X.jpg" width="1643"></media:content>
+      <media:credit>Dave Killen/The Oregonian, via Associated Press</media:credit>
+      <media:description>A misting tent in downtown Portland, Ore., this month. Scientists say that climate change is making heat waves in the Northwest longer and more intense.</media:description>
     </item>
     <item>
-      <title>Myanmar Shop Owners Are Being Jailed for Increasing Wages</title>
-      <link>https://www.nytimes.com/2024/07/01/world/asia/myanmar-junta-inflation-arrests.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/07/01/world/asia/myanmar-junta-inflation-arrests.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/07/01/world/asia/myanmar-junta-inflation-arrests.html" rel="standout"></atom:link>
-      <description>Myanmar’s junta, facing a growing popular rebellion, has plunged the country into economic crisis, reversing gains from a decade of civilian leadership.</description>
-      <dc:creator>Richard C. Paddock</dc:creator>
-      <pubDate>Mon, 01 Jul 2024 06:14:20 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Currency</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Inflation (Economics)</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Myanmar</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Prices (Fares, Fees and Rates)</category>
-      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/01/multimedia/01myanmar-crisis-01-jpwm/01myanmar-crisis-01-jpwm-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Agence France-Presse — Getty Images</media:credit>
-      <media:description>A vegetable vendor at a market in Lashio, Myanmar, in June.</media:description>
+      <title>Pacific Northwest Faces Critical Fire Risk as Wildfires Burn</title>
+      <link>https://www.nytimes.com/2024/07/21/us/wildfires-lightning-oregon-washington.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/us/wildfires-lightning-oregon-washington.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/us/wildfires-lightning-oregon-washington.html" rel="standout"></atom:link>
+      <description>More than half a million people were under fire danger warnings on Sunday as a heat wave hit the region and several large blazes burned in Oregon.</description>
+      <dc:creator>Yan Zhuang and Amanda Holpuch</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 22:36:07 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Wildfires</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Heat and Heat Waves</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Oregon</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Washington (State)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Fires and Firefighters</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Lightning</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Pacific Northwestern States (US)</category>
+      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/07/21/us/21xp-oregon-wildfires2/21xp-oregon-wildfires2-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Oregon State Fire Marshal</media:credit>
+      <media:description>Firefighters worked to contain multiple blazes in Oregon on Saturday.</media:description>
     </item>
     <item>
-      <title>Anything Can Happen, and Usually Does, on ‘Watch What Happens Live’</title>
-      <link>https://www.nytimes.com/2024/06/30/arts/television/watch-what-happens-live-anniversary.html</link>
-      <guid isPermaLink="true">https://www.nytimes.com/2024/06/30/arts/television/watch-what-happens-live-anniversary.html</guid>
-      <atom:link href="https://www.nytimes.com/2024/06/30/arts/television/watch-what-happens-live-anniversary.html" rel="standout"></atom:link>
-      <description>With Andy Cohen, Hillary Clinton will do shots and Oscar-winners gush about reality stars — all savvy promotion for Bravo’s outrageous TV universe.</description>
-      <dc:creator>Shivani Gonzalez</dc:creator>
-      <pubDate>Sun, 30 Jun 2024 09:00:43 +0000</pubDate>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Television</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Cable Television</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/des">Reality Television</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Bravo</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Cohen, Andy (1968- )</category>
-      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_ttl">Watch What Happens Live With Andy Cohen (TV Program)</category>
-      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/06/30/multimedia/30wwhl-anny-03-qmtg/30wwhl-anny-03-qmtg-mediumSquareAt3X.jpg" width="1800"></media:content>
-      <media:credit>Hunter Abrams for The New York Times</media:credit>
-      <media:description>“Watch What Happens Live,” created and hosted by Andy Cohen, left, has become cable TV’s highest-rated late-night talk show, one that thrusts Bravo’s reality TV universe into the forefront of pop culture.</media:description>
+      <title>Joe Biden’s Extraordinary Example of Dropping Out</title>
+      <link>https://www.nytimes.com/2024/07/21/opinion/joe-biden-drops-out-2024-history.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/opinion/joe-biden-drops-out-2024-history.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/opinion/joe-biden-drops-out-2024-history.html" rel="standout"></atom:link>
+      <description>It’s hard to grasp the historical rarity, emotional agony and fundamental humility of what the president just did.</description>
+      <dc:creator>Frank Bruni</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 20:17:19 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 1968</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Primaries and Caucuses</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Democratic National Convention</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Republican Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Harris, Kamala D</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Johnson, Lyndon Baines</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">United States</category>
+      <media:content height="1799" medium="image" url="https://static01.nyt.com/images/2024/07/23/opinion/23bruni1/23bruni1-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Damon Winter/The New York Times</media:credit>
+    </item>
+    <item>
+      <title>Can Kamala Harris Step Up? Asking for a Friend.</title>
+      <link>https://www.nytimes.com/2024/07/21/opinion/kamala-harris-joe-biden-drops-out.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/opinion/kamala-harris-joe-biden-drops-out.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/opinion/kamala-harris-joe-biden-drops-out.html" rel="standout"></atom:link>
+      <description>What are the alternatives? And about those Republicans ...</description>
+      <dc:creator>Gail Collins and Bret Stephens</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 00:41:55 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2016</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2020</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Republican Party</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Conservatism (US Politics)</category>
+      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21conversation1-gfbv/21conversation1-gfbv-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Doug Mills/The New York Times</media:credit>
+    </item>
+    <item>
+      <title>Kamala Harris or Bust</title>
+      <link>https://www.nytimes.com/2024/07/09/opinion/kamala-harris-replace-biden.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/09/opinion/kamala-harris-replace-biden.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/09/opinion/kamala-harris-replace-biden.html" rel="standout"></atom:link>
+      <description>The only conversation the Democrats need to be having now is about how to line up behind their vice president.</description>
+      <dc:creator>Tressie McMillan Cottom</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 22:32:57 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">United States Politics and Government</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Presidential Election of 2024</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Harris, Kamala D</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Biden, Joseph R Jr</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Trump, Donald J</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Democratic Party</category>
+      <media:content height="1801" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21opinionPoint-vhzw/21opinionPoint-vhzw-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Kevin Mohatt/Reuters</media:credit>
+    </item>
+    <item>
+      <title>Delta Flight Cancellations Continue As It Struggles To Recover From Tech Outage</title>
+      <link>https://www.nytimes.com/2024/07/22/business/delta-global-tech-outage-pete-buttigieg.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/22/business/delta-global-tech-outage-pete-buttigieg.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/22/business/delta-global-tech-outage-pete-buttigieg.html" rel="standout"></atom:link>
+      <description>Transportation Secretary Pete Buttigieg singled out the airline on Sunday for continued disruptions and “unacceptable” customer service as it canceled another 1,300 flights.</description>
+      <dc:creator>Yan Zhuang</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 07:01:09 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Airlines and Airplanes</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Computer Network Outages</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Delays (Transportation)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Aviation Accidents, Safety and Disasters</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Computers and the Internet</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Travel and Vacations</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Bastian, Edward H</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Buttigieg, Pete (1982- )</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Delta Air Lines Inc</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">United States</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Transportation Department (US)</category>
+      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/22/multimedia/22xp-delta-vzqg/22xp-delta-vzqg-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Alex Welsh for The New York Times</media:credit>
+      <media:description>Secretary of Transportation Pete Buttigieg singled out Delta and warned that it must provide its customers adequate customer support and protections.</media:description>
+    </item>
+    <item>
+      <title>Bangladesh Protests Inequality of Opportunity</title>
+      <link>https://www.nytimes.com/2024/07/21/world/asia/bangladesh-protests-quotas-jobs.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/world/asia/bangladesh-protests-quotas-jobs.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/world/asia/bangladesh-protests-quotas-jobs.html" rel="standout"></atom:link>
+      <description>Demonstrations set off by the reinstatement of a quota system for government jobs revealed broader resentment about the uneven distribution of wealth and opportunity.</description>
+      <dc:creator>Anupreeta Das</dc:creator>
+      <pubDate>Mon, 22 Jul 2024 03:24:33 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Bangladesh</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Demonstrations, Protests and Riots</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Income Inequality</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Government Employees</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Remittances</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">International Crisis Group</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Wazed, Hasina</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Dhaka (Bangladesh)</category>
+      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21bangladesh-analysis-photo1-mvbf/21bangladesh-analysis-photo1-mvbf-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Munir Uz Zaman/Agence France-Presse — Getty Images</media:credit>
+      <media:description>Large demonstrations in Bangladesh, like this one in Dhaka, the capital, began early this month. Protests against a quota system for public-sector jobs have erupted many times in the past two decades.</media:description>
+    </item>
+    <item>
+      <title>Tadej Pogacar Wins the Tour de France for the Third Time</title>
+      <link>https://www.nytimes.com/2024/07/21/sports/cycling/pogacar-tour-de-france.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/sports/cycling/pogacar-tour-de-france.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/sports/cycling/pogacar-tour-de-france.html" rel="standout"></atom:link>
+      <description>Pogacar won his third Tour, beating his rival Jonas Vingegaard by 6:17 after a final time trial victory in Nice on Sunday.</description>
+      <dc:creator>Victor Mather</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 18:54:05 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Cycling, Road</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Tour de France (Bicycle Race)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Pogacar, Tadej</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Vingegaard, Jonas (1996- )</category>
+      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21xp-tour-winner-wider-gfjm/21xp-tour-winner-wider-gfjm-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Anne-Christine Poujoulat/Agence France-Presse — Getty Images</media:credit>
+      <media:description>Tadej Pogacar of Slovenia crossed the finish line on Sunday to win his third Tour de France.</media:description>
+    </item>
+    <item>
+      <title>Soho Waiters Race Keeps London Servers on Their Toes</title>
+      <link>https://www.nytimes.com/2024/07/21/world/europe/soho-london-waiters-race.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/21/world/europe/soho-london-waiters-race.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/21/world/europe/soho-london-waiters-race.html" rel="standout"></atom:link>
+      <description>Waiters in London competed in an annual footrace designed to test their mettle, their coordination and their skill as servers.</description>
+      <dc:creator>Amelia Nierenberg</dc:creator>
+      <pubDate>Sun, 21 Jul 2024 23:03:35 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">London (England)</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Waiters and Waitresses</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Contests and Prizes</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Paris (France)</category>
+      <media:content height="1800" medium="image" url="https://static01.nyt.com/images/2024/07/21/multimedia/21uk-waiters-race-vhjq/21uk-waiters-race-vhjq-mediumSquareAt3X.jpg" width="1800"></media:content>
+      <media:credit>Andrew Testa for The New York Times</media:credit>
+      <media:description>Competing in the Soho Waiters’ Race in London on Sunday. “It’s the Olympics for us waiters,” one participant said.</media:description>
+    </item>
+    <item>
+      <title>These Sculptures Changed What Art Could Be, Then Changed Themselves</title>
+      <link>https://www.nytimes.com/2024/07/19/arts/design/eva-hesse-sculptures-hauser-wirth.html</link>
+      <guid isPermaLink="true">https://www.nytimes.com/2024/07/19/arts/design/eva-hesse-sculptures-hauser-wirth.html</guid>
+      <atom:link href="https://www.nytimes.com/2024/07/19/arts/design/eva-hesse-sculptures-hauser-wirth.html" rel="standout"></atom:link>
+      <description>Eva Hesse’s latex and fiberglass pieces from the late 1960s have been reunited from five institutions. Their rapid deterioration makes their future uncertain — which may be their best quality.</description>
+      <dc:creator>Max Lakin</dc:creator>
+      <pubDate>Fri, 19 Jul 2024 11:03:29 +0000</pubDate>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_per">Hesse, Eva</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Content Type: Personal Profile</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Art</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Sculpture</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/des">Museums</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_org">Hauser &amp; Wirth</category>
+      <category domain="http://www.nytimes.com/namespaces/keywords/nyt_geo">Manhattan (NYC)</category>
     </item>
   </channel>
 </rss>

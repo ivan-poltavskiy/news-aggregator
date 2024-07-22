@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"news-aggregator/aggregator"
 	"news-aggregator/cmd/web/handlers"
+	"news-aggregator/cmd/web/service"
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
@@ -38,4 +39,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Could not start server: %s\n", err.Error())
 	}
+
+	go service.PeriodicallyUpdateNews(sourceStorage)
+	select {}
 }
