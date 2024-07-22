@@ -51,7 +51,7 @@ func SaveSource(url string, sourceStorage storage.Storage) (source.Name, error) 
 	}
 	sourceEntity.PathToFile = source.PathToFile(jsonPath)
 
-	if !IsSourceExists(sourceEntity.Name) {
+	if !IsSourceExists(sourceEntity.Name, sourceStorage) {
 		err = sourceStorage.SaveSource(sourceEntity)
 		if err != nil {
 			return "", err

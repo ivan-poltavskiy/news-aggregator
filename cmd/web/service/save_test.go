@@ -54,7 +54,7 @@ func TestSaveSource(t *testing.T) {
 			want:    "pravda",
 			wantErr: false,
 			setup: func() {
-				// Expectation for successful source save
+				mockStorage.EXPECT().GetSources().Return([]source.Source{}, nil)
 				mockStorage.EXPECT().SaveSource(gomock.AssignableToTypeOf(source.Source{})).Return(nil)
 			},
 		},
