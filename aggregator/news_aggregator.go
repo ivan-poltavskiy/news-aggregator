@@ -27,6 +27,7 @@ func New(newsCollector Collector) client.Aggregator {
 // Returns:
 // - A slice of news that have been fetched and filtered.
 // - An error message string if any errors occurred during the process.
+
 func (aggregator *newsAggregator) Aggregate(sources []string, filters ...filter.NewsFilter) ([]news.News, error) {
 	var sourceNames []source.Name
 

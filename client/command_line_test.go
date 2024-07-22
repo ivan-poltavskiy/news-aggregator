@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"io"
-	"news-aggregator/aggregator/mock_aggregator"
+	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"os"

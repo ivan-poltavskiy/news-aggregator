@@ -2,7 +2,7 @@ package storage
 
 import "news-aggregator/entity/source"
 
-//go:generate mockgen -source=C:\Users\polta\GolandProjects\news-aggregator\storage\storage.go -destination=C:\Users\polta\GolandProjects\news-aggregator\mock_aggregator\mock_storage.go -package=mock_aggregator news-aggregator/storage Storage
+//go:generate mockgen -source=storage.go -destination=mock_aggregator/mock_storage.go -package=mock_aggregator news-aggregator/storage Storage
 
 // Storage is the type of repository for saving and managing sources.
 type Storage interface {
