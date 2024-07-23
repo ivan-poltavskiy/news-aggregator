@@ -37,10 +37,10 @@ func main() {
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
 		handlers.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
 	})
-	logrus.Info("Starting server on " + *port)
+	logrus.Info("Starting server on: " + *port)
 
 	go func() {
-		err := http.ListenAndServeTLS(*port, *pathToCertificate, *pathToKey, nil)
+		err := http.ListenAndServeTLS(":"+*port, *pathToCertificate, *pathToKey, nil)
 		if err != nil {
 			logrus.Fatalf("Could not start server: %s\n", err.Error())
 		}
