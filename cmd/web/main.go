@@ -23,19 +23,19 @@ func main() {
 	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
-	newsStorage := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
-	sourceStorage := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
-	newsCollector := collector.New(sourceStorage)
+	newsJsonStorage := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
+	sourceJsonStorage := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	newsCollector := collector.New(sourceJsonStorage)
 	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
 		handlers.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddSourceHandler(w, r, sourceStorage, newsStorage)
+		handlers.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.DeleteSourceByNameHandler(w, r, sourceStorage)
+		handlers.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
 	})
 	logrus.Info("Starting server on " + *port)
 
@@ -48,7 +48,7 @@ func main() {
 
 	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
 
-	go service.PeriodicallyUpdateNews(sourceStorage, time.Duration(*newsUpdatePeriod)*time.Minute, newsStorage)
+	go service.PeriodicallyUpdateNews(sourceJsonStorage, time.Duration(*newsUpdatePeriod)*time.Minute, newsJsonStorage)
 
 	select {}
 

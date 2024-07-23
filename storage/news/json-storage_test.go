@@ -42,7 +42,7 @@ func TestSaveNews(t *testing.T) {
 			defer os.RemoveAll(tmpDir)
 
 			constant.PathToResources = tmpDir
-			jsonStorage := NewJsonNewsStorage(source.PathToFile(filepath.Join(tmpDir, tt.sourceName)))
+			jsonStorage := NewJsonStorage(source.PathToFile(filepath.Join(tmpDir, tt.sourceName)))
 
 			if tt.name == "directory creation error" {
 				// Simulate directory creation error
@@ -117,7 +117,7 @@ func TestGetNews(t *testing.T) {
 			defer os.RemoveAll(tmpDir)
 
 			constant.PathToResources = tmpDir
-			jsonStorage := NewJsonNewsStorage(source.PathToFile(filepath.Join(tmpDir, "test_source.json")))
+			jsonStorage := NewJsonStorage(source.PathToFile(filepath.Join(tmpDir, "test_source.json")))
 
 			filePath := filepath.Join(tmpDir, "test_source.json")
 			_, err = tt.setupFile(t, filePath)
