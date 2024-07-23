@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.14](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.13...v1.0.14) (2024-07-23)
+
+
+### Bug Fixes
+
+* delete unnecessary step from release-please.yml ([f50418d](https://github.com/ivan-poltavskiy/news-aggregator/commit/f50418d838a6ec56acfcfc27d2d99cca40d16869))
+
 ## [1.0.13](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.12...v1.0.13) (2024-07-22)
 
 
