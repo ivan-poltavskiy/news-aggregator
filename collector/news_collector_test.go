@@ -34,7 +34,7 @@ func beforeEach() {
 		log.Fatalf("Failed to write to temp file: %v", err)
 	}
 
-	sourceStorage := source2.NewJsonSourceStorage(source.PathToFile(file.Name()))
+	sourceStorage, _ := source2.NewJsonSourceStorage(source.PathToFile(file.Name()))
 	testArticleCollector = &newsCollector{sourceStorage: sourceStorage, parsers: GetDefaultParsers()}
 }
 

@@ -17,11 +17,11 @@ type jsonNewsStorage struct {
 }
 
 // NewJsonStorage create new instance of storage in JSON file
-func NewJsonStorage(pathToStorage source.PathToFile) NewsStorage {
+func NewJsonStorage(pathToStorage source.PathToFile) (NewsStorage, error) {
 	if pathToStorage == "" {
-		panic("pathToStorage is empty")
+		return nil, fmt.Errorf("NewJsonStorage: pathToStorage is empty")
 	}
-	return &jsonNewsStorage{pathToStorage}
+	return &jsonNewsStorage{pathToStorage}, nil
 }
 
 // SaveNews saves the provided news articles to the specified JSON file.

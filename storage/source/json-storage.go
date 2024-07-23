@@ -18,11 +18,11 @@ type jsonSourceStorage struct {
 }
 
 // NewJsonSourceStorage create new instance of storage in JSON file
-func NewJsonSourceStorage(pathToStorage source.PathToFile) Storage {
+func NewJsonSourceStorage(pathToStorage source.PathToFile) (Storage, error) {
 	if pathToStorage == "" {
-		panic("pathToStorage is empty")
+		return nil, fmt.Errorf("NewJsonSourceStorage: pathToStorage is empty")
 	}
-	return &jsonSourceStorage{pathToStorage}
+	return &jsonSourceStorage{pathToStorage}, nil
 }
 
 // SaveSource load the input source to the storage

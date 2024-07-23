@@ -10,8 +10,11 @@ import (
 )
 
 func main() {
-	sourceStorage := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
-	newsCollector := collector.New(sourceStorage)
+	jsonSourceStorage, err := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	if err != nil {
+		panic(err)
+	}
+	newsCollector := collector.New(jsonSourceStorage)
 	newsAggregator := aggregator.New(newsCollector)
 	cli := client.NewCommandLine(newsAggregator)
 	articles, err := cli.FetchNews()
