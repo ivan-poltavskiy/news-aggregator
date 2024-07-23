@@ -19,7 +19,7 @@ type addSourceRequest struct {
 func AddSourceHandler(w http.ResponseWriter, r *http.Request, sourceStorage source.Storage, newsStorage newsStorage.NewsStorage) {
 	var requestBody addSourceRequest
 
-	if err := getUrlFromRequest(r, &requestBody); err != nil {
+	if err := parseRequest(r, &requestBody); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -38,7 +38,7 @@ func AddSourceHandler(w http.ResponseWriter, r *http.Request, sourceStorage sour
 }
 
 // get the URL of the source from the request
-func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
+func parseRequest(r *http.Request, requestBody *addSourceRequest) error {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Error("Failed to read request body: ", err)
@@ -56,6 +56,6 @@ func getUrlFromRequest(r *http.Request, requestBody *addSourceRequest) error {
 		return err
 	}
 
-	logrus.Info("getUrlFromRequest: Successfully parsed request body")
+	logrus.Info("parseRequest: Successfully parsed request body")
 	return nil
 }
