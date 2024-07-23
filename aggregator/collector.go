@@ -7,7 +7,7 @@ import (
 
 // Collector is using for fetching news from source by source name.
 //
-//go:generate mockgen -source=collector.go -destination=mock_aggregator\mock_collector.go -package=mock_aggregator news-aggregator/aggregator Collector
+//go:generate mockgen -source=collector.go -destination=mock_aggregator/mock_collector.go -package=mock_aggregator news-aggregator/aggregator Collector
 type Collector interface {
 	FindNewsByResourcesName(sourcesNames []source.Name) ([]news.News, error)
 }
