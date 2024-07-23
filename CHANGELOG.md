@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.15](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.14...v1.0.15) (2024-07-23)
+
+
+### Bug Fixes
+
+* update github actions configure. ([9d1a116](https://github.com/ivan-poltavskiy/news-aggregator/commit/9d1a11636ea23adaca3a9443f92cf39c12c872a5))
+
 ## [1.0.14](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.13...v1.0.14) (2024-07-23)
 
 
