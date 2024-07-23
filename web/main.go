@@ -10,7 +10,7 @@ import (
 	"news-aggregator/entity/source"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
-	handlers2 "news-aggregator/web/handlers"
+	"news-aggregator/web/handlers"
 	"news-aggregator/web/service"
 	"time"
 )
@@ -35,13 +35,13 @@ func main() {
 	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handlers2.FetchNewsHandler(w, r, newsAggregator)
+		handlers.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers2.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
+		handlers.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers2.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
+		handlers.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
 	})
 	logrus.Info("Starting server on: " + *port)
 
