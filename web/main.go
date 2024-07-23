@@ -5,13 +5,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/aggregator"
-	"news-aggregator/cmd/web/handlers"
-	"news-aggregator/cmd/web/service"
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
+	handlers2 "news-aggregator/web/handlers"
+	"news-aggregator/web/service"
 	"time"
 )
 
@@ -35,13 +35,13 @@ func main() {
 	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handlers.FetchNewsHandler(w, r, newsAggregator)
+		handlers2.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
+		handlers2.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
+		handlers2.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
 	})
 	logrus.Info("Starting server on: " + *port)
 

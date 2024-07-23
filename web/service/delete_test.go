@@ -2,8 +2,8 @@ package service_test
 
 import (
 	"errors"
-	"news-aggregator/cmd/web/service"
 	"news-aggregator/storage/source/mock_aggregator"
+	"news-aggregator/web/service"
 	"testing"
 
 	"github.com/golang/mock/gomock"

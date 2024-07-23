@@ -8,12 +8,12 @@ import (
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/source"
 	newsStorage "news-aggregator/storage/news"
 	newsStorage_mock "news-aggregator/storage/news/mock_aggregator"
 	sourceStorage "news-aggregator/storage/source"
 	"news-aggregator/storage/source/mock_aggregator"
+	"news-aggregator/web/service"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

@@ -5,8 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
-	"news-aggregator/cmd/web/service"
 	"news-aggregator/storage/source"
+	"news-aggregator/web/service"
 	"strings"
 )
 

@@ -2,11 +2,11 @@ package service_test
 
 import (
 	"github.com/stretchr/testify/assert"
+	"news-aggregator/web/service"
 	"os"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"news-aggregator/cmd/web/service"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	newsStorage_mock "news-aggregator/storage/news/mock_aggregator"

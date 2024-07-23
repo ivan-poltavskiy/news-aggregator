@@ -23,7 +23,7 @@ Start the application with the required flags.
 
 For example:
 ```bash
-go run cmd/command-line-client/main.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
+go run cmd/main.go --sources=ABC --keywords=ukraine --startDate=2024-05-10 --endDate=2024-05-23
 ```
 
 Parameters
@@ -37,7 +37,7 @@ Parameters
 
 It is possible to run the aggregator on a web server. To do this, run main.go from the news-aggregator/cmd/web directory or use the command:
 ```bash
-go run cmd/web/main.go
+go run web/main.go
 ```
 By default, the server uses HTTPS, listens on port 443 and uses a self-signed certificate and key, but these can be changed with the --port, --news-update-period and --key-path flags respectively.
 

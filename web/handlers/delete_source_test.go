@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"news-aggregator/storage/source/mock_aggregator"
+	"news-aggregator/web/handlers"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"news-aggregator/cmd/web/handlers"
 )
 
 func TestDeleteSourceByNameHandler(t *testing.T) {

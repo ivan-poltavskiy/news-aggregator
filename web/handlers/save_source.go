@@ -5,9 +5,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
-	"news-aggregator/cmd/web/service"
 	newsStorage "news-aggregator/storage/news"
 	"news-aggregator/storage/source"
+	"news-aggregator/web/service"
 )
 
 // addSourceRequest is a structure containing the fields required to add a new source.
