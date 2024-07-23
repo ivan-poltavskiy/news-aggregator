@@ -9,6 +9,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -28,7 +29,17 @@ jobs:
           sudo mv ./bin/task /usr/local/bin/task
 
       - name: Run Taskfile tasks
-        run: task test
+        run: task check-all
 
       - name: Build
         run: go build -v ./...
+
+      - name: Check for formatting changes
+        run: |
+            git diff --exit-code > /dev/null
+            if [ $? -ne 0 ]; then
+              echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+              exit 1
+            else
+              echo "No formatting changes detected."
+            fi
