@@ -39,9 +39,9 @@ It is possible to run the aggregator on a web server. To do this, run main.go fr
 ```bash
 go run cmd/web/main.go
 ```
-By default, the server uses HTTPS, listens on port 443 and uses a self-signed certificate and key, but these can be changed with the --port, --pathToCertificate and --pathToKey flags respectively.
+By default, the server uses HTTPS, listens on port 443 and uses a self-signed certificate and key, but these can be changed with the --port, --news-update-period and --key-path flags respectively.
 
 It is also possible to run the server in a container using Docker. The configuration is written in the .Dockerfile file.
 
-The aggregator has auto news updates every 5 minutes for the server, but this time can also be changed using the --newsUpdatePeriod flag at server startup.
+The aggregator has auto news updates every 5 minutes for the server, but this time can also be changed using the --news-update-period flag at server startup.
 

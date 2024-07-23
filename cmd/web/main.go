@@ -18,9 +18,9 @@ import (
 func main() {
 
 	port := flag.String("port", constant.PORT, "port to listen on")
-	pathToCertificate := flag.String("pathToCertificate", constant.PathToCertFile, "Certificate file path")
-	pathToKey := flag.String("pathToKey", constant.PathToKeyFile, "Key file path")
-	newsUpdatePeriod := flag.Int("newsUpdatePeriod", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
+	pathToCertificate := flag.String("certificate-path", constant.PathToCertFile, "Certificate file path")
+	pathToKey := flag.String("key-path", constant.PathToKeyFile, "Key file path")
+	newsUpdatePeriod := flag.Int("news-update-period", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
 	newsJsonStorage := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
