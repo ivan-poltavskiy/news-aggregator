@@ -8,10 +8,11 @@ import (
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
 	"news-aggregator/web/handlers"
-	"news-aggregator/web/service"
+	"news-aggregator/web/news"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func main() {
 	newsUpdatePeriod := flag.Int("news-update-period", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
-	newsJsonStorage, err := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
+	newsJsonStorage, err := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -31,17 +32,20 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	newsCollector := collector.New(sourceJsonStorage)
+
+	newStorage := storage.NewStorage(newsJsonStorage, sourceJsonStorage)
+
+	newsCollector := collector.New(newStorage)
 	newsAggregator := aggregator.New(newsCollector)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
 		handlers.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.AddSourceHandler(w, r, sourceJsonStorage, newsJsonStorage)
+		handlers.AddSourceHandler(w, r, newStorage)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		handlers.DeleteSourceByNameHandler(w, r, sourceJsonStorage)
+		handlers.DeleteSourceByNameHandler(w, r, newStorage)
 	})
 	logrus.Info("Starting server on: " + *port)
 
@@ -53,8 +57,8 @@ func main() {
 	}()
 
 	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
-
-	go service.PeriodicallyUpdateNews(sourceJsonStorage, time.Duration(*newsUpdatePeriod)*time.Minute, newsJsonStorage)
+	service := news.NewNewsService(newStorage)
+	go service.PeriodicallyUpdateNews(time.Duration(*newsUpdatePeriod) * time.Minute)
 
 	select {}
 

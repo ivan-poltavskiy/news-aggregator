@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/storage/source/mock_aggregator"
+	"news-aggregator/storage/mock_aggregator"
 	"news-aggregator/web/handlers"
 	"testing"
 

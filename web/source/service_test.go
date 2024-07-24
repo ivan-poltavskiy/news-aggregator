@@ -1,24 +1,67 @@
-package service_test
+package source_test
 
 import (
-	"github.com/stretchr/testify/assert"
-	"news-aggregator/web/service"
+	"errors"
+	"news-aggregator/entity/news"
+	"news-aggregator/entity/source"
+	"news-aggregator/storage/mock_aggregator"
+	sourceService "news-aggregator/web/source"
 	"os"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"news-aggregator/entity/news"
-	"news-aggregator/entity/source"
-	newsStorage_mock "news-aggregator/storage/news/mock_aggregator"
-	sourceStorage_mock "news-aggregator/storage/source/mock_aggregator"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestDeleteSourceByName(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+
+	tests := []struct {
+		name       string
+		sourceName string
+		mockFunc   func()
+		expectErr  bool
+	}{
+		{
+			name:       "Success",
+			sourceName: "example-source",
+			mockFunc: func() {
+				mockStorage.EXPECT().DeleteSourceByName("example-source").Return(nil)
+			},
+			expectErr: false,
+		},
+		{
+			name:       "Failure",
+			sourceName: "non-existent-source",
+			mockFunc: func() {
+				mockStorage.EXPECT().DeleteSourceByName("non-existent-source").Return(errors.New("delete error"))
+			},
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc()
+			service := sourceService.NewSourceService(mockStorage)
+			err := service.DeleteSourceByName(tt.sourceName)
+			if tt.expectErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
 
 func TestSaveSource(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockSourceStorage := sourceStorage_mock.NewMockStorage(ctrl)
-	mockNewsStorage := newsStorage_mock.NewMockNewsStorage(ctrl)
+	mockStorage := mock_aggregator.NewMockStorage(ctrl)
 
 	testResourcesDir := "resources"
 
@@ -50,12 +93,12 @@ func TestSaveSource(t *testing.T) {
 					},
 				}
 
-				mockSourceStorage.EXPECT().IsSourceExists(gomock.Any()).Return(false).Times(1)
-				mockSourceStorage.EXPECT().SaveSource(gomock.Any()).Return(nil).Times(1)
-				mockNewsStorage.EXPECT().SaveNews(gomock.Any(), gomock.Any()).Return(
+				mockStorage.EXPECT().IsSourceExists(gomock.Any()).Return(false).Times(1)
+				mockStorage.EXPECT().SaveSource(gomock.Any()).Return(nil).Times(1)
+				mockStorage.EXPECT().SaveNews(gomock.Any(), gomock.Any()).Return(
 					source.Source{Name: "pravda"},
 					nil).Times(1)
-				mockNewsStorage.EXPECT().GetNewsBySourceName(gomock.Any(), gomock.Any()).Return(returnsNews, nil).Times(1)
+				mockStorage.EXPECT().GetNewsBySourceName(gomock.Any(), gomock.Any()).Return(returnsNews, nil).Times(1)
 			},
 		},
 		{
@@ -82,7 +125,8 @@ func TestSaveSource(t *testing.T) {
 				tt.setup()
 			}
 
-			got, err := service.SaveSource(tt.url, mockSourceStorage, mockNewsStorage)
+			service := sourceService.NewSourceService(mockStorage)
+			got, err := service.SaveSource(tt.url)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -90,26 +134,6 @@ func TestSaveSource(t *testing.T) {
 			if err == nil && got != tt.want {
 				t.Errorf("SaveSource() got = %v, want %v", got, tt.want)
 			}
-		})
-	}
-}
-
-func TestExtractDomainName(t *testing.T) {
-	tests := []struct {
-		url          string
-		expectedName string
-	}{
-		{"https://www.example.com/path", "example"},
-		{"http://example.com/path", "example"},
-		{"https://example.com", "example"},
-		{"https://sub.example.com/path", "sub"},
-		{"invalid-url", "unknown"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.url, func(t *testing.T) {
-			domain := service.ExtractDomainName(tt.url)
-			assert.Equal(t, tt.expectedName, domain, "Expected domain name to match")
 		})
 	}
 }

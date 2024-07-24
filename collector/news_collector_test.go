@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
-	source2 "news-aggregator/storage/source"
+	"news-aggregator/storage"
+	newsStorage "news-aggregator/storage/news"
+	sourceStorage "news-aggregator/storage/source"
 	"os"
 	"testing"
 )
@@ -33,9 +36,10 @@ func beforeEach() {
 	if err != nil {
 		log.Fatalf("Failed to write to temp file: %v", err)
 	}
-
-	sourceStorage, _ := source2.NewJsonSourceStorage(source.PathToFile(file.Name()))
-	testArticleCollector = &newsCollector{sourceStorage: sourceStorage, parsers: GetDefaultParsers()}
+	sourceStorage, _ := sourceStorage.NewJsonSourceStorage(source.PathToFile(file.Name()))
+	newsJsonStorage, _ := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
+	newStorage := storage.NewStorage(newsJsonStorage, sourceStorage)
+	testArticleCollector = &newsCollector{sourceStorage: newStorage, parsers: GetDefaultParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {

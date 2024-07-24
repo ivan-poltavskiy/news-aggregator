@@ -1,4 +1,4 @@
-package service
+package feed
 
 import (
 	"fmt"
@@ -8,73 +8,28 @@ import (
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/parser"
-	newsStorage "news-aggregator/storage/news"
-	sourceStorage "news-aggregator/storage/source"
 	"os"
 	"regexp"
 	"strings"
 )
 
-// SaveSource processes the source URL and returns the source entity
-func SaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage newsStorage.NewsStorage) (source.Name, error) {
-
-	if url == "" {
-		return "", fmt.Errorf("passed url is empty")
-	}
-
-	rssURL, err := getRssFeedLink(url)
-	if err != nil {
-		return "", err
-	}
-	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
-
-	domainName := ExtractDomainName(url)
-
-	parsedNews, err := parseRssFeed(rssURL, domainName)
-	if err != nil {
-		return "", err
-	}
-
-	sourceEntity := source.Source{
-		Name:       source.Name(domainName),
-		SourceType: source.STORAGE,
-		Link:       source.Link(url),
-	}
-
-	sourceEntity, err = SaveNews(sourceEntity, newsStorage, sourceStorage, parsedNews)
-	if err != nil {
-		return "", err
-	}
-
-	if !sourceStorage.IsSourceExists(sourceEntity.Name) {
-		err = sourceStorage.SaveSource(sourceEntity)
-		if err != nil {
-			return "", err
-		}
-		logrus.Info("Source added")
-	} else {
-		logrus.Info("Source already exists")
-	}
-	return sourceEntity.Name, nil
-}
-
-// getRssFeedLink takes link of rss feed from the input site
-func getRssFeedLink(url string) (string, error) {
+// GetRssFeedLink takes link of rss feed from the input site
+func GetRssFeedLink(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		logrus.Error("getRssFeedLink: RSS URL not found ", err)
+		logrus.Error("GetRssFeedLink: RSS URL not found ", err)
 		return "", fmt.Errorf("rss url not found: %s", url)
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			logrus.Error("getRssFeedLink: Error closing response body ", err)
+			logrus.Error("GetRssFeedLink: Error closing response body ", err)
 		}
 	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Error("getRssFeedLink: Failed to read page content ", err)
+		logrus.Error("GetRssFeedLink: Failed to read page content ", err)
 		return "", err
 	}
 
@@ -82,12 +37,12 @@ func getRssFeedLink(url string) (string, error) {
 	matches := re.FindStringSubmatch(string(body))
 
 	if len(matches) < 2 {
-		logrus.Warn("getRssFeedLink: RSS link not found")
+		logrus.Warn("GetRssFeedLink: RSS link not found")
 		return "", nil
 	}
 
 	rssURL := matches[1]
-	logrus.Info("getRssFeedLink: RSS link found: ", rssURL)
+	logrus.Info("GetRssFeedLink: RSS link found: ", rssURL)
 	return rssURL, nil
 }
 
@@ -105,8 +60,8 @@ func ExtractDomainName(url string) string {
 	return domain
 }
 
-// parseRssFeed downloads the RSS feed and returns the parsed news
-func parseRssFeed(rssURL, domainName string) ([]news.News, error) {
+// ParseRssFeed downloads the RSS feed and returns the parsed news
+func ParseRssFeed(rssURL, domainName string) ([]news.News, error) {
 	rssResponse, err := http.Get(rssURL)
 	if err != nil || rssResponse.StatusCode != http.StatusOK {
 		logrus.Error("Failed to download RSS feed: ", err)

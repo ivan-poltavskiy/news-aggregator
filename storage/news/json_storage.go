@@ -7,7 +7,7 @@ import (
 	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	sourceStorage "news-aggregator/storage/source"
+	"news-aggregator/storage"
 	"os"
 	"path/filepath"
 )
@@ -16,10 +16,10 @@ type jsonNewsStorage struct {
 	pathToStorage source.PathToFile
 }
 
-// NewJsonStorage create new instance of storage in JSON file
-func NewJsonStorage(pathToStorage source.PathToFile) (NewsStorage, error) {
+// NewJsonNewsStorage create new instance of storage in JSON file
+func NewJsonNewsStorage(pathToStorage source.PathToFile) (storage.NewsStorage, error) {
 	if pathToStorage == "" {
-		return nil, fmt.Errorf("NewJsonStorage: pathToStorage is empty")
+		return nil, fmt.Errorf("NewJsonNewsStorage: pathToStorage is empty")
 	}
 	return &jsonNewsStorage{pathToStorage}, nil
 }
@@ -84,7 +84,7 @@ func (jsonStorage *jsonNewsStorage) GetNews(jsonFilePath string) ([]news.News, e
 	return existingArticles, nil
 }
 
-func (jsonStorage *jsonNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage sourceStorage.Storage) ([]news.News, error) {
+func (jsonStorage *jsonNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.SourceStorage) ([]news.News, error) {
 	source, err := sourceStorage.GetSourceByName(sourceName)
 	if err != nil {
 		logrus.Error("Failed to get source by name: ", err)

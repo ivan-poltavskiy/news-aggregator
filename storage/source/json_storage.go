@@ -8,6 +8,7 @@ import (
 	"io"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
+	"news-aggregator/storage"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +19,7 @@ type jsonSourceStorage struct {
 }
 
 // NewJsonSourceStorage create new instance of storage in JSON file
-func NewJsonSourceStorage(pathToStorage source.PathToFile) (Storage, error) {
+func NewJsonSourceStorage(pathToStorage source.PathToFile) (storage.SourceStorage, error) {
 	if pathToStorage == "" {
 		return nil, fmt.Errorf("NewJsonSourceStorage: pathToStorage is empty")
 	}

@@ -9,26 +9,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"news-aggregator/entity/source"
-	newsStorage "news-aggregator/storage/news"
-	newsStorage_mock "news-aggregator/storage/news/mock_aggregator"
-	sourceStorage "news-aggregator/storage/source"
-	"news-aggregator/storage/source/mock_aggregator"
-	"news-aggregator/web/service"
+	"news-aggregator/storage/mock_aggregator"
+	sourceService "news-aggregator/web/source"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-// mock the Save function
-func mockSaveSource(url string, sourceStorage sourceStorage.Storage, newsStorage newsStorage.NewsStorage) (source.Name, error) {
+// mockSaveSource mocks the SaveSource method
+func mockSaveSource(_ *sourceService.SourcesService, url string) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
 	if url == "https://www.pravda.com.ua/" {
 		return "pravda", nil
-	}
-	if sourceStorage == nil && newsStorage == nil {
-		return "", fmt.Errorf("passed sourceStorage or newsStorage is empty")
 	}
 	return "", fmt.Errorf("unknown error")
 }
@@ -37,9 +32,11 @@ func TestAddSourceHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockStorage := mock_aggregator.NewMockStorage(ctrl)
-	newsMockStorage := newsStorage_mock.NewMockNewsStorage(ctrl)
 
-	patch := monkey.Patch(service.SaveSource, mockSaveSource)
+	service := sourceService.NewSourceService(mockStorage)
+
+	// Patch the SaveSource method
+	patch := monkey.PatchInstanceMethod(reflect.TypeOf(service), "SaveSource", mockSaveSource)
 	defer patch.Unpatch()
 
 	tests := []struct {
@@ -76,7 +73,7 @@ func TestAddSourceHandler(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				AddSourceHandler(w, r, mockStorage, newsMockStorage)
+				AddSourceHandler(w, r, mockStorage)
 			})
 
 			handler.ServeHTTP(rr, req)

@@ -1,19 +1,29 @@
-package service
+package news
 
 import (
 	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	newsStorage "news-aggregator/storage/news"
-	sourceStorage "news-aggregator/storage/source"
+	"news-aggregator/storage"
+	"news-aggregator/web/feed"
 	"sync"
 	"time"
 )
 
-// SaveNews saves the news to the storage
-func SaveNews(sourceEntity source.Source, newsStorage newsStorage.NewsStorage, sourceStorage sourceStorage.Storage, parsedNews []news.News) (source.Source, error) {
+type NewsService struct {
+	storage storage.Storage
+}
 
-	existingNews, err := newsStorage.GetNewsBySourceName(sourceEntity.Name, sourceStorage)
+func NewNewsService(storage storage.Storage) *NewsService {
+	return &NewsService{
+		storage: storage,
+	}
+}
+
+// SaveNews saves the news to the storage
+func (service NewsService) SaveNews(sourceEntity source.Source, parsedNews []news.News) (source.Source, error) {
+
+	existingNews, err := service.storage.GetNewsBySourceName(sourceEntity.Name, service.storage)
 	if err != nil {
 		return source.Source{}, err
 	}
@@ -26,13 +36,13 @@ func SaveNews(sourceEntity source.Source, newsStorage newsStorage.NewsStorage, s
 
 	existingNews = append(existingNews, newArticles...)
 
-	sourceEntity, err = newsStorage.SaveNews(sourceEntity, existingNews)
+	sourceEntity, err = service.storage.SaveNews(sourceEntity, existingNews)
 
 	return sourceEntity, nil
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePeriod time.Duration, newsStorage newsStorage.NewsStorage) {
+func (service NewsService) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 
@@ -40,7 +50,7 @@ func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePerio
 		select {
 		case <-ticker.C:
 			logrus.Info("Starting periodic update of news")
-			sources, err := sourceStorage.GetSources()
+			sources, err := service.storage.GetSources()
 			if err != nil {
 				logrus.Error("Failed to retrieve sources: ", err)
 				continue
@@ -51,7 +61,7 @@ func PeriodicallyUpdateNews(sourceStorage sourceStorage.Storage, newsUpdatePerio
 				wg.Add(1)
 				go func(src source.Source) {
 					defer wg.Done()
-					err := updateSourceNews(src, newsStorage, sourceStorage)
+					err := updateSourceNews(src, service.storage)
 					if err != nil {
 						logrus.Error("Failed to update news for source: ", src.Name, err)
 					}
@@ -81,19 +91,19 @@ func newsUnification(articles []news.News, existingArticles []news.News) []news.
 }
 
 // updateSourceNews updating the news of the input source
-func updateSourceNews(inputSource source.Source, newsStorage newsStorage.NewsStorage, sourceStorage sourceStorage.Storage) error {
-	domainName := ExtractDomainName(string(inputSource.Link))
-	rssURL, err := getRssFeedLink(string(inputSource.Link))
+func updateSourceNews(inputSource source.Source, storage storage.Storage) error {
+	domainName := feed.ExtractDomainName(string(inputSource.Link))
+	rssURL, err := feed.GetRssFeedLink(string(inputSource.Link))
 	if err != nil {
 		return err
 	}
 
-	currentNews, err := parseRssFeed(rssURL, domainName)
+	currentNews, err := feed.ParseRssFeed(rssURL, domainName)
 	if err != nil {
 		return err
 	}
 
-	_, err = SaveNews(inputSource, newsStorage, sourceStorage, currentNews)
+	_, err = storage.SaveNews(inputSource, currentNews)
 	if err != nil {
 		return err
 	}

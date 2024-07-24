@@ -5,8 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
-	"news-aggregator/storage/source"
-	"news-aggregator/web/service"
+	"news-aggregator/storage"
+	sourceService "news-aggregator/web/source"
 	"strings"
 )
 
@@ -15,7 +15,7 @@ type deleteSourceRequest struct {
 }
 
 // DeleteSourceByNameHandler is a handler for removing the source from the storage.
-func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceStorage source.Storage) {
+func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceStorage storage.Storage) {
 
 	var request deleteSourceRequest
 	body, err := io.ReadAll(r.Body)
@@ -41,7 +41,8 @@ func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceSto
 
 	logrus.Infof("Request to delete source received: %s", request.Name)
 
-	err = service.DeleteSourceByName(request.Name, sourceStorage)
+	service := sourceService.NewSourceService(sourceStorage)
+	err = service.DeleteSourceByName(request.Name)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			logrus.Warnf("Source not found: %s", request.Name)
