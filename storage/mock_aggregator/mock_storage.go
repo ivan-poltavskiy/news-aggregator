@@ -37,17 +37,17 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 }
 
 // DeleteSourceByName mocks base method.
-func (m *MockStorage) DeleteSourceByName(name string) error {
+func (m *MockStorage) DeleteSourceByName(arg0 source.Name) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteSourceByName", name)
+	ret := m.ctrl.Call(m, "DeleteSourceByName", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteSourceByName indicates an expected call of DeleteSourceByName.
-func (mr *MockStorageMockRecorder) DeleteSourceByName(name interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) DeleteSourceByName(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSourceByName", reflect.TypeOf((*MockStorage)(nil).DeleteSourceByName), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSourceByName", reflect.TypeOf((*MockStorage)(nil).DeleteSourceByName), arg0)
 }
 
 // GetNews mocks base method.
@@ -66,7 +66,7 @@ func (mr *MockStorageMockRecorder) GetNews(path interface{}) *gomock.Call {
 }
 
 // GetNewsBySourceName mocks base method.
-func (m *MockStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.SourceStorage) ([]news.News, error) {
+func (m *MockStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNewsBySourceName", sourceName, sourceStorage)
 	ret0, _ := ret[0].([]news.News)
@@ -125,18 +125,18 @@ func (mr *MockStorageMockRecorder) IsSourceExists(arg0 interface{}) *gomock.Call
 }
 
 // SaveNews mocks base method.
-func (m *MockStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
+func (m *MockStorage) SaveNews(providedSource source.Source, news []news.News) (source.Source, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveNews", currentSource, news)
+	ret := m.ctrl.Call(m, "SaveNews", providedSource, news)
 	ret0, _ := ret[0].(source.Source)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SaveNews indicates an expected call of SaveNews.
-func (mr *MockStorageMockRecorder) SaveNews(currentSource, news interface{}) *gomock.Call {
+func (mr *MockStorageMockRecorder) SaveNews(providedSource, news interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockStorage)(nil).SaveNews), currentSource, news)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockStorage)(nil).SaveNews), providedSource, news)
 }
 
 // SaveSource mocks base method.
@@ -153,31 +153,31 @@ func (mr *MockStorageMockRecorder) SaveSource(source interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSource", reflect.TypeOf((*MockStorage)(nil).SaveSource), source)
 }
 
-// MockNewsStorage is a mock of NewsStorage interface.
-type MockNewsStorage struct {
+// MockNews is a mock of News interface.
+type MockNews struct {
 	ctrl     *gomock.Controller
-	recorder *MockNewsStorageMockRecorder
+	recorder *MockNewsMockRecorder
 }
 
-// MockNewsStorageMockRecorder is the mock recorder for MockNewsStorage.
-type MockNewsStorageMockRecorder struct {
-	mock *MockNewsStorage
+// MockNewsMockRecorder is the mock recorder for MockNews.
+type MockNewsMockRecorder struct {
+	mock *MockNews
 }
 
-// NewMockNewsStorage creates a new mock instance.
-func NewMockNewsStorage(ctrl *gomock.Controller) *MockNewsStorage {
-	mock := &MockNewsStorage{ctrl: ctrl}
-	mock.recorder = &MockNewsStorageMockRecorder{mock}
+// NewMockNews creates a new mock instance.
+func NewMockNews(ctrl *gomock.Controller) *MockNews {
+	mock := &MockNews{ctrl: ctrl}
+	mock.recorder = &MockNewsMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockNewsStorage) EXPECT() *MockNewsStorageMockRecorder {
+func (m *MockNews) EXPECT() *MockNewsMockRecorder {
 	return m.recorder
 }
 
 // GetNews mocks base method.
-func (m *MockNewsStorage) GetNews(path string) ([]news.News, error) {
+func (m *MockNews) GetNews(path string) ([]news.News, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNews", path)
 	ret0, _ := ret[0].([]news.News)
@@ -186,13 +186,13 @@ func (m *MockNewsStorage) GetNews(path string) ([]news.News, error) {
 }
 
 // GetNews indicates an expected call of GetNews.
-func (mr *MockNewsStorageMockRecorder) GetNews(path interface{}) *gomock.Call {
+func (mr *MockNewsMockRecorder) GetNews(path interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNews", reflect.TypeOf((*MockNewsStorage)(nil).GetNews), path)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNews", reflect.TypeOf((*MockNews)(nil).GetNews), path)
 }
 
 // GetNewsBySourceName mocks base method.
-func (m *MockNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.SourceStorage) ([]news.News, error) {
+func (m *MockNews) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNewsBySourceName", sourceName, sourceStorage)
 	ret0, _ := ret[0].([]news.News)
@@ -201,65 +201,65 @@ func (m *MockNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStor
 }
 
 // GetNewsBySourceName indicates an expected call of GetNewsBySourceName.
-func (mr *MockNewsStorageMockRecorder) GetNewsBySourceName(sourceName, sourceStorage interface{}) *gomock.Call {
+func (mr *MockNewsMockRecorder) GetNewsBySourceName(sourceName, sourceStorage interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNewsBySourceName", reflect.TypeOf((*MockNewsStorage)(nil).GetNewsBySourceName), sourceName, sourceStorage)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNewsBySourceName", reflect.TypeOf((*MockNews)(nil).GetNewsBySourceName), sourceName, sourceStorage)
 }
 
 // SaveNews mocks base method.
-func (m *MockNewsStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
+func (m *MockNews) SaveNews(providedSource source.Source, news []news.News) (source.Source, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveNews", currentSource, news)
+	ret := m.ctrl.Call(m, "SaveNews", providedSource, news)
 	ret0, _ := ret[0].(source.Source)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SaveNews indicates an expected call of SaveNews.
-func (mr *MockNewsStorageMockRecorder) SaveNews(currentSource, news interface{}) *gomock.Call {
+func (mr *MockNewsMockRecorder) SaveNews(providedSource, news interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockNewsStorage)(nil).SaveNews), currentSource, news)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNews", reflect.TypeOf((*MockNews)(nil).SaveNews), providedSource, news)
 }
 
-// MockSourceStorage is a mock of SourceStorage interface.
-type MockSourceStorage struct {
+// MockSource is a mock of Source interface.
+type MockSource struct {
 	ctrl     *gomock.Controller
-	recorder *MockSourceStorageMockRecorder
+	recorder *MockSourceMockRecorder
 }
 
-// MockSourceStorageMockRecorder is the mock recorder for MockSourceStorage.
-type MockSourceStorageMockRecorder struct {
-	mock *MockSourceStorage
+// MockSourceMockRecorder is the mock recorder for MockSource.
+type MockSourceMockRecorder struct {
+	mock *MockSource
 }
 
-// NewMockSourceStorage creates a new mock instance.
-func NewMockSourceStorage(ctrl *gomock.Controller) *MockSourceStorage {
-	mock := &MockSourceStorage{ctrl: ctrl}
-	mock.recorder = &MockSourceStorageMockRecorder{mock}
+// NewMockSource creates a new mock instance.
+func NewMockSource(ctrl *gomock.Controller) *MockSource {
+	mock := &MockSource{ctrl: ctrl}
+	mock.recorder = &MockSourceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockSourceStorage) EXPECT() *MockSourceStorageMockRecorder {
+func (m *MockSource) EXPECT() *MockSourceMockRecorder {
 	return m.recorder
 }
 
 // DeleteSourceByName mocks base method.
-func (m *MockSourceStorage) DeleteSourceByName(name string) error {
+func (m *MockSource) DeleteSourceByName(arg0 source.Name) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteSourceByName", name)
+	ret := m.ctrl.Call(m, "DeleteSourceByName", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteSourceByName indicates an expected call of DeleteSourceByName.
-func (mr *MockSourceStorageMockRecorder) DeleteSourceByName(name interface{}) *gomock.Call {
+func (mr *MockSourceMockRecorder) DeleteSourceByName(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSourceByName", reflect.TypeOf((*MockSourceStorage)(nil).DeleteSourceByName), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSourceByName", reflect.TypeOf((*MockSource)(nil).DeleteSourceByName), arg0)
 }
 
 // GetSourceByName mocks base method.
-func (m *MockSourceStorage) GetSourceByName(arg0 source.Name) (source.Source, error) {
+func (m *MockSource) GetSourceByName(arg0 source.Name) (source.Source, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSourceByName", arg0)
 	ret0, _ := ret[0].(source.Source)
@@ -268,13 +268,13 @@ func (m *MockSourceStorage) GetSourceByName(arg0 source.Name) (source.Source, er
 }
 
 // GetSourceByName indicates an expected call of GetSourceByName.
-func (mr *MockSourceStorageMockRecorder) GetSourceByName(arg0 interface{}) *gomock.Call {
+func (mr *MockSourceMockRecorder) GetSourceByName(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSourceByName", reflect.TypeOf((*MockSourceStorage)(nil).GetSourceByName), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSourceByName", reflect.TypeOf((*MockSource)(nil).GetSourceByName), arg0)
 }
 
 // GetSources mocks base method.
-func (m *MockSourceStorage) GetSources() ([]source.Source, error) {
+func (m *MockSource) GetSources() ([]source.Source, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSources")
 	ret0, _ := ret[0].([]source.Source)
@@ -283,13 +283,13 @@ func (m *MockSourceStorage) GetSources() ([]source.Source, error) {
 }
 
 // GetSources indicates an expected call of GetSources.
-func (mr *MockSourceStorageMockRecorder) GetSources() *gomock.Call {
+func (mr *MockSourceMockRecorder) GetSources() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockSourceStorage)(nil).GetSources))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockSource)(nil).GetSources))
 }
 
 // IsSourceExists mocks base method.
-func (m *MockSourceStorage) IsSourceExists(arg0 source.Name) bool {
+func (m *MockSource) IsSourceExists(arg0 source.Name) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsSourceExists", arg0)
 	ret0, _ := ret[0].(bool)
@@ -297,13 +297,13 @@ func (m *MockSourceStorage) IsSourceExists(arg0 source.Name) bool {
 }
 
 // IsSourceExists indicates an expected call of IsSourceExists.
-func (mr *MockSourceStorageMockRecorder) IsSourceExists(arg0 interface{}) *gomock.Call {
+func (mr *MockSourceMockRecorder) IsSourceExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSourceExists", reflect.TypeOf((*MockSourceStorage)(nil).IsSourceExists), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSourceExists", reflect.TypeOf((*MockSource)(nil).IsSourceExists), arg0)
 }
 
 // SaveSource mocks base method.
-func (m *MockSourceStorage) SaveSource(source source.Source) error {
+func (m *MockSource) SaveSource(source source.Source) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveSource", source)
 	ret0, _ := ret[0].(error)
@@ -311,7 +311,7 @@ func (m *MockSourceStorage) SaveSource(source source.Source) error {
 }
 
 // SaveSource indicates an expected call of SaveSource.
-func (mr *MockSourceStorageMockRecorder) SaveSource(source interface{}) *gomock.Call {
+func (mr *MockSourceMockRecorder) SaveSource(source interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSource", reflect.TypeOf((*MockSourceStorage)(nil).SaveSource), source)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSource", reflect.TypeOf((*MockSource)(nil).SaveSource), source)
 }

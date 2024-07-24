@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"news-aggregator/entity/source"
 	"news-aggregator/storage"
 	sourceService "news-aggregator/web/source"
 	"strings"
@@ -42,7 +43,7 @@ func DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request, sourceSto
 	logrus.Infof("Request to delete source received: %s", request.Name)
 
 	service := sourceService.NewSourceService(sourceStorage)
-	err = service.DeleteSourceByName(request.Name)
+	err = service.DeleteSourceByName(source.Name(request.Name))
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			logrus.Warnf("Source not found: %s", request.Name)

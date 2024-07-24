@@ -19,7 +19,7 @@ type jsonSourceStorage struct {
 }
 
 // NewJsonSourceStorage create new instance of storage in JSON file
-func NewJsonSourceStorage(pathToStorage source.PathToFile) (storage.SourceStorage, error) {
+func NewJsonSourceStorage(pathToStorage source.PathToFile) (storage.Source, error) {
 	if pathToStorage == "" {
 		return nil, fmt.Errorf("NewJsonSourceStorage: pathToStorage is empty")
 	}
@@ -101,7 +101,7 @@ func (storage *jsonSourceStorage) GetSources() ([]source.Source, error) {
 }
 
 // DeleteSourceByName remove the source from JSON storage by the name of this source
-func (storage *jsonSourceStorage) DeleteSourceByName(name string) error {
+func (storage *jsonSourceStorage) DeleteSourceByName(name source.Name) error {
 	var updatedSources []source.Source
 	found := false
 	definedSources, err := storage.GetSources()
@@ -109,11 +109,11 @@ func (storage *jsonSourceStorage) DeleteSourceByName(name string) error {
 		return err
 	}
 	for _, currentSource := range definedSources {
-		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(name) {
+		if strings.ToLower(string(currentSource.Name)) != strings.ToLower(string(name)) {
 			updatedSources = append(updatedSources, currentSource)
 		} else {
 			found = true
-			directoryPath := filepath.Join(constant.PathToResources, strings.ToLower(name))
+			directoryPath := filepath.Join(constant.PathToResources, strings.ToLower(string(name)))
 			err := os.RemoveAll(directoryPath)
 			if err != nil {
 				logrus.Errorf("Failed to delete source directory %s: %v", directoryPath, err)

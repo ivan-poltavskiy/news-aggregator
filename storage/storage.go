@@ -9,20 +9,29 @@ import (
 //
 //go:generate mockgen -source=storage.go -destination=mock_aggregator/mock_storage.go -package=mock_aggregator news-aggregator/storage Storage
 type Storage interface {
-	NewsStorage
-	SourceStorage
+	News
+	Source
 }
 
-type NewsStorage interface {
-	SaveNews(currentSource source.Source, news []news.News) (source.Source, error)
+// News is an implementation of the Storage for managing the news
+type News interface {
+	// SaveNews saves the news of provided source and return the entity of this source
+	SaveNews(providedSource source.Source, news []news.News) (source.Source, error)
+	// GetNews returns the slice of news from the provided path
 	GetNews(path string) ([]news.News, error)
-	GetNewsBySourceName(sourceName source.Name, sourceStorage SourceStorage) ([]news.News, error)
+	// GetNewsBySourceName returns the slice of news by source name from the provided source storage
+	GetNewsBySourceName(sourceName source.Name, sourceStorage Source) ([]news.News, error)
 }
 
-type SourceStorage interface {
+// Source is an implementation of the Storage for managing the sources
+type Source interface {
+	// SaveSource saves the provided source to the storage
 	SaveSource(source source.Source) error
-	DeleteSourceByName(name string) error
+	// DeleteSourceByName removes the source by provided source's name
+	DeleteSourceByName(source.Name) error
+	// GetSources returns the all sources from the storage
 	GetSources() ([]source.Source, error)
+	// IsSourceExists check
 	IsSourceExists(source.Name) bool
 	GetSourceByName(source.Name) (source.Source, error)
 }

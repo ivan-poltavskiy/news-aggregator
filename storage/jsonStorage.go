@@ -1,13 +1,14 @@
 package storage
 
 type jsonStorage struct {
-	NewsStorage
-	SourceStorage
+	News
+	Source
 }
 
-func NewStorage(newsStorage NewsStorage, sourceStorage SourceStorage) Storage {
+// NewStorage returns the new instance of the Storage interface
+func NewStorage(newsStorage News, sourceStorage Source) Storage {
 	return &jsonStorage{
-		NewsStorage:   newsStorage,
-		SourceStorage: sourceStorage,
+		News:   newsStorage,
+		Source: sourceStorage,
 	}
 }

@@ -29,7 +29,7 @@ func TestDeleteSourceByName(t *testing.T) {
 			name:       "Success",
 			sourceName: "example-source",
 			mockFunc: func() {
-				mockStorage.EXPECT().DeleteSourceByName("example-source").Return(nil)
+				mockStorage.EXPECT().DeleteSourceByName(source.Name("example-source")).Return(nil)
 			},
 			expectErr: false,
 		},
@@ -37,7 +37,7 @@ func TestDeleteSourceByName(t *testing.T) {
 			name:       "Failure",
 			sourceName: "non-existent-source",
 			mockFunc: func() {
-				mockStorage.EXPECT().DeleteSourceByName("non-existent-source").Return(errors.New("delete error"))
+				mockStorage.EXPECT().DeleteSourceByName(source.Name("non-existent-source")).Return(errors.New("delete error"))
 			},
 			expectErr: true,
 		},
@@ -47,7 +47,7 @@ func TestDeleteSourceByName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc()
 			service := sourceService.NewSourceService(mockStorage)
-			err := service.DeleteSourceByName(tt.sourceName)
+			err := service.DeleteSourceByName(source.Name(tt.sourceName))
 			if tt.expectErr {
 				assert.Error(t, err)
 			} else {

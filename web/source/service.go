@@ -21,7 +21,7 @@ func NewSourceService(storage storage.Storage) *SourcesService {
 }
 
 // DeleteSourceByName removes the source from storage by name.
-func (service *SourcesService) DeleteSourceByName(name string) error {
+func (service *SourcesService) DeleteSourceByName(name source.Name) error {
 	err := service.storage.DeleteSourceByName(name)
 	if err != nil {
 		logrus.Error("Error deleting source:", err)

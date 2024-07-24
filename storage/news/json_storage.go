@@ -17,7 +17,7 @@ type jsonNewsStorage struct {
 }
 
 // NewJsonNewsStorage create new instance of storage in JSON file
-func NewJsonNewsStorage(pathToStorage source.PathToFile) (storage.NewsStorage, error) {
+func NewJsonNewsStorage(pathToStorage source.PathToFile) (storage.News, error) {
 	if pathToStorage == "" {
 		return nil, fmt.Errorf("NewJsonNewsStorage: pathToStorage is empty")
 	}
@@ -84,7 +84,7 @@ func (jsonStorage *jsonNewsStorage) GetNews(jsonFilePath string) ([]news.News, e
 	return existingArticles, nil
 }
 
-func (jsonStorage *jsonNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.SourceStorage) ([]news.News, error) {
+func (jsonStorage *jsonNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
 	source, err := sourceStorage.GetSourceByName(sourceName)
 	if err != nil {
 		logrus.Error("Failed to get source by name: ", err)

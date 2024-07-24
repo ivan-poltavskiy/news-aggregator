@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"news-aggregator/entity/source"
 	"news-aggregator/storage/mock_aggregator"
 	"news-aggregator/web/handlers"
 	"testing"
@@ -33,7 +34,7 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 			expectedStatus: http.StatusOK,
 			expectedBody:   "Source deleted successfully",
 			mockFunc: func() {
-				mockStorage.EXPECT().DeleteSourceByName("ExistingSource").Return(nil)
+				mockStorage.EXPECT().DeleteSourceByName(source.Name("ExistingSource")).Return(nil)
 			},
 		},
 		{
@@ -42,7 +43,7 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   "Source not found",
 			mockFunc: func() {
-				mockStorage.EXPECT().DeleteSourceByName("NonExistingSource").Return(errors.New("source not found"))
+				mockStorage.EXPECT().DeleteSourceByName(source.Name("NonExistingSource")).Return(errors.New("source not found"))
 			},
 		},
 		{

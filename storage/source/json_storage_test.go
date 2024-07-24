@@ -164,7 +164,7 @@ func TestDeleteSourceByName(t *testing.T) {
 			defer teardownTempFile(filePath)
 
 			storage := &jsonSourceStorage{pathToStorage: source.PathToFile(filePath)}
-			err = storage.DeleteSourceByName(tt.inputName)
+			err = storage.DeleteSourceByName(source.Name(tt.inputName))
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("DeleteSourceByName() error = %v, wantErr %v", err, tt.expectErr)
 			}
