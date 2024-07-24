@@ -1,13 +1,24 @@
-package handlers
+package news
 
 import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/client"
+	"news-aggregator/storage"
 )
 
+type NewsHandler struct {
+	service *NewsService
+}
+
+func NewNewsHandler(storage storage.Storage) *NewsHandler {
+	return &NewsHandler{
+		service: NewNewsService(storage),
+	}
+}
+
 // FetchNewsHandler handles requests for fetching news.
-func FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
+func (h *NewsHandler) FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
 
 	webClient := client.NewWebClient(*r, w, newsAggregator)
 	news, err := webClient.FetchNews()
