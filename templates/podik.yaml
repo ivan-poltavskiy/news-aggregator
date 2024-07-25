@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: news-aggregator
+spec:
+  containers:
+    - name: news-aggregator
+      image: alanut93/news_aggregator:1.0.15
+      ports:
+      - containerPort: 80
+        name: news-aggregator
