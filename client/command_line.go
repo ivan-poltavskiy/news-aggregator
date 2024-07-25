@@ -1,39 +1,40 @@
 package client
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
 	"github.com/reiver/go-porterstemmer"
-	"news-aggregator/constant"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"news-aggregator/sorter"
-	"news-aggregator/validator"
 	"os"
 	"regexp"
 	"strings"
 	"text/template"
-	"time"
 )
 
 // commandLineClient represents a command line client for the news-aggregator application.
 type commandLineClient struct {
 	aggregator       Aggregator
-	sources          string
+	sources          []string
 	keywords         string
 	startDateStr     string
 	endDateStr       string
 	sortBy           string
 	sortingBySources bool
 	help             bool
+	DateSorter       sorter.DateSorter
+	filters          []filter.NewsFilter
 }
 
 // NewCommandLine creates and initializes a new commandLineClient with the provided aggregator.
 func NewCommandLine(aggregator Aggregator) Client {
 	cli := &commandLineClient{aggregator: aggregator}
-	flag.StringVar(&cli.sources, "sources", "", "Specify news sources separated by comma")
+	cli.DateSorter = sorter.DateSorter{}
+	var sourcesStr string
+	flag.StringVar(&sourcesStr, "sources", "", "Specify news sources separated by comma")
 	flag.StringVar(&cli.keywords, "keywords", "", "Specify keywords to filter collector articles")
 	flag.StringVar(&cli.startDateStr, "startDate", "", "Specify start date (YYYY-MM-DD)")
 	flag.StringVar(&cli.endDateStr, "endDate", "", "Specify end date (YYYY-MM-DD)")
@@ -41,6 +42,16 @@ func NewCommandLine(aggregator Aggregator) Client {
 	flag.BoolVar(&cli.sortingBySources, "sortingBySources", false, "Enable sorting articles by sources")
 	flag.BoolVar(&cli.help, "help", false, "Show help information")
 	flag.Parse()
+
+	cli.sources = checkUnique(strings.Split(sourcesStr, ","))
+	cli.filters = buildKeywordFilter(cli.keywords, cli.filters)
+	var err error
+	cli.filters, err = buildDateFilters(cli.startDateStr, cli.endDateStr, cli.filters)
+	if err != nil {
+		logrus.Error("Command line client: Date filter error: ", err)
+	}
+
+	logrus.Info("Command line client: Initialized with sources: ", cli.sources, " and filters: ", cli.filters)
 	return cli
 }
 
@@ -51,20 +62,19 @@ func (cli *commandLineClient) FetchNews() ([]news.News, error) {
 		return nil, nil
 	}
 
-	filters, fetchParametersError := cli.fetchParameters()
-	uniqueSources := checkUnique(strings.Split(cli.sources, ","))
-	if fetchParametersError != nil {
-		return nil, fetchParametersError
-	}
-
-	news, err := cli.aggregator.Aggregate(uniqueSources, filters...)
+	logrus.Info("Command line client: Fetching news with sources: ", cli.sources, " and filters: ", cli.filters)
+	news, err := cli.aggregator.Aggregate(cli.sources, cli.filters...)
 	if err != nil {
+		logrus.Error("Command line client: Aggregation error: ", err)
 		return nil, err
 	}
-	news, fetchParametersError = Sorter.SortNews(sorter.DateSorter{}, news, cli.sortBy)
+
+	news, fetchParametersError := cli.DateSorter.SortNews(news, cli.sortBy)
 	if fetchParametersError != nil {
+		logrus.Error("Command line client: Date sorting error: ", fetchParametersError)
 		return nil, fetchParametersError
 	}
+	logrus.Info("Command line client: Articles fetched and sorted by date with sortBy: ", cli.sortBy)
 	return news, nil
 }
 
@@ -86,7 +96,7 @@ func (cli *commandLineClient) Print(newsForOutput []news.News) {
 
 	tmpl, err := template.New("news").Funcs(funcMap).ParseFiles("client/OutputTemplate.tmpl")
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Command line client: Template parsing error: ", err)
 	}
 
 	type newsData struct {
@@ -129,82 +139,20 @@ func (cli *commandLineClient) Print(newsForOutput []news.News) {
 	}
 
 	err = tmpl.ExecuteTemplate(os.Stdout, "news", outputData)
+	logrus.Info("Command line client: Printing articles with count: ", outputData.Count)
+	err = tmpl.ExecuteTemplate(os.Stdout, "news", outputData)
 	if err != nil {
-		panic(err)
+		logrus.Fatal("Command line client: Template execution error: ", err)
 	}
 }
 
 // printUsage prints the usage instructions
 func (cli *commandLineClient) printUsage() {
 	fmt.Println("Usage of news-aggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. " +
-		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
+		"\nType --sources, and then list the news you want to retrieve information from. " +
+		"The program supports such news news:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
 		"Date format - yyyy-mm-dd" + "" +
 		"Type --sortBy to sort by DESC/ASC." + "Type --sortingBySources to sort by sources.")
-}
-
-// fetchParameters extracts and validates command line parameters,
-// including sources and filters, and returns them for use in news fetching.
-func (cli *commandLineClient) fetchParameters() ([]filter.NewsFilter, error) {
-
-	var filters []filter.NewsFilter
-
-	filters = buildKeywordFilter(cli, filters)
-	filters, err := buildDateFilters(cli, filters)
-	if err != nil {
-		return nil, err
-	}
-	return filters, nil
-}
-
-// buildKeywordFilter extracts keywords from command line arguments and adds them to the filters.
-func buildKeywordFilter(cli *commandLineClient, filters []filter.NewsFilter) []filter.NewsFilter {
-	if cli.keywords != "" {
-		keywords := strings.Split(cli.keywords, ",")
-		uniqueKeywords := checkUnique(keywords)
-		filters = append(filters, filter.ByKeyword{Keywords: uniqueKeywords})
-	}
-	return filters
-}
-
-// buildDateFilters extracts date filters from command line arguments and adds them to the filters.
-func buildDateFilters(cli *commandLineClient, filters []filter.NewsFilter) ([]filter.NewsFilter, error) {
-
-	validationErr, isValid := validator.ValidateDate(cli.startDateStr, cli.endDateStr)
-
-	if validationErr != nil {
-		return nil, validationErr
-	}
-	if isValid {
-
-		startDate, err := time.Parse(constant.DateOutputLayout, cli.startDateStr)
-
-		if err != nil {
-			return nil, errors.New("Invalid start date: " + cli.startDateStr)
-		}
-
-		endDate, err := time.Parse(constant.DateOutputLayout, cli.endDateStr)
-
-		if err != nil {
-			return nil, errors.New("Invalid end date: " + cli.endDateStr)
-		}
-
-		return append(filters, filter.ByDate{StartDate: startDate, EndDate: endDate}), nil
-	}
-	return filters, nil
-}
-
-// CheckUnique returns a slice containing only unique strings from the input slice.
-func checkUnique(input []string) []string {
-	uniqueMap := make(map[string]struct{})
-	var uniqueList []string
-	for _, item := range input {
-		if _, ok := uniqueMap[item]; !ok {
-			uniqueMap[item] = struct{}{}
-			uniqueList = append(uniqueList, item)
-		}
-	}
-	return uniqueList
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"io"
-	"news-aggregator/aggregator/mock_aggregator"
+	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"os"
@@ -22,7 +22,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 
 	type fields struct {
 		aggregator   Aggregator
-		sources      string
+		sources      []string
 		keywords     string
 		startDateStr string
 		endDateStr   string
@@ -38,7 +38,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 			name: "Test with articles",
 			fields: fields{
 				aggregator:   mockAggregator,
-				sources:      "source1,source2",
+				sources:      []string{"source1", "source2"},
 				keywords:     "test",
 				startDateStr: "2023-01-01",
 				endDateStr:   "2023-12-31",
@@ -59,7 +59,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 			name: "Test with error message",
 			fields: fields{
 				aggregator:   mockAggregator,
-				sources:      "",
+				sources:      []string{""},
 				keywords:     "test",
 				startDateStr: "2023-01-01",
 				endDateStr:   "2023-12-31",
@@ -94,7 +94,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 func TestFetchKeywords(t *testing.T) {
 	cli := &commandLineClient{keywords: "keyword1,keyword2"}
 	var filters []filter.NewsFilter
-	filters = buildKeywordFilter(cli, filters)
+	filters = buildKeywordFilter(cli.keywords, filters)
 
 	expectedFilters := []filter.NewsFilter{
 		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
@@ -108,7 +108,7 @@ func TestFetchKeywords(t *testing.T) {
 func TestFetchDateFilters(t *testing.T) {
 	cli := &commandLineClient{startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
 	var filters []filter.NewsFilter
-	filters, _ = buildDateFilters(cli, filters)
+	filters, _ = buildDateFilters(cli.startDateStr, cli.endDateStr, filters)
 
 	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
@@ -121,33 +121,11 @@ func TestFetchDateFilters(t *testing.T) {
 	}
 }
 
-func TestFetchParameters(t *testing.T) {
-	cli := &commandLineClient{sources: "source1,source2", keywords: "keyword1,keyword2", startDateStr: "2023-01-01", endDateStr: "2023-12-31"}
-	filters, _ := cli.fetchParameters()
-	uniqueSources := checkUnique(strings.Split(cli.sources, ","))
-
-	startDate := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
-	endDate := time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC)
-	expectedFilters := []filter.NewsFilter{
-		filter.ByKeyword{Keywords: []string{"keyword1", "keyword2"}},
-		filter.ByDate{StartDate: startDate, EndDate: endDate},
-	}
-	expectedSources := []string{"source1", "source2"}
-
-	if !reflect.DeepEqual(filters, expectedFilters) {
-		t.Errorf("fetchParameters() filters failed, got: %v, want: %v", filters, expectedFilters)
-	}
-
-	if !reflect.DeepEqual(uniqueSources, expectedSources) {
-		t.Errorf("fetchParameters() uniqueSources failed, got: %v, want: %v", uniqueSources, expectedSources)
-	}
-}
-
 func TestCommandLineClient_printUsage(t *testing.T) {
 	cli := &commandLineClient{}
 	expectedOutput := "Usage of news-aggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. " +
-		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
+		"\nType --sources, and then list the news you want to retrieve information from. " +
+		"The program supports such news news:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
 		"Date format - yyyy-mm-dd" + "" +
@@ -197,7 +175,7 @@ func TestCheckUnique(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkUnique(tt.args.input); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Actual result %v, expexted %v", got, tt.want)
+				t.Errorf("Actual result %v, expected %v", got, tt.want)
 			}
 		})
 	}

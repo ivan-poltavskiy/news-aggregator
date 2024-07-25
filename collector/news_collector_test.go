@@ -1,19 +1,45 @@
 package collector
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"news-aggregator/constant"
 	"news-aggregator/entity/source"
-	"reflect"
+	"news-aggregator/storage"
+	newsStorage "news-aggregator/storage/news"
+	sourceStorage "news-aggregator/storage/source"
+	"os"
 	"testing"
 )
 
 var testArticleCollector *newsCollector
 
 func beforeEach() {
+	dir := os.TempDir()
+	file, err := ioutil.TempFile(dir, "test-sources-*.json")
+	if err != nil {
+		log.Fatalf("Failed to create temp file: %v", err)
+	}
+
 	sources := []source.Source{
 		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
 	}
-	testArticleCollector = &newsCollector{sources: sources, parsers: GetDefaultParsers()}
+
+	data, err := json.Marshal(sources)
+	if err != nil {
+		log.Fatalf("Failed to marshal sources: %v", err)
+	}
+
+	err = os.WriteFile(file.Name(), data, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Failed to write to temp file: %v", err)
+	}
+	sourceStorage, _ := sourceStorage.NewJsonStorage(source.PathToFile(file.Name()))
+	newsJsonStorage, _ := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
+	newStorage := storage.NewStorage(newsJsonStorage, sourceStorage)
+	testArticleCollector = &newsCollector{sourceStorage: newStorage, parsers: GetDefaultParsers()}
 }
 
 func TestFindNewsByResourcesName(t *testing.T) {
@@ -98,40 +124,6 @@ func TestFindNewsForCurrentSource(t *testing.T) {
 			got, _ := testArticleCollector.findNewsForCurrentSource(tt.args.currentSource, tt.args.name)
 			if len(got) != tt.wantQuantity {
 				t.Errorf("Actual result = %v, expected = %v", len(got), tt.wantQuantity)
-			}
-		})
-	}
-}
-
-func TestInitializeSource(t *testing.T) {
-	tests := []struct {
-		name    string
-		sources []source.Source
-	}{
-		{
-			name: "InitializeParsers with two sources",
-			sources: []source.Source{
-				{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
-			},
-		},
-		{
-			name:    "InitializeParsers with no sources",
-			sources: []source.Source{},
-		},
-		{
-			name: "InitializeParsers with one source",
-			sources: []source.Source{
-				{Name: "nbc", PathToFile: "../resources/nbc-newsCollector.json", SourceType: "JSON"},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			testArticleCollector = &newsCollector{sources: tt.sources, parsers: GetDefaultParsers()}
-			if !reflect.DeepEqual(testArticleCollector.sources, tt.sources) {
-				t.Errorf("Actual result = %v, expected = %v", testArticleCollector.sources, tt.sources)
 			}
 		})
 	}
