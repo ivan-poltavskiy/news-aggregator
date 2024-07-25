@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"news-aggregator/aggregator"
+	"news-aggregator/client"
 	"news-aggregator/collector"
 	"news-aggregator/constant"
 	"news-aggregator/entity/source"
@@ -40,7 +41,7 @@ func main() {
 	handler := NewHandler(resourcesStorage)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handler.GetNewsHandler().FetchNewsHandler(w, r, newsAggregator)
+		handler.GetNewsHandler().FetchNewsHandler(w, client.NewWebClient(*r, w, newsAggregator))
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
 		handler.GetSourceHandler().AddSourceHandler(w, r)

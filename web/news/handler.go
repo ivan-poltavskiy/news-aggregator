@@ -11,6 +11,7 @@ type HandlerForNews struct {
 	service *Service
 }
 
+// NewNewsHandler returns the new instance of the news handler
 func NewNewsHandler(storage storage.Storage) *HandlerForNews {
 	return &HandlerForNews{
 		service: NewService(storage),
@@ -18,14 +19,13 @@ func NewNewsHandler(storage storage.Storage) *HandlerForNews {
 }
 
 // FetchNewsHandler handles requests for fetching news.
-func (h *HandlerForNews) FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
+func (h *HandlerForNews) FetchNewsHandler(w http.ResponseWriter, client client.Client) {
 
-	webClient := client.NewWebClient(*r, w, newsAggregator)
-	news, err := webClient.FetchNews()
+	news, err := client.FetchNews()
 	if err != nil {
 		logrus.Error("Failed to fetch news ", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	webClient.Print(news)
+	client.Print(news)
 }
