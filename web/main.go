@@ -40,13 +40,13 @@ func main() {
 	handler := NewHandler(resourcesStorage)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		handler.NewsHandler.FetchNewsHandler(w, r, newsAggregator)
+		handler.GetNewsHandler().FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		handler.SourceHandler.AddSourceHandler(w, r)
+		handler.GetSourceHandler().AddSourceHandler(w, r)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		handler.SourceHandler.DeleteSourceByNameHandler(w, r)
+		handler.GetSourceHandler().DeleteSourceByNameHandler(w, r)
 	})
 	logrus.Info("Starting server on: " + *port)
 
