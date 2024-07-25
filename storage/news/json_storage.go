@@ -85,15 +85,15 @@ func (jsonStorage *jsonStorage) GetNews(jsonFilePath string) ([]news.News, error
 }
 
 func (jsonStorage *jsonStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
-	source, err := sourceStorage.GetSourceByName(sourceName)
+	currentSource, err := sourceStorage.GetSourceByName(sourceName)
 	if err != nil {
-		logrus.Error("Failed to get source by name: ", err)
+		logrus.Error("Failed to get currentSource by name: ", err)
 		return nil, err
 	}
-	news, err := jsonStorage.GetNews(string(source.PathToFile))
+	receivedNews, err := jsonStorage.GetNews(string(currentSource.PathToFile))
 	if err != nil {
-		logrus.Error("Failed to get source by path: ", err)
+		logrus.Error("Failed to get currentSource by path: ", err)
 		return nil, err
 	}
-	return news, nil
+	return receivedNews, nil
 }

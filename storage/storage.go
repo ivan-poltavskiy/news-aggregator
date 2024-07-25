@@ -13,6 +13,19 @@ type Storage interface {
 	Source
 }
 
+type jsonStorage struct {
+	News
+	Source
+}
+
+// NewStorage returns the new instance of the Storage interface
+func NewStorage(newsStorage News, sourceStorage Source) Storage {
+	return &jsonStorage{
+		News:   newsStorage,
+		Source: sourceStorage,
+	}
+}
+
 // News is an implementation of the Storage for managing the news
 type News interface {
 	// SaveNews saves the news of provided source and return the entity of this source

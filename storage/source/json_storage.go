@@ -30,14 +30,12 @@ func NewJsonStorage(pathToStorage source.PathToFile) (storage.Source, error) {
 func (storage *jsonStorage) SaveSource(source source.Source) error {
 	logrus.Info("jsonStorage: Starting to save the source to storage")
 
-	// Read existing sources
 	existingSources, err := storage.GetSources()
 	if err != nil && !os.IsNotExist(err) {
 		logrus.Error("jsonStorage: Failed to read existing sources: ", err)
 		return err
 	}
 
-	// Check if the source already exists
 	for _, existingSource := range existingSources {
 		if existingSource.Name == source.Name {
 			logrus.Info("jsonStorage: Source already exists, skipping save")
@@ -45,10 +43,8 @@ func (storage *jsonStorage) SaveSource(source source.Source) error {
 		}
 	}
 
-	// Add the new source
 	existingSources = append(existingSources, source)
 
-	// Save the updated sources list
 	file, err := os.Create(string(storage.pathToStorage))
 	if err != nil {
 		logrus.Error("jsonStorage: Failed to create storage file: ", err)
@@ -71,7 +67,6 @@ func (storage *jsonStorage) SaveSource(source source.Source) error {
 	return nil
 }
 
-// GetSources returns the all sources from the JSON storage
 func (storage *jsonStorage) GetSources() ([]source.Source, error) {
 	logrus.Info("jsonStorage: Starting loading the existing sources from storage")
 	file, err := os.Open(string(storage.pathToStorage))

@@ -45,7 +45,6 @@ func TestSaveNews(t *testing.T) {
 			jsonStorage, _ := NewJsonStorage(source.PathToFile(filepath.Join(tmpDir, tt.sourceName)))
 
 			if tt.name == "directory creation error" {
-				// Simulate directory creation error
 				constant.PathToResources = "/invalid/path"
 			}
 
