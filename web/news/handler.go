@@ -7,18 +7,18 @@ import (
 	"news-aggregator/storage"
 )
 
-type NewsHandler struct {
+type HandlerForNews struct {
 	service *Service
 }
 
-func NewNewsHandler(storage storage.Storage) *NewsHandler {
-	return &NewsHandler{
+func NewNewsHandler(storage storage.Storage) *HandlerForNews {
+	return &HandlerForNews{
 		service: NewService(storage),
 	}
 }
 
 // FetchNewsHandler handles requests for fetching news.
-func (h *NewsHandler) FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
+func (h *HandlerForNews) FetchNewsHandler(w http.ResponseWriter, r *http.Request, newsAggregator client.Aggregator) {
 
 	webClient := client.NewWebClient(*r, w, newsAggregator)
 	news, err := webClient.FetchNews()

@@ -7,8 +7,8 @@ import (
 )
 
 type Handler struct {
-	*source.SourceHandler
-	*news.NewsHandler
+	SourceHandler *source.HandlerForSources
+	NewsHandler   *news.HandlerForNews
 }
 
 func NewHandler(storage storage.Storage) *Handler {

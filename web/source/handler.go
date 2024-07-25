@@ -18,17 +18,17 @@ type addSourceRequest struct {
 	URL string `json:"url"`
 }
 
-type SourceHandler struct {
+type HandlerForSources struct {
 	service *Service
 }
 
-func NewSourceHandler(storage storage.Storage) *SourceHandler {
-	return &SourceHandler{
+func NewSourceHandler(storage storage.Storage) *HandlerForSources {
+	return &HandlerForSources{
 		service: NewService(storage),
 	}
 }
 
-func (h *SourceHandler) DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerForSources) DeleteSourceByNameHandler(w http.ResponseWriter, r *http.Request) {
 	var request deleteSourceRequest
 	body, err := io.ReadAll(r.Body)
 
@@ -74,7 +74,7 @@ func (h *SourceHandler) DeleteSourceByNameHandler(w http.ResponseWriter, r *http
 	logrus.Info("Response for delete source written successfully")
 }
 
-func (h *SourceHandler) AddSourceHandler(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Request) {
 	var requestBody addSourceRequest
 
 	if err := parseRequest(r, &requestBody); err != nil {
