@@ -10,18 +10,18 @@ import (
 	"time"
 )
 
-type NewsService struct {
+type Service struct {
 	storage storage.Storage
 }
 
-func NewNewsService(storage storage.Storage) *NewsService {
-	return &NewsService{
+func NewService(storage storage.Storage) *Service {
+	return &Service{
 		storage: storage,
 	}
 }
 
 // SaveNews saves the news to the storage
-func (service NewsService) SaveNews(sourceEntity source.Source, parsedNews []news.News) (source.Source, error) {
+func (service Service) SaveNews(sourceEntity source.Source, parsedNews []news.News) (source.Source, error) {
 
 	existingNews, err := service.storage.GetNewsBySourceName(sourceEntity.Name, service.storage)
 	if err != nil {
@@ -42,7 +42,7 @@ func (service NewsService) SaveNews(sourceEntity source.Source, parsedNews []new
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func (service NewsService) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
+func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 

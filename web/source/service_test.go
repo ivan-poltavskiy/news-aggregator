@@ -46,7 +46,7 @@ func TestDeleteSourceByName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc()
-			service := sourceService.NewSourceService(mockStorage)
+			service := sourceService.NewService(mockStorage)
 			err := service.DeleteSourceByName(source.Name(tt.sourceName))
 			if tt.expectErr {
 				assert.Error(t, err)
@@ -125,7 +125,7 @@ func TestSaveSource(t *testing.T) {
 				tt.setup()
 			}
 
-			service := sourceService.NewSourceService(mockStorage)
+			service := sourceService.NewService(mockStorage)
 			got, err := service.SaveSource(tt.url)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)

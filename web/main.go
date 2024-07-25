@@ -12,7 +12,6 @@ import (
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
 	"news-aggregator/web/news"
-	sourceHandlers "news-aggregator/web/source"
 	"time"
 )
 
@@ -24,30 +23,30 @@ func main() {
 	newsUpdatePeriod := flag.Int("news-update-period", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
-	newsJsonStorage, err := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
+	newsJsonStorage, err := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	sourceJsonStorage, err := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	sourceJsonStorage, err := sourceStorage.NewJsonStorage(source.PathToFile(constant.PathToStorage))
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	newStorage := storage.NewStorage(newsJsonStorage, sourceJsonStorage)
+	resourcesStorage := storage.NewStorage(newsJsonStorage, sourceJsonStorage)
 
-	newsCollector := collector.New(newStorage)
+	newsCollector := collector.New(resourcesStorage)
 	newsAggregator := aggregator.New(newsCollector)
 
-	NewHandler
+	handler := NewHandler(resourcesStorage)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
-		news.FetchNewsHandler(w, r, newsAggregator)
+		handler.FetchNewsHandler(w, r, newsAggregator)
 	})
 	http.HandleFunc("POST /sources", func(w http.ResponseWriter, r *http.Request) {
-		sourceHandlers.AddSourceHandler(w, r, newStorage)
+		handler.AddSourceHandler(w, r)
 	})
 	http.HandleFunc("DELETE /sources", func(w http.ResponseWriter, r *http.Request) {
-		sourceHandlers.DeleteSourceByNameHandler(w, r, newStorage)
+		handler.DeleteSourceByNameHandler(w, r)
 	})
 	logrus.Info("Starting server on: " + *port)
 
@@ -59,7 +58,7 @@ func main() {
 	}()
 
 	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
-	service := news.NewNewsService(newStorage)
+	service := news.NewService(resourcesStorage)
 	go service.PeriodicallyUpdateNews(time.Duration(*newsUpdatePeriod) * time.Minute)
 
 	select {}

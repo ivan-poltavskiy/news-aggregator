@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
-	newsJsonStorage, err := newsStorage.NewJsonNewsStorage(source.PathToFile(constant.PathToResources))
+	newsJsonStorage, err := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	jsonSourceStorage, err := sourceStorage.NewJsonSourceStorage(source.PathToFile(constant.PathToStorage))
+	jsonSourceStorage, err := sourceStorage.NewJsonStorage(source.PathToFile(constant.PathToStorage))
 	if err != nil {
 		panic(err)
 	}

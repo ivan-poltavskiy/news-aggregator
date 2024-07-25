@@ -26,7 +26,7 @@ func TestSaveNews(t *testing.T) {
 	mockStorage.EXPECT().GetNewsBySourceName(sourceEntity.Name, mockStorage).Return(existingNews, nil)
 	mockStorage.EXPECT().SaveNews(sourceEntity, append(existingNews, parsedNews...)).Return(sourceEntity, nil)
 
-	service := NewsService{
+	service := Service{
 		storage: mockStorage,
 	}
 

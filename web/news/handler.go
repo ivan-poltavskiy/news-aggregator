@@ -8,12 +8,12 @@ import (
 )
 
 type NewsHandler struct {
-	service *NewsService
+	service *Service
 }
 
 func NewNewsHandler(storage storage.Storage) *NewsHandler {
 	return &NewsHandler{
-		service: NewNewsService(storage),
+		service: NewService(storage),
 	}
 }
 

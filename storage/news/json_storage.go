@@ -12,20 +12,20 @@ import (
 	"path/filepath"
 )
 
-type jsonNewsStorage struct {
+type jsonStorage struct {
 	pathToStorage source.PathToFile
 }
 
-// NewJsonNewsStorage create new instance of storage in JSON file
-func NewJsonNewsStorage(pathToStorage source.PathToFile) (storage.News, error) {
+// NewJsonStorage create new instance of storage in JSON file
+func NewJsonStorage(pathToStorage source.PathToFile) (storage.News, error) {
 	if pathToStorage == "" {
-		return nil, fmt.Errorf("NewJsonNewsStorage: pathToStorage is empty")
+		return nil, fmt.Errorf("NewJsonStorage: pathToStorage is empty")
 	}
-	return &jsonNewsStorage{pathToStorage}, nil
+	return &jsonStorage{pathToStorage}, nil
 }
 
 // SaveNews saves the provided news articles to the specified JSON file.
-func (jsonStorage *jsonNewsStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
+func (jsonStorage *jsonStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
 
 	directoryPath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(currentSource.Name)))
 
@@ -53,13 +53,13 @@ func (jsonStorage *jsonNewsStorage) SaveNews(currentSource source.Source, news [
 		return source.Source{}, fmt.Errorf("failed to encode articles to JSON file")
 	}
 
-	logrus.Info("jsonNewsStorage: Articles successfully parsed and saved to: ", jsonFilePath)
+	logrus.Info("jsonStorage: Articles successfully parsed and saved to: ", jsonFilePath)
 	currentSource.PathToFile = source.PathToFile(jsonFilePath)
 	return currentSource, nil
 }
 
 // GetNews retrieves news articles from the specified JSON file.
-func (jsonStorage *jsonNewsStorage) GetNews(jsonFilePath string) ([]news.News, error) {
+func (jsonStorage *jsonStorage) GetNews(jsonFilePath string) ([]news.News, error) {
 	var existingArticles []news.News
 
 	if _, err := os.Stat(jsonFilePath); err == nil {
@@ -84,7 +84,7 @@ func (jsonStorage *jsonNewsStorage) GetNews(jsonFilePath string) ([]news.News, e
 	return existingArticles, nil
 }
 
-func (jsonStorage *jsonNewsStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
+func (jsonStorage *jsonStorage) GetNewsBySourceName(sourceName source.Name, sourceStorage storage.Source) ([]news.News, error) {
 	source, err := sourceStorage.GetSourceByName(sourceName)
 	if err != nil {
 		logrus.Error("Failed to get source by name: ", err)

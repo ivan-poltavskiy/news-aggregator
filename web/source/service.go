@@ -9,19 +9,19 @@ import (
 	"news-aggregator/web/news"
 )
 
-type SourcesService struct {
+type Service struct {
 	storage storage.Storage
 }
 
-// NewSourceService creates new instance of the SourcesService
-func NewSourceService(storage storage.Storage) *SourcesService {
-	return &SourcesService{
+// NewService creates new instance of the Service
+func NewService(storage storage.Storage) *Service {
+	return &Service{
 		storage: storage,
 	}
 }
 
 // DeleteSourceByName removes the source from storage by name.
-func (service *SourcesService) DeleteSourceByName(name source.Name) error {
+func (service *Service) DeleteSourceByName(name source.Name) error {
 	err := service.storage.DeleteSourceByName(name)
 	if err != nil {
 		logrus.Error("Error deleting source:", err)
@@ -31,7 +31,7 @@ func (service *SourcesService) DeleteSourceByName(name source.Name) error {
 }
 
 // SaveSource processes the source URL and returns the source entity
-func (service *SourcesService) SaveSource(url string) (source.Name, error) {
+func (service *Service) SaveSource(url string) (source.Name, error) {
 
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
@@ -55,7 +55,7 @@ func (service *SourcesService) SaveSource(url string) (source.Name, error) {
 		SourceType: source.STORAGE,
 		Link:       source.Link(url),
 	}
-	newsService := news.NewNewsService(service.storage)
+	newsService := news.NewService(service.storage)
 	sourceEntity, err = newsService.SaveNews(sourceEntity, parsedNews)
 	if err != nil {
 		return "", err

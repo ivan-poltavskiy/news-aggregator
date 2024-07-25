@@ -83,7 +83,7 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 }
 
 // mockSaveSource mocks the SaveSource method
-func mockSaveSource(_ *SourcesService, url string) (source.Name, error) {
+func mockSaveSource(_ *Service, url string) (source.Name, error) {
 	if url == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
@@ -98,7 +98,7 @@ func TestAddSourceHandler(t *testing.T) {
 	defer ctrl.Finish()
 	mockStorage := mock_aggregator.NewMockStorage(ctrl)
 
-	service := NewSourceService(mockStorage)
+	service := NewService(mockStorage)
 	patch := monkey.PatchInstanceMethod(reflect.TypeOf(service), "SaveSource", mockSaveSource)
 	defer patch.Unpatch()
 

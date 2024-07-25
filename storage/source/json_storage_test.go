@@ -57,7 +57,7 @@ func TestIsSourceExists(t *testing.T) {
 			filePath := setupTempFile(t, data)
 			defer teardownTempFile(filePath)
 
-			storage := &jsonSourceStorage{pathToStorage: source.PathToFile(filePath)}
+			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			exists := storage.IsSourceExists(tt.input)
 			assert.Equal(t, tt.expected, exists)
 		})
@@ -108,7 +108,7 @@ func TestSaveSource(t *testing.T) {
 			filePath := setupTempFile(t, existingData)
 			defer teardownTempFile(filePath)
 
-			storage := &jsonSourceStorage{pathToStorage: source.PathToFile(filePath)}
+			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			err = storage.SaveSource(tt.newSource)
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("SaveSource() error = %v, wantErr %v", err, tt.expectErr)
@@ -163,7 +163,7 @@ func TestDeleteSourceByName(t *testing.T) {
 			filePath := setupTempFile(t, data)
 			defer teardownTempFile(filePath)
 
-			storage := &jsonSourceStorage{pathToStorage: source.PathToFile(filePath)}
+			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			err = storage.DeleteSourceByName(source.Name(tt.inputName))
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("DeleteSourceByName() error = %v, wantErr %v", err, tt.expectErr)
@@ -218,7 +218,7 @@ func TestGetSourceByName(t *testing.T) {
 			filePath := setupTempFile(t, data)
 			defer teardownTempFile(filePath)
 
-			storage := &jsonSourceStorage{pathToStorage: source.PathToFile(filePath)}
+			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			source, err := storage.GetSourceByName(tt.inputName)
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("GetSourceByName() error = %v, wantErr %v", err, tt.expectErr)

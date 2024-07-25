@@ -19,12 +19,12 @@ type addSourceRequest struct {
 }
 
 type SourceHandler struct {
-	service *SourcesService
+	service *Service
 }
 
 func NewSourceHandler(storage storage.Storage) *SourceHandler {
 	return &SourceHandler{
-		service: NewSourceService(storage),
+		service: NewService(storage),
 	}
 }
 
