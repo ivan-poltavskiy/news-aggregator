@@ -19,7 +19,7 @@ func main() {
 	}
 	jsonSourceStorage, err := sourceStorage.NewJsonStorage(source.PathToFile(constant.PathToStorage))
 	if err != nil {
-		panic(err)
+		logrus.Fatal(err)
 	}
 	newStorage := storage.NewStorage(
 		newsJsonStorage,
