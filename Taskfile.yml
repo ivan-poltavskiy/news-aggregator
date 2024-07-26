@@ -47,5 +47,28 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    deps: [tidy, fmt, vet, test]
+    deps: [ tidy, fmt, vet, test ]
 
+  create-namespace:
+    cmd: |
+      if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
+        kubectl create namespace {{.namespace_name}}
+      else
+        echo "Namespace {{.namespace_name}} already exists"
+      fi
+    desc: "Create a Kubernetes namespace if it does not exist"
+
+  delete-namespace:
+    cmd: kubectl delete namespace {{.namespace_name}}
+    desc: "Delete a Kubernetes namespace"
+
+  deploy:
+    desc: "Deploys news-aggregator app on Kubernetes cluster"
+    deps: [ create-ns ]
+    cmds:
+      - kubectl apply -f {{.k8s_folder}}
+
+  undeploy:
+    desc: "Removes news-aggregator app from Kubernetes cluster"
+    cmds:
+      - kubectl delete -f {{.k8s_folder}}
