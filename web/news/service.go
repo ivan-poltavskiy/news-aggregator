@@ -61,9 +61,11 @@ func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 				wg.Add(1)
 				go func(src source.Source) {
 					defer wg.Done()
-					err := updateSourceNews(src, service.storage)
-					if err != nil {
-						logrus.Error("Failed to update news for source: ", src.Name, err)
+					if src.SourceType == source.STORAGE {
+						err := updateSourceNews(src, service.storage)
+						if err != nil {
+							logrus.Error("Failed to update news for source: ", src.Name, err)
+						}
 					}
 				}(src)
 			}
