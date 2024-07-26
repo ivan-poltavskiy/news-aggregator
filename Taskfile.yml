@@ -50,13 +50,15 @@ tasks:
     deps: [ tidy, fmt, vet, test ]
 
   create-namespace:
-    cmd: |
-      if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
-        kubectl create namespace {{.namespace_name}}
-      else
-        echo "Namespace {{.namespace_name}} already exists"
-      fi
     desc: "Create a Kubernetes namespace if it does not exist"
+    cmds:
+        - |
+          if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
+            kubectl create namespace {{.namespace_name}}
+            echo "Namespace {{.namespace_name}} created"
+          else
+            echo "Namespace {{.namespace_name}} already exists"
+          fi
 
   delete-namespace:
     cmd: kubectl delete namespace {{.namespace_name}}
@@ -64,7 +66,7 @@ tasks:
 
   deploy:
     desc: "Deploys news-aggregator app on Kubernetes cluster"
-    deps: [ create-ns ]
+    deps: [ create-namespace ]
     cmds:
       - kubectl apply -f {{.k8s_folder}}
 
