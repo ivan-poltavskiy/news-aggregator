@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+//go:generate mockgen -source=client.go -destination=mock_aggregator/mock_client.go -package=mock_aggregator news-aggregator/client Client
 type Client interface {
 	//FetchNews collect the news by some rules defined in the implementations.
 	FetchNews() ([]news.News, error)

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"io"
-	"news-aggregator/aggregator/mock_aggregator"
+	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
 	"os"
@@ -124,8 +124,8 @@ func TestFetchDateFilters(t *testing.T) {
 func TestCommandLineClient_printUsage(t *testing.T) {
 	cli := &commandLineClient{}
 	expectedOutput := "Usage of news-aggregator:" +
-		"\nType --sources, and then list the resources you want to retrieve information from. " +
-		"The program supports such news resources:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
+		"\nType --sources, and then list the news you want to retrieve information from. " +
+		"The program supports such news news:\nABC, BBC, NBC, USA Today and Washington Times. \n" +
 		"\nType --keywords, and then list the keywords by which you want to filter articles. \n" +
 		"\nType --startDate and --endDate to filter by date. News published between the specified dates will be shown." +
 		"Date format - yyyy-mm-dd" + "" +
