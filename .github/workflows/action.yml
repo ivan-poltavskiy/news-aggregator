@@ -38,7 +38,7 @@ jobs:
         run: |
             git diff --exit-code > /dev/null
             if [ $? -ne 0 ]; then
-              echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+              echo "Formatting changes detected. Please run 'task check-all' locally and commit the changes."
               exit 1
             else
               echo "No formatting changes detected."
