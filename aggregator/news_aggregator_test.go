@@ -15,7 +15,7 @@ import (
 func TestNews_Aggregate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	constant.PathToStorage = "../storage/sources-storage.json"
+	constant.PathToStorage = "." + constant.PathToStorage
 
 	mockCollector := mock_aggregator.NewMockCollector(ctrl)
 	type args struct {
