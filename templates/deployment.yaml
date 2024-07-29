@@ -21,3 +21,16 @@ spec:
           image: alanut93/news_aggregator:1.0.15
           ports:
             - containerPort: 443
+          volumeMounts:
+            - mountPath: "/resources"
+              name: news-aggregator-resources
+            - mountPath: "/storage"
+              name: news-aggregator-storage
+      volumes:
+        - name: news-aggregator-resources
+          persistentVolumeClaim:
+            claimName: news-aggregator-pvc-resources
+
+        - name: news-aggregator-storage
+          persistentVolumeClaim:
+            claimName: news-aggregator-pvc-storage
