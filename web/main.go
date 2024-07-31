@@ -12,7 +12,6 @@ import (
 	"news-aggregator/storage"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
-	handler2 "news-aggregator/web/handler"
 	"news-aggregator/web/news"
 	"time"
 )
@@ -39,7 +38,7 @@ func main() {
 	newsCollector := collector.New(resourcesStorage)
 	newsAggregator := aggregator.New(newsCollector)
 
-	handler := handler2.NewHandler(resourcesStorage)
+	handler := NewHandler(resourcesStorage)
 
 	http.HandleFunc("GET /news", func(w http.ResponseWriter, r *http.Request) {
 		handler.GetNewsHandler().FetchNewsHandler(w, client.NewWebClient(*r, w, newsAggregator))

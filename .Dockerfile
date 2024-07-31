@@ -22,7 +22,7 @@ COPY validator/ ./validator/
 COPY storage/ ./storage/
 COPY web/ ./web/
 
-RUN go build -o /bin/main ./web/main.go
+RUN go build -o /bin/main ./web/main.go ./web/handler.go
 
 # Stage 2: Build image
 FROM alpine:3.20.1
