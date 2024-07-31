@@ -2,8 +2,8 @@
   "lockfile_version": "1",
   "packages": {
     "docker@24.0.9": {
-      "last_modified": "2024-07-07T07:43:47Z",
-      "resolved": "github:NixOS/nixpkgs/b60793b86201040d9dee019a05089a9150d08b5b#docker",
+      "last_modified": "2024-07-19T15:40:08Z",
+      "resolved": "github:NixOS/nixpkgs/ad0111043c09f7d0f6b9f039882cbf350d4f7d49#docker",
       "source": "devbox-search",
       "version": "24.0.9",
       "systems": {
@@ -11,41 +11,41 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/z4gffv4lqqiq73hz0gva9z686wmvdhhb-docker-24.0.9",
+              "path": "/nix/store/vq5qf23f96wmvfk54lbh5ipp1gd4abzf-docker-24.0.9",
               "default": true
             }
           ],
-          "store_path": "/nix/store/z4gffv4lqqiq73hz0gva9z686wmvdhhb-docker-24.0.9"
+          "store_path": "/nix/store/vq5qf23f96wmvfk54lbh5ipp1gd4abzf-docker-24.0.9"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/li8nfkj5zs2nvi0k09lhxandbq934jd3-docker-24.0.9",
+              "path": "/nix/store/pdx0w7gavpvkmypq7rby15l4nwcs8js8-docker-24.0.9",
               "default": true
             }
           ],
-          "store_path": "/nix/store/li8nfkj5zs2nvi0k09lhxandbq934jd3-docker-24.0.9"
+          "store_path": "/nix/store/pdx0w7gavpvkmypq7rby15l4nwcs8js8-docker-24.0.9"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/6v0wb1xyq9hmrmhlasrs0402i6cwlcdn-docker-24.0.9",
+              "path": "/nix/store/gaygj32dpkacbfifkg3h1vzvb0hvdblj-docker-24.0.9",
               "default": true
             }
           ],
-          "store_path": "/nix/store/6v0wb1xyq9hmrmhlasrs0402i6cwlcdn-docker-24.0.9"
+          "store_path": "/nix/store/gaygj32dpkacbfifkg3h1vzvb0hvdblj-docker-24.0.9"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/1np02dm0gj75v46c7mx9433vbcxxbhhb-docker-24.0.9",
+              "path": "/nix/store/k7w8fpa8z824yjqglfsga472bzh8ck76-docker-24.0.9",
               "default": true
             }
           ],
-          "store_path": "/nix/store/1np02dm0gj75v46c7mx9433vbcxxbhhb-docker-24.0.9"
+          "store_path": "/nix/store/k7w8fpa8z824yjqglfsga472bzh8ck76-docker-24.0.9"
         }
       }
     },
@@ -142,6 +142,54 @@
             }
           ],
           "store_path": "/nix/store/vz8d6wmfcf38l3h3vymwqr6c5zxp5jmp-go-1.22.3"
+        }
+      }
+    },
+    "mockgen@1.6.0": {
+      "last_modified": "2023-12-13T22:54:10Z",
+      "resolved": "github:NixOS/nixpkgs/fd04bea4cbf76f86f244b9e2549fca066db8ddff#mockgen",
+      "source": "devbox-search",
+      "version": "1.6.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/8jsr1j1h8g3k3j5rg8vv79aviffxrfny-mockgen-1.6.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/8jsr1j1h8g3k3j5rg8vv79aviffxrfny-mockgen-1.6.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/34rrlc5lz43mibljdd7ai0qyi7zcq4ic-mockgen-1.6.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/34rrlc5lz43mibljdd7ai0qyi7zcq4ic-mockgen-1.6.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/cj1r5vllmiq7fh4izsmlacjrdkw2h4b5-mockgen-1.6.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/cj1r5vllmiq7fh4izsmlacjrdkw2h4b5-mockgen-1.6.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hs49h3p9ss5f5bqv6phgsx93s4cawif2-mockgen-1.6.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hs49h3p9ss5f5bqv6phgsx93s4cawif2-mockgen-1.6.0"
         }
       }
     }
