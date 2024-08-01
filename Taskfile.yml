@@ -32,6 +32,7 @@ tasks:
 
   vet:
     desc: "Run go vet on all Go files"
+    deps: [ mocks-generate ]
     cmd: go vet ./...
 
   docker-build:
