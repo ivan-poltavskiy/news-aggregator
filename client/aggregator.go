@@ -7,7 +7,7 @@ import (
 
 // Aggregator defines an interface for aggregating collector news.
 //
-//go:generate mockgen -source=aggregator.go -destination=mock_aggregator/mock_aggregator.go -package=mock_aggregator news-aggregator/aggregator Aggregator
+//go:generate mockgen -source=aggregator.go -destination=../mocks/mock_aggregator.go -package=mocks news-aggregator/aggregator Aggregator
 type Aggregator interface {
 	// Aggregate fetches news from the provided sources,
 	//applies the given filters, and returns the filtered news.

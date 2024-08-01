@@ -7,7 +7,7 @@ import (
 
 // Storage is the abstract repository for saving some resources in the app
 //
-//go:generate mockgen -source=storage.go -destination=mock_aggregator/mock_storage.go -package=mock_aggregator news-aggregator/storage Storage
+//go:generate mockgen -source=storage.go -destination=../mocks/mock_storage.go -package=mocks news-aggregator/storage Storage
 type Storage interface {
 	News
 	Source

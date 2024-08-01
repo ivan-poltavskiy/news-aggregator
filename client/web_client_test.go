@@ -5,9 +5,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
+	"news-aggregator/mocks"
 	"news-aggregator/sorter"
 	"reflect"
 	"strings"
@@ -19,7 +19,7 @@ func TestWebClient_FetchNews(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockAggregator := mock_aggregator.NewMockAggregator(ctrl)
+	mockAggregator := mocks.NewMockAggregator(ctrl)
 
 	type fields struct {
 		aggregator       Aggregator

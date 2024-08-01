@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"io"
-	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
 	"news-aggregator/filter"
+	"news-aggregator/mocks"
 	"os"
 	"reflect"
 	"strings"
@@ -18,7 +18,7 @@ func TestCommandLineClient_FetchArticles(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockAggregator := mock_aggregator.NewMockAggregator(ctrl)
+	mockAggregator := mocks.NewMockAggregator(ctrl)
 
 	type fields struct {
 		aggregator   Aggregator

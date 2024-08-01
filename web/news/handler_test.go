@@ -4,9 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"news-aggregator/client/mock_aggregator"
 	"news-aggregator/entity/news"
-	mock_aggregator2 "news-aggregator/storage/mock_aggregator"
+	mock_aggregator2 "news-aggregator/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -17,7 +16,7 @@ func TestFetchNewsHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockClient := mock_aggregator.NewMockClient(ctrl)
+	mockClient := mock_aggregator2.NewMockClient(ctrl)
 	mockStorage := mock_aggregator2.NewMockStorage(ctrl)
 	handler := NewNewsHandler(mockStorage)
 
