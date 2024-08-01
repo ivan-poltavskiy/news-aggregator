@@ -32,7 +32,6 @@ tasks:
 
   vet:
     desc: "Run go vet on all Go files"
-    deps: [ mocks-generate ]
     cmd: go vet ./...
 
   docker-build:
@@ -53,7 +52,12 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    deps: [ tidy, fmt, vet, test ]
+    cmds:
+      - task: tidy
+      - task: fmt
+      - task: vet
+      - task: test
+
 
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
