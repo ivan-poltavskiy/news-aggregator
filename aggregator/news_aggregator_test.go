@@ -2,11 +2,11 @@ package aggregator
 
 import (
 	"github.com/golang/mock/gomock"
-	"news-aggregator/aggregator/mock_aggregator"
 	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/filter"
+	"news-aggregator/mock_aggregator"
 	"reflect"
 	"testing"
 	"time"
