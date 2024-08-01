@@ -55,8 +55,9 @@ tasks:
     cmds:
       - task: tidy
       - task: fmt
-      - task: vet
       - task: test
+      - task: vet
+
 
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
