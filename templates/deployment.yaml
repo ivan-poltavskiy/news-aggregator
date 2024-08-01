@@ -18,19 +18,13 @@ spec:
       serviceAccountName: news-aggregator-service-account
       containers:
         - name: news-aggregator
-          image: alanut93/news_aggregator:1.0.15
+          image: alanut93/news_aggregator:v1.0.18
           ports:
             - containerPort: 443
           volumeMounts:
-            - mountPath: "/resources"
-              name: news-aggregator-resources
-            - mountPath: "/storage"
-              name: news-aggregator-storage
+            - mountPath: "/mnt"
+              name: news-aggregator-mnt
       volumes:
-        - name: news-aggregator-resources
+        - name: news-aggregator-mnt
           persistentVolumeClaim:
-            claimName: news-aggregator-pvc-resources
-
-        - name: news-aggregator-storage
-          persistentVolumeClaim:
-            claimName: news-aggregator-pvc-storage
+            claimName: news-aggregator-pvc-mnt
