@@ -17,13 +17,8 @@ tasks:
     desc: "Run go mod tidy"
     cmd: go mod tidy
 
-  mocks-generate:
-    desc: "Generate mocks for the project"
-    cmd: go generate ./...
-
   test:
     desc: "Run all tests in the project."
-    deps: [ mocks-generate ]
     cmd: go test ./...
 
   fmt:
