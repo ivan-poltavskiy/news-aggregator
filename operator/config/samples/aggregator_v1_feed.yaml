@@ -1,0 +1,7 @@
+apiVersion: aggregator.com.teamdev/v1
+kind: Feed
+metadata:
+  name: feed-sample
+spec:
+  name: pravda,
+  link: https://www.pravda.com.ua/
