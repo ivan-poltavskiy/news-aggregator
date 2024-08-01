@@ -4,7 +4,7 @@ import (
 	"errors"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
+	client "news-aggregator/storage/mock_aggregator"
 	sourceService "news-aggregator/web/source"
 	"os"
 	"testing"
@@ -17,7 +17,7 @@ func TestDeleteSourceByName(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := storage.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 
 	tests := []struct {
 		name       string
@@ -61,7 +61,7 @@ func TestSaveSource(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := storage.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 
 	testResourcesDir := "resources"
 

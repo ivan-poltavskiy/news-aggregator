@@ -4,7 +4,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
+	client "news-aggregator/storage/mock_aggregator"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ func TestSaveNews(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := storage.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 
 	sourceEntity := source.Source{Name: "TestSource"}
 	parsedNews := []news.News{
