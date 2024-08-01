@@ -23,7 +23,7 @@ tasks:
 
   test:
     desc: "Run all tests in the project."
-    deps:  [mocks-generate]
+    deps: [ mocks-generate ]
     cmd: go test ./...
 
   fmt:
@@ -52,18 +52,22 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    deps: [ tidy, fmt, vet, test ]
+    cmds:
+      - task: tidy
+      - task: fmt
+      - task: vet
+      - task: test
 
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
     cmds:
-        - |
-          if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
-            kubectl create namespace {{.namespace_name}}
-            echo "Namespace {{.namespace_name}} created"
-          else
-            echo "Namespace {{.namespace_name}} already exists"
-          fi
+      - |
+        if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
+          kubectl create namespace {{.namespace_name}}
+          echo "Namespace {{.namespace_name}} created"
+        else
+          echo "Namespace {{.namespace_name}} already exists"
+        fi
 
   delete-namespace:
     cmd: kubectl delete namespace {{.namespace_name}}
