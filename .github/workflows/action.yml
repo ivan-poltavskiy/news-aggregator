@@ -5,7 +5,7 @@ on:
     branches: [ "**" ]
   pull_request:
     types: [ opened, ready_for_review ]
-    branches: ["**"]
+    branches: [ "**" ]
 
 
 concurrency:
@@ -24,6 +24,9 @@ jobs:
         with:
           go-version: '1.22.3'
 
+      - name: Install mockgen
+        run: go install github.com/golang/mock/mockgen@v1.6.0
+
       - name: Install Taskfile
         run: |
           sh -c "$(curl -sL https://taskfile.dev/install.sh)"
@@ -37,10 +40,10 @@ jobs:
 
       - name: Check for formatting changes
         run: |
-            git diff --exit-code > /dev/null
-            if [ $? -ne 0 ]; then
-              echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
-              exit 1
-            else
-              echo "No formatting changes detected."
-            fi
+          git diff --exit-code > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+            exit 1
+          else
+            echo "No formatting changes detected."
+          fi
