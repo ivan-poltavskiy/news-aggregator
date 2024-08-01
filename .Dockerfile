@@ -16,7 +16,7 @@ COPY constant/ ./constant/
 COPY entity/ ./entity/
 COPY filter/ ./filter/
 COPY parser/ ./parser/
-COPY resources/ ./resources/
+COPY mnt/ ./mnt/
 COPY sorter/ ./sorter/
 COPY validator/ ./validator/
 COPY storage/ ./storage/
@@ -29,10 +29,8 @@ FROM alpine:3.20.1
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=base /bin/main /usr/local/bin/main
 
-# Copy storage to the root directory
-COPY --from=base /src/storage /storage
-# Copy resources to the root directory
-COPY --from=base /src/resources /resources
+# Copy storage and resources to the root directory
+COPY --from=base /src/mnt /mnt
 
 COPY web/certificates web/certificates
 

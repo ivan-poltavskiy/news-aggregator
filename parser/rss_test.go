@@ -21,7 +21,7 @@ func TestRss_ParseSource(t *testing.T) {
 		{
 			name: "Parse valid RSS file",
 			args: args{
-				path: "../resources/testdata/test_rss.xml",
+				path: "../mnt/resources/testdata/test_rss.xml",
 				name: "testrss",
 			},
 			want: []news.News{

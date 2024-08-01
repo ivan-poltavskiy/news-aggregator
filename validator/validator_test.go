@@ -7,7 +7,7 @@ import (
 
 func TestCheckSource(t *testing.T) {
 
-	constant.PathToStorage = "." + constant.PathToStorage
+	constant.PathToStorage = "../" + constant.PathToStorage
 
 	type args struct {
 		sources []string

@@ -23,8 +23,8 @@ func beforeEach() {
 	}
 
 	sources := []source.Source{
-		{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
-		{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+		{Name: "bbc", PathToFile: "../mnt/resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
+		{Name: "nbc", PathToFile: "../mnt/resources/nbc-news.json", SourceType: "JSON"},
 	}
 
 	data, err := json.Marshal(sources)
@@ -105,7 +105,7 @@ func TestFindNewsForCurrentSource(t *testing.T) {
 	}{
 		{name: "Test for bbc source",
 			args: args{
-				currentSource: source.Source{Name: "bbc", PathToFile: "../resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
+				currentSource: source.Source{Name: "bbc", PathToFile: "../mnt/resources/bbc-world-category-19-05-24.xml", SourceType: "RSS"},
 				name:          "bbc",
 			},
 			wantQuantity: 54,
@@ -113,7 +113,7 @@ func TestFindNewsForCurrentSource(t *testing.T) {
 
 		{name: "Test for nbc source",
 			args: args{
-				currentSource: source.Source{Name: "nbc", PathToFile: "../resources/nbc-news.json", SourceType: "JSON"},
+				currentSource: source.Source{Name: "nbc", PathToFile: "../mnt/resources/nbc-news.json", SourceType: "JSON"},
 				name:          "nbc",
 			},
 			wantQuantity: 100,
