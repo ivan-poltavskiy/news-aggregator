@@ -12,7 +12,7 @@
 
 ## Installation
 
-To install the app, clone it from the repository:
+To install the app, clone it from the repository to your machine:
 ```bash
 git clone https://github.com/yourusername/news-aggregator.git
 ```
