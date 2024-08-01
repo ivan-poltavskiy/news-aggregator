@@ -17,7 +17,7 @@ func TestNews_Aggregate(t *testing.T) {
 	defer ctrl.Finish()
 	constant.PathToStorage = "../" + constant.PathToStorage
 
-	mockCollector := mock_aggregator.NewMockCollector(ctrl)
+	mockCollector := aggregator.NewMockCollector(ctrl)
 	type args struct {
 		sources []string
 		filters []filter.NewsFilter
