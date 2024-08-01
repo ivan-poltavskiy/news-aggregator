@@ -1,0 +1,62 @@
+[
+  {
+    "Name": "bbc",
+    "PathToFile": "mnt/resources/bbc-world-category-19-05-24.xml",
+    "SourceType": "RSS",
+    "Link": ""
+  },
+  {
+    "Name": "nbc",
+    "PathToFile": "mnt/resources/nbc-news.json",
+    "SourceType": "JSON",
+    "Link": ""
+  },
+  {
+    "Name": "abc",
+    "PathToFile": "mnt/resources/abcnews-international-category-19-05-24.xml",
+    "SourceType": "RSS",
+    "Link": ""
+  },
+  {
+    "Name": "washington",
+    "PathToFile": "mnt/resources/washingtontimes-world-category-19-05-24.xml",
+    "SourceType": "RSS",
+    "Link": ""
+  },
+  {
+    "Name": "usatoday",
+    "PathToFile": "mnt/resources/usatoday-world-news.html",
+    "SourceType": "UsaToday",
+    "Link": ""
+  },
+  {
+    "Name": "nytimes",
+    "PathToFile": "mnt/resources/nytimes/nytimes.json",
+    "SourceType": "STORAGE",
+    "Link": "https://www.nytimes.com/"
+  },
+  {
+    "Name": "pravda",
+    "PathToFile": "mnt/resources/pravda/pravda.json",
+    "SourceType": "STORAGE",
+    "Link": "https://www.pravda.com.ua/"
+  },
+  {
+    "Name": "kashtan",
+    "PathToFile": "mnt/resources/kashtan/kashtan.json",
+    "SourceType": "STORAGE",
+    "Link": "https://www.kashtan.news/"
+  },
+  {
+    "Name": "",
+    "PathToFile": "",
+    "SourceType": "",
+    "Link": ""
+  },
+  {
+    "Name": "cbsnews",
+    "PathToFile": "mnt/resources/cbsnews/cbsnews.json",
+    "SourceType": "STORAGE",
+    "Link": "https://www.cbsnews.com/"
+  }
+]
