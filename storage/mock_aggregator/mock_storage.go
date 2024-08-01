@@ -2,7 +2,7 @@
 // Source: storage.go
 
 // Package mock_aggregator is a generated GoMock package.
-package mock_aggregator
+package storage
 
 import (
 	news "news-aggregator/entity/news"

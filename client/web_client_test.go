@@ -19,7 +19,7 @@ func TestWebClient_FetchNews(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockAggregator := mock_aggregator.NewMockAggregator(ctrl)
+	mockAggregator := client.NewMockAggregator(ctrl)
 
 	type fields struct {
 		aggregator       Aggregator

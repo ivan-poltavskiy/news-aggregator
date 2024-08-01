@@ -2,7 +2,7 @@
 // Source: client.go
 
 // Package mock_aggregator is a generated GoMock package.
-package mock_aggregator
+package client
 
 import (
 	news "news-aggregator/entity/news"
