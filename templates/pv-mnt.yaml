@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: news-aggregator-pv-storage
+  name: news-aggregator-pv-resources
   namespace: news-aggregator
 spec:
   capacity:
@@ -9,4 +9,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data/news-aggregator/storage"
+    path: "/mnt/data/news-aggregator/mnt"
