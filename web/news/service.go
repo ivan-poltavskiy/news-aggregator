@@ -43,7 +43,7 @@ func (service Service) SaveNews(sourceEntity source.Source, parsedNews []news.Ne
 }
 
 // PeriodicallyUpdateNews updates news for all sources.
-func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
+func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) error {
 	ticker := time.NewTicker(newsUpdatePeriod)
 	defer ticker.Stop()
 
@@ -54,7 +54,7 @@ func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 			sources, err := service.storage.GetSources()
 			if err != nil {
 				logrus.Error("Failed to retrieve sources: ", err)
-				continue
+				return err
 			}
 
 			var wg sync.WaitGroup
@@ -73,13 +73,12 @@ func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 				}(src)
 			}
 
-			go func() {
-				wg.Wait()
-				close(errChan)
-			}()
+			wg.Wait()
+			close(errChan)
 
 			for err := range errChan {
 				logrus.Error(err)
+				return err
 			}
 
 			logrus.Info("Periodic update of news completed")
