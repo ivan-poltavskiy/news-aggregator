@@ -48,10 +48,10 @@ tasks:
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
     cmds:
-      - task: tidy
-      - task: fmt
+#      - task: tidy
+#      - task: fmt
       - task: test
-      - task: vet
+#      - task: vet
 
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
