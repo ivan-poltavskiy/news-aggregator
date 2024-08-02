@@ -23,7 +23,7 @@ tasks:
 
   test:
     desc: "Run all tests in the project."
-    deps:  [mocks-generate]
+    deps: [ mocks-generate ]
     cmd: go test ./...
 
   fmt:
@@ -52,5 +52,9 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    deps: [tidy, fmt, vet, test]
+    cmds:
+      - task: tidy
+      - task: fmt
+      - task: test
+      - task: vet
 
