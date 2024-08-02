@@ -24,7 +24,7 @@ tasks:
   test:
     desc: "Run all tests in the project."
 #    deps: [ mocks-generate ]
-    cmd: go test  ./storage/news/... ./web/feed/... ./web/news/... ./web/source/...
+    cmd: go test  ./storage/news/... ./storage/source/... ./web/feed/... ./web/news/... ./web/source/...
 
   fmt:
     desc: "go fmt on all Go files"
