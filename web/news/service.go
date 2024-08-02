@@ -1,6 +1,7 @@
 package news
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
@@ -57,6 +58,8 @@ func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 			}
 
 			var wg sync.WaitGroup
+			errChan := make(chan error, len(sources))
+
 			for _, src := range sources {
 				wg.Add(1)
 				go func(src source.Source) {
@@ -64,12 +67,21 @@ func (service Service) PeriodicallyUpdateNews(newsUpdatePeriod time.Duration) {
 					if src.SourceType == source.STORAGE {
 						err := updateSourceNews(src, service.storage)
 						if err != nil {
-							logrus.Error("Failed to update news for source: ", src.Name, err)
+							errChan <- fmt.Errorf("failed to update news for source: %s, %v", src.Name, err)
 						}
 					}
 				}(src)
 			}
-			wg.Wait()
+
+			go func() {
+				wg.Wait()
+				close(errChan)
+			}()
+
+			for err := range errChan {
+				logrus.Error(err)
+			}
+
 			logrus.Info("Periodic update of news completed")
 		}
 	}
