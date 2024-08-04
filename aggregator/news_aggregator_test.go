@@ -2,7 +2,7 @@ package aggregator
 
 import (
 	"github.com/golang/mock/gomock"
-	"news-aggregator/aggregator/mock_aggregator"
+	aggregator "news-aggregator/aggregator/mock_aggregator"
 	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
@@ -17,7 +17,7 @@ func TestNews_Aggregate(t *testing.T) {
 	defer ctrl.Finish()
 	constant.PathToStorage = "." + constant.PathToStorage
 
-	mockCollector := mock_aggregator.NewMockCollector(ctrl)
+	mockCollector := aggregator.NewMockCollector(ctrl)
 	type args struct {
 		sources []string
 		filters []filter.NewsFilter

@@ -7,23 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"news-aggregator/entity/source"
 )
-
-func setupTempFile(t *testing.T, content []byte) string {
-	tmpDir := os.TempDir()
-
-	tmpFile := filepath.Join(tmpDir, "storage.json")
-	if err := os.WriteFile(tmpFile, content, 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	return tmpFile
-}
-
-func teardownTempFile(filePath string) {
-	os.RemoveAll(filepath.Dir(filePath))
-}
 
 func TestIsSourceExists(t *testing.T) {
 	sources := []source.Source{
@@ -54,8 +40,14 @@ func TestIsSourceExists(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			filePath := setupTempFile(t, data)
-			defer teardownTempFile(filePath)
+			tmpDir, err := os.MkdirTemp("", "news-aggregator")
+			require.NoError(t, err)
+			defer os.RemoveAll(tmpDir)
+
+			filePath := filepath.Join(tmpDir, "storage.json")
+			if err := os.WriteFile(filePath, data, 0644); err != nil {
+				t.Fatal(err)
+			}
 
 			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			exists := storage.IsSourceExists(tt.input)
@@ -100,13 +92,19 @@ func TestSaveSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmpDir, err := os.MkdirTemp("", "news-aggregator")
+			require.NoError(t, err)
+			defer os.RemoveAll(tmpDir)
+
 			existingData, err := json.Marshal(tt.existing)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			filePath := setupTempFile(t, existingData)
-			defer teardownTempFile(filePath)
+			filePath := filepath.Join(tmpDir, "storage.json")
+			if err := os.WriteFile(filePath, existingData, 0644); err != nil {
+				t.Fatal(err)
+			}
 
 			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			err = storage.SaveSource(tt.newSource)
@@ -160,8 +158,14 @@ func TestDeleteSourceByName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			filePath := setupTempFile(t, data)
-			defer teardownTempFile(filePath)
+			tmpDir, err := os.MkdirTemp("", "news-aggregator")
+			require.NoError(t, err)
+			defer os.RemoveAll(tmpDir)
+
+			filePath := filepath.Join(tmpDir, "storage.json")
+			if err := os.WriteFile(filePath, data, 0644); err != nil {
+				t.Fatal(err)
+			}
 
 			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			err = storage.DeleteSourceByName(source.Name(tt.inputName))
@@ -215,8 +219,14 @@ func TestGetSourceByName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			filePath := setupTempFile(t, data)
-			defer teardownTempFile(filePath)
+			tmpDir, err := os.MkdirTemp("", "news-aggregator")
+			require.NoError(t, err)
+			defer os.RemoveAll(tmpDir)
+
+			filePath := filepath.Join(tmpDir, "storage.json")
+			if err := os.WriteFile(filePath, data, 0644); err != nil {
+				t.Fatal(err)
+			}
 
 			storage := &jsonStorage{pathToStorage: source.PathToFile(filePath)}
 			source, err := storage.GetSourceByName(tt.inputName)

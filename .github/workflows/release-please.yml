@@ -1,0 +1,41 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - master
+      - feature/add-realese-please
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run release-please
+        id: create-version
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: go
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: ${{ github.ref_name }}
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v1
+
+      - name: Conditional Docker steps
+        if: ${{ steps.create-version.outputs.release_created }}
+        run: |
+          # Log in to Docker Hub
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+          # Build and push Docker image
+          IMAGE_TAG=${{ steps.create-version.outputs.version }}
+          echo "Building Docker image with tag: ${IMAGE_TAG}"
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/news_aggregator:${IMAGE_TAG} -f .Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/news_aggregator:${IMAGE_TAG}

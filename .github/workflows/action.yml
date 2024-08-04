@@ -1,0 +1,49 @@
+name: Go
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    types: [ opened, ready_for_review ]
+    branches: [ "**" ]
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+
+      - name: Install mockgen
+        run: go install github.com/golang/mock/mockgen@v1.6.0
+
+      - name: Install Taskfile
+        run: |
+          sh -c "$(curl -sL https://taskfile.dev/install.sh)"
+          sudo mv ./bin/task /usr/local/bin/task
+
+      - name: Run Taskfile tasks
+        run: task check-all
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Check for formatting changes
+        run: |
+          git diff --exit-code > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+            exit 1
+          else
+            echo "No formatting changes detected."
+          fi
