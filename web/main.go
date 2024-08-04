@@ -48,6 +48,15 @@ func main() {
 	})
 	logrus.Info("Starting server on: " + *port)
 
+	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
+	service := news.NewService(resourcesStorage)
+	go func() {
+		err := service.PeriodicallyUpdateNews(time.Duration(*newsUpdatePeriod) * time.Second)
+		if err != nil {
+			logrus.Fatalf("Error in periodic news update: %s\n", err)
+		}
+	}()
+
 	err = http.ListenAndServeTLS(":"+*port, *pathToCertificate, *pathToKey, nil)
 	if err != nil {
 		logrus.Fatalf("Could not start server: %s\n", err.Error())

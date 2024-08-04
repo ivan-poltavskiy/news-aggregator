@@ -19,6 +19,7 @@ tasks:
 
   test:
     desc: "Run all tests in the project."
+    deps: [ mocks-generate ]
     cmd: go test ./...
 
   fmt:
@@ -46,7 +47,7 @@ tasks:
     cmd: go run cmd/web/main.go
 
   check-all:
-    desc: "Run all checks: mod tidy, fmt, vet, and tests"
+    desc: "Run all checks: mod tidy, fmt, tests and vet"
     cmds:
       - task: tidy
       - task: fmt
@@ -56,25 +57,26 @@ tasks:
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
     cmds:
-      - |
-        if ! kubectl get namespace {{.namespace_name}} >/dev/null 2>&1; then
-          kubectl create namespace {{.namespace_name}}
-          echo "Namespace {{.namespace_name}} created"
-        else
-          echo "Namespace {{.namespace_name}} already exists"
-        fi
+        - |
+          if ! kubectl get namespace news-aggregator >/dev/null 2>&1; then
+            kubectl create namespace news-aggregator
+            echo "Namespace news-aggregator created"
+          else
+            echo "Namespace news-aggregator already exists"
+          fi
 
   delete-namespace:
-    cmd: kubectl delete namespace {{.namespace_name}}
+    cmd: kubectl delete namespace news-aggregator
     desc: "Delete a Kubernetes namespace"
 
   deploy:
     desc: "Deploys news-aggregator app on Kubernetes cluster"
     deps: [ create-namespace ]
     cmds:
-      - kubectl apply -f {{.k8s_folder}}
+      - kubectl apply -f templates
 
   undeploy:
     desc: "Removes news-aggregator app from Kubernetes cluster"
     cmds:
-      - kubectl delete -f {{.k8s_folder}}
+      - kubectl delete -f templates
+
