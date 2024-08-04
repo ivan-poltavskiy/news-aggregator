@@ -17,7 +17,7 @@ func TestDeleteSourceByName(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := client.NewMockStorage(ctrl)
+	mockStorage := storage.NewMockStorage(ctrl)
 
 	tests := []struct {
 		name       string
@@ -61,7 +61,7 @@ func TestSaveSource(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := client.NewMockStorage(ctrl)
+	mockStorage := storage.NewMockStorage(ctrl)
 
 	testResourcesDir := "resources"
 
