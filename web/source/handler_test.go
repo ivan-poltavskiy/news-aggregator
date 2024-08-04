@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
 	"reflect"
 	"testing"
 )

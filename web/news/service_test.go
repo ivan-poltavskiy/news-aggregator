@@ -4,7 +4,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
 	"testing"
 )
 
