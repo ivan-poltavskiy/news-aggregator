@@ -2,11 +2,13 @@ package constant
 
 const DateOutputLayout = "2006-01-02"
 
-var PathToStorage = "./storage/sources-storage.json"
+var PathToStorage = "./storage/source/sources_storage.json"
 
-const PORT = ":443"
+const PORT = "443"
 
 var PathToResources = "resources"
 
-const CertFile = "certificates/server.crt"
-const KeyFile = "certificates/server.key"
+const PathToCertFile = "web/certificates/server.crt"
+const PathToKeyFile = "web/certificates/server.key"
+
+const NewsUpdatePeriodIOnMinutes = 5
