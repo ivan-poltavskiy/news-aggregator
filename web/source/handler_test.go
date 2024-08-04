@@ -20,7 +20,7 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 	handler := NewSourceHandler(mockStorage)
 
 	tests := []struct {
@@ -96,7 +96,7 @@ func mockSaveSource(_ *Service, url string) (source.Name, error) {
 func TestAddSourceHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 
 	service := NewService(mockStorage)
 	patch := monkey.PatchInstanceMethod(reflect.TypeOf(service), "SaveSource", mockSaveSource)

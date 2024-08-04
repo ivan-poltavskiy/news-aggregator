@@ -12,7 +12,7 @@ func TestSaveNews(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mock_aggregator.NewMockStorage(ctrl)
+	mockStorage := client.NewMockStorage(ctrl)
 
 	sourceEntity := source.Source{Name: "TestSource"}
 	parsedNews := []news.News{

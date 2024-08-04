@@ -17,7 +17,7 @@ func TestFetchNewsHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockClient := mock_aggregator.NewMockClient(ctrl)
+	mockClient := client.NewMockClient(ctrl)
 	mockStorage := mock_aggregator2.NewMockStorage(ctrl)
 	handler := NewNewsHandler(mockStorage)
 
