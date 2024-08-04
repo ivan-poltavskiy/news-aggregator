@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.17](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.16...v1.0.17) (2024-08-04)
+
+
+### Bug Fixes
+
+* fix the tests ([65fc469](https://github.com/ivan-poltavskiy/news-aggregator/commit/65fc469feb0d46befa5260b1ca6d885be56548c0))
+* fix the tests ([dd1fdaa](https://github.com/ivan-poltavskiy/news-aggregator/commit/dd1fdaac8d063144d5ae8f88d90acb33bc9a5b10))
+
 ## [1.0.16](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.15...v1.0.16) (2024-08-04)
 
 
