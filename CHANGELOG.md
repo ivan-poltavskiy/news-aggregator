@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.16](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.15...v1.0.16) (2024-08-04)
+
+
+### Bug Fixes
+
+* Update tests, taskfile and actions. Change the mocks generation ([d0a53a7](https://github.com/ivan-poltavskiy/news-aggregator/commit/d0a53a70adc5fe4e9158c9bc42c606e64666f9ed))
+
 ## [1.0.15](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.14...v1.0.15) (2024-07-23)
 
 
