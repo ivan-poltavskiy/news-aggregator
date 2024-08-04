@@ -51,7 +51,7 @@ tasks:
     cmd: go run cmd/web/main.go
 
   check-all:
-    desc: "Run all checks: mod tidy, fmt, vet, and tests"
+    desc: "Run all checks: mod tidy, fmt, tests and vet"
     cmds:
       - task: tidy
       - task: fmt
