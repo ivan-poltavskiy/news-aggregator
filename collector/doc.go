@@ -7,6 +7,6 @@
 //	name source.Name, allArticles []newsCollector.News) []newsCollector.News returns
 //	the list of collector from the passed source.
 //
-// InitializeSource(sources []source.Source) initializes the resources that
+// InitializeSource(sources []source.Source) initializes the news that
 // will be available for parsing.
 package collector

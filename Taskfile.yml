@@ -1,8 +1,8 @@
 version: '3'
 
 env:
-  DOCKER_IMAGE_NAME: "ivan/news_aggregator"
-  DOCKER_IMAGE_TAG: "v1.0"
+  DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
+  DOCKER_IMAGE_TAG: "v1.0.18"
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
@@ -17,8 +17,13 @@ tasks:
     desc: "Run go mod tidy"
     cmd: go mod tidy
 
+  mocks-generate:
+    desc: "Generate mocks for the project"
+    cmd: go generate ./...
+
   test:
     desc: "Run all tests in the project."
+    deps: [ mocks-generate ]
     cmd: go test ./...
 
   fmt:
@@ -47,7 +52,11 @@ tasks:
 
   check-all:
     desc: "Run all checks: mod tidy, fmt, vet, and tests"
-    deps: [ tidy, fmt, vet, test ]
+    cmds:
+      - task: tidy
+      - task: fmt
+      - task: test
+      - task: vet
 
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
@@ -74,3 +83,4 @@ tasks:
     desc: "Removes news-aggregator app from Kubernetes cluster"
     cmds:
       - kubectl delete -f {{.k8s_folder}}
+
