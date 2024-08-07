@@ -43,9 +43,35 @@ spec:
                 type: string
             type: object
           status:
+            description: FeedStatus defines the observed state of Feed
             properties:
-              status:
-                type: string
+              conditions:
+                items:
+                  description: Condition represents the state of a Feed at a certain
+                    point.
+                  properties:
+                    lastUpdateTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: If status is False, the message should be populated
+                      type: string
+                    reason:
+                      description: If status is False, the reason should be populated
+                      type: string
+                    status:
+                      description: Status of the condition. Could be true or false
+                      type: boolean
+                    type:
+                      description: Type of the condition, e.g., Added, Updated, Deleted.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
             type: object
         type: object
     served: true
