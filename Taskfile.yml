@@ -38,6 +38,10 @@ tasks:
     desc: "Run docker build"
     cmd: docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
 
+  docker-build-operator:
+    desc: "Run docker build for operator image"
+    cmd: docker build -t alanut93/updater:v1.0.2 -f operator/Dockerfile .
+
   docker-run:
     desc: "Run docker container"
     cmd: docker run -d -p $DOCKER_PORT:$SERVER_EXPOSE_PORT $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG

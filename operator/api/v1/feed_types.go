@@ -6,7 +6,7 @@ import (
 
 type FeedSpec struct {
 	Name string `json:"name,omitempty"`
-	Link string `json:"link,omitempty"`
+	Url  string `json:"url,omitempty"`
 }
 
 type FeedStatus struct {

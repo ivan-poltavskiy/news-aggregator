@@ -1,7 +1,16 @@
 apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
-  name: feed-sample
+  name: kashtan
 spec:
-  name: pravda,
-  link: https://www.pravda.com.ua/
+  name: kashtan
+  url: https://www.kashtan.news/
+
+---
+apiVersion: aggregator.com.teamdev/v1
+kind: Feed
+metadata:
+  name: nytimes
+spec:
+  name: nytimes
+  url: https://www.nytimes.com/
