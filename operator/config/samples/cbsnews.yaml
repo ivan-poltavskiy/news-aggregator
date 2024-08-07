@@ -3,5 +3,5 @@ kind: Feed
 metadata:
   name: cbsnews
 spec:
-  name: cbsnewsАВВАВ
+  name: cbsnews
   url: https://www.cbsnews.com/
