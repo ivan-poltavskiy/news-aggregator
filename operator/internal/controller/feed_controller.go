@@ -13,15 +13,16 @@ import (
 	"net/http"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
-
-const finalizer = "feed.finalizers.news.teamdev.com"
 
 // FeedReconciler reconciles a Feed object
 type FeedReconciler struct {
 	Client     client.Client
 	Scheme     *runtime.Scheme
 	HttpClient http.Client
+	Finalizer  string
 }
 
 // FeedCreateRequest contains the URL of the feed to save it
@@ -50,15 +51,15 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, err
 	}
 
-	if !containsString(feed.ObjectMeta.Finalizers, finalizer) {
-		feed.ObjectMeta.Finalizers = append(feed.ObjectMeta.Finalizers, finalizer)
+	if !containsString(feed.ObjectMeta.Finalizers, r.Finalizer) {
+		feed.ObjectMeta.Finalizers = append(feed.ObjectMeta.Finalizers, r.Finalizer)
 		if err := r.Client.Update(ctx, &feed); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
 
 	if !feed.ObjectMeta.DeletionTimestamp.IsZero() {
-		if containsString(feed.ObjectMeta.Finalizers, finalizer) {
+		if containsString(feed.ObjectMeta.Finalizers, r.Finalizer) {
 			if err := r.deleteFeed(&feed); err != nil {
 				updateCondition(&feed, aggregatorv1.ConditionDeleted, false, "Failed to delete feed", err.Error())
 				if err := r.Client.Status().Update(ctx, &feed); err != nil {
@@ -67,7 +68,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 				return ctrl.Result{}, err
 			}
 
-			feed.ObjectMeta.Finalizers = removeString(feed.ObjectMeta.Finalizers, finalizer)
+			feed.ObjectMeta.Finalizers = removeString(feed.ObjectMeta.Finalizers, r.Finalizer)
 			if err := r.Client.Update(ctx, &feed); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -169,6 +170,17 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 func (r *FeedReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&aggregatorv1.Feed{}).
+		WithEventFilter(predicate.Funcs{
+			CreateFunc: func(e event.CreateEvent) bool {
+				return true
+			},
+			DeleteFunc: func(e event.DeleteEvent) bool {
+				return !e.DeleteStateUnknown
+			},
+			UpdateFunc: func(e event.UpdateEvent) bool {
+				return e.ObjectNew.GetGeneration() != e.ObjectOld.GetGeneration()
+			},
+		}).
 		Complete(r)
 }
 
