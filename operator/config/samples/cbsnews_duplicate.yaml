@@ -1,0 +1,7 @@
+apiVersion: aggregator.com.teamdev/v1
+kind: Feed
+metadata:
+  name: kashtan1
+spec:
+  name: kashtan
+  url: https://www.kashtan.news/
