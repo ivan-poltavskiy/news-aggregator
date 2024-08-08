@@ -1,7 +1,7 @@
 apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
-  name: kashtan1
+  name: kashtan12
 spec:
-  name: kashtan
-  url: https://www.kashtan.news/
+  name: kashtan12
+  url: https://www.kashtan.news/12

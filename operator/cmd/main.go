@@ -141,6 +141,10 @@ func main() {
 		Scheme:     mgr.GetScheme(),
 		HttpClient: *httpClient,
 		Finalizer:  finalizer,
+		HttpsLinks: controller.HttpsLinks{
+			LinkForCreateFeed: "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources",
+			LinkForDeleteFeed: "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources",
+		},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Feed")
 		os.Exit(1)

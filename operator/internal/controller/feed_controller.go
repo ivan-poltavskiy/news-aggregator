@@ -23,6 +23,11 @@ type FeedReconciler struct {
 	Scheme     *runtime.Scheme
 	HttpClient http.Client
 	Finalizer  string
+	HttpsLinks HttpsLinks
+}
+type HttpsLinks struct {
+	LinkForCreateFeed string
+	LinkForDeleteFeed string
 }
 
 // FeedCreateRequest contains the URL of the feed to save it
@@ -89,11 +94,12 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, err
 	}
 
-	logrus.Info("Status updated.")
+	logrus.Info("Status updated. Feed Name and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
 
 	return ctrl.Result{}, nil
 }
 
+// addFeed adds to the
 func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 	feedCreateRequest := FeedCreateRequest{
 		Url: feed.Spec.Url,
@@ -105,7 +111,7 @@ func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 		return err
 	}
 
-	resp, err := r.HttpClient.Post("https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources", "application/json", bytes.NewBuffer(reqBody))
+	resp, err := r.HttpClient.Post(r.HttpsLinks.LinkForCreateFeed, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.Error("Failed to make POST request: ", err)
 		return err
@@ -138,7 +144,7 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 
 	logrus.Infof("Feed for delete name: %s", feed.Spec.Name)
 
-	req, err := http.NewRequest("DELETE", "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("DELETE", r.HttpsLinks.LinkForDeleteFeed, bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.Error("Failed to create DELETE request: ", err)
 		return err

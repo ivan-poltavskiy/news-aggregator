@@ -29,26 +29,25 @@ var _ webhook.Defaulter = &Feed{}
 func (r *Feed) Default() {
 	feedlog.Info("default", "name", r.Name)
 
-	// TODO(user): fill in your defaulting logic.
 }
 
 // +kubebuilder:webhook:path=/validate-aggregator-com-teamdev-v1-feed,mutating=false,failurePolicy=fail,sideEffects=None,groups=aggregator.com.teamdev,resources=feeds,verbs=create;update;delete,versions=v1,name=vfeed.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Feed{}
 
-// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+// ValidateCreate validates the input data at the time of Feed's creation
 func (r *Feed) ValidateCreate() (admission.Warnings, error) {
 	feedlog.Info("validate create", "name", r.Name)
 	return r.validateFeed()
 }
 
-// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+// ValidateUpdate validates the input data at the time of Feed's update
 func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	feedlog.Info("validate update", "name", r.Name)
 	return r.validateFeed()
 }
 
-// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+// ValidateDelete validates the input data at the time of Feed's delete
 func (r *Feed) ValidateDelete() (admission.Warnings, error) {
 	feedlog.Info("validate delete", "name", r.Name)
 	return nil, nil
