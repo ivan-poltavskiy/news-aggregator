@@ -2,10 +2,10 @@ package v1
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -37,7 +37,6 @@ var _ webhook.Validator = &Feed{}
 
 // ValidateCreate validates the input data at the time of Feed's creation
 func (r *Feed) ValidateCreate() (admission.Warnings, error) {
-
 	logrus.Info("validate create", "name", r.Name)
 
 	return r.validateFeed()
@@ -59,26 +58,31 @@ func (r *Feed) ValidateDelete() (admission.Warnings, error) {
 
 // validateFeed implements the common validation logic for both create and update operations.
 func (r *Feed) validateFeed() (admission.Warnings, error) {
+	var errorsList field.ErrorList
+	specPath := field.NewPath("spec")
 
 	// Validate name
 	if r.Spec.Name == "" {
-		return nil, errors.New("ValidateCreate: name cannot be empty")
-	}
-	if len(r.Spec.Name) > 20 {
-		return nil, errors.New("ValidateCreate: name must not exceed 20 characters")
+		errorsList = append(errorsList, field.Required(specPath.Child("name"), "name cannot be empty"))
+	} else if len(r.Spec.Name) > 20 {
+		errorsList = append(errorsList, field.Invalid(specPath.Child("name"), r.Spec.Name, "name must not exceed 20 characters"))
 	}
 
-	// Validate link
+	// Validate URL
 	if r.Spec.Url == "" {
-		return nil, errors.New("ValidateCreate: link cannot be empty")
-	}
-	if !isValidURL(r.Spec.Url) {
-		return nil, errors.New("ValidateCreate: link must be a valid URL")
+		errorsList = append(errorsList, field.Required(specPath.Child("url"), "URL cannot be empty"))
+	} else if !isValidURL(r.Spec.Url) {
+		errorsList = append(errorsList, field.Invalid(specPath.Child("url"), r.Spec.Url, "URL must be a valid URL"))
 	}
 
-	err := checkNameUniqueness(r)
-	if err != nil {
-		return nil, errors.New("ValidateCreate: name is already taken")
+	// Check name uniqueness
+	if err := checkNameUniqueness(r); err != nil {
+		errorsList = append(errorsList, field.Invalid(specPath.Child("name"), r.Spec.Name, err.Error()))
+	}
+
+	// Return the aggregated errors if any
+	if len(errorsList) > 0 {
+		return nil, errorsList.ToAggregate()
 	}
 
 	return nil, nil

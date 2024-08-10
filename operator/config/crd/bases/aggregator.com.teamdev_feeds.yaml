@@ -69,7 +69,7 @@ spec:
                       description: Success of the condition. Could be true or false
                       type: boolean
                     type:
-                      description: Type of the condition, e.g., Added, Updated, Deleted.
+                      description: Type of the condition, e.g., Added, Deleted.
                       type: string
                   required:
                   - status
