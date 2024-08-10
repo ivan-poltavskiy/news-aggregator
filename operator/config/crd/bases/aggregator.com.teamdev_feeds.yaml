@@ -17,6 +17,8 @@ spec:
   - name: v1
     schema:
       openAPIV3Schema:
+        description: Feed describe the information of the news source for news aggregator
+          in the K8S cluster
         properties:
           apiVersion:
             description: |-
@@ -36,6 +38,7 @@ spec:
           metadata:
             type: object
           spec:
+            description: FeedSpec contains the specification's fields of the Feed
             properties:
               name:
                 type: string
@@ -43,12 +46,13 @@ spec:
                 type: string
             type: object
           status:
-            description: FeedStatus defines the observed state of Feed
+            description: FeedStatus describes the status of a feed during its full
+              life cycle in the system
             properties:
               conditions:
                 items:
-                  description: Condition represents the state of a Feed at a certain
-                    point.
+                  description: Condition describes the states of a feed during its
+                    life cycle in the system
                   properties:
                     lastUpdateTime:
                       description: Last time the condition transitioned from one status
@@ -56,13 +60,13 @@ spec:
                       format: date-time
                       type: string
                     message:
-                      description: If status is False, the message should be populated
+                      description: If Success is False, the message should be populated
                       type: string
                     reason:
-                      description: If status is False, the reason should be populated
+                      description: If Success is False, the reason should be populated
                       type: string
                     status:
-                      description: Status of the condition. Could be true or false
+                      description: Success of the condition. Could be true or false
                       type: boolean
                     type:
                       description: Type of the condition, e.g., Added, Updated, Deleted.

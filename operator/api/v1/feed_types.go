@@ -11,16 +11,13 @@ const (
 	// ConditionAdded indicates that the feed has been successfully added
 	ConditionAdded ConditionType = "Added"
 
-	// ConditionUpdated indicates that the feed has been successfully updated
-	ConditionUpdated ConditionType = "Updated"
-
 	// ConditionDeleted indicates that the feed has been successfully deleted
 	ConditionDeleted ConditionType = "Deleted"
 )
 
 // Condition describes the states of a feed during its life cycle in the system
 type Condition struct {
-	// Type of the condition, e.g., Added, Updated, Deleted.
+	// Type of the condition, e.g., Added, Deleted.
 	Type ConditionType `json:"type"`
 	// Success of the condition. Could be true or false
 	Success bool `json:"status"`
@@ -62,6 +59,27 @@ type FeedList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Feed `json:"items"`
+}
+
+// AddCondition adds new condition to the Feed's status
+func (f *FeedStatus) AddCondition(condition Condition) {
+	newCondition := Condition{
+		Type:           condition.Type,
+		Success:        condition.Success,
+		Reason:         condition.Reason,
+		Message:        condition.Message,
+		LastUpdateTime: metav1.Now(),
+	}
+
+	f.Conditions = append(f.Conditions, newCondition)
+}
+
+// GetCurrentCondition returns the current condition of the Feed
+func (f *FeedStatus) GetCurrentCondition() Condition {
+	if len(f.Conditions) == 0 {
+		return Condition{}
+	}
+	return f.Conditions[len(f.Conditions)-1]
 }
 
 func init() {

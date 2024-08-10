@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -41,22 +40,6 @@ type HttpsLinks struct {
 	LinkForDeleteFeed string
 }
 
-// FeedCreateRequest contains the URL of the feed to save it
-type FeedCreateRequest struct {
-	Url string `json:"url"`
-}
-
-// FeedUpdateRequest contains the data of the feed to update it
-type FeedUpdateRequest struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
-}
-
-// DeleteRequest contains the name of the feed to delete it
-type DeleteRequest struct {
-	Name string `json:"name"`
-}
-
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=feeds,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=feeds/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=feeds/finalizers,verbs=update
@@ -68,6 +51,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	err := r.Client.Get(ctx, req.NamespacedName, &feed)
 	if err != nil {
 		if errors.IsNotFound(err) {
+			logrus.Info("Reconcile: Feed was not found. Error ignored")
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
@@ -83,7 +67,14 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	if !feed.ObjectMeta.DeletionTimestamp.IsZero() {
 		if containsString(feed.ObjectMeta.Finalizers, r.Finalizer) {
 			if err := r.deleteFeed(&feed); err != nil {
-				updateCondition(&feed, aggregatorv1.ConditionDeleted, false, "Failed to delete feed", err.Error())
+
+				feed.Status.AddCondition(aggregatorv1.Condition{
+					Type:    aggregatorv1.ConditionDeleted,
+					Success: false,
+					Message: "Reconcile: Failed to delete feed",
+					Reason:  err.Error(),
+				})
+
 				if err := r.Client.Status().Update(ctx, &feed); err != nil {
 					return ctrl.Result{}, err
 				}
@@ -98,14 +89,16 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, nil
 	}
 
-	var Condition aggregatorv1.ConditionType
-	for _, condition := range feed.Status.Conditions {
-		Condition = condition.Type
-	}
-
-	if Condition != aggregatorv1.ConditionAdded {
+	if feed.Status.GetCurrentCondition().Type != aggregatorv1.ConditionAdded {
 		if err := r.addFeed(feed); err != nil {
-			updateCondition(&feed, aggregatorv1.ConditionAdded, false, "Failed to add feed", err.Error())
+
+			feed.Status.AddCondition(aggregatorv1.Condition{
+				Type:    aggregatorv1.ConditionAdded,
+				Success: false,
+				Message: "Reconcile: Failed to add feed",
+				Reason:  err.Error(),
+			})
+
 			if err := r.Client.Status().Update(ctx, &feed); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -113,15 +106,24 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 	} else {
 		if err := r.updateFeed(feed); err != nil {
-			updateCondition(&feed, aggregatorv1.ConditionAdded, false, "Failed to add feed", err.Error())
+			feed.Status.AddCondition(aggregatorv1.Condition{
+				Type:    aggregatorv1.ConditionAdded,
+				Success: false,
+				Message: "Reconcile: Failed to update feed",
+				Reason:  err.Error(),
+			})
 			if err := r.Client.Status().Update(ctx, &feed); err != nil {
 				return ctrl.Result{}, err
 			}
 			return ctrl.Result{}, err
 		}
 	}
-
-	updateCondition(&feed, aggregatorv1.ConditionAdded, true, "", "")
+	feed.Status.AddCondition(aggregatorv1.Condition{
+		Type:    aggregatorv1.ConditionAdded,
+		Success: true,
+		Message: "",
+		Reason:  "",
+	})
 	if err := r.Client.Status().Update(ctx, &feed); err != nil {
 		return ctrl.Result{}, err
 	}
@@ -135,7 +137,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 // addFeed call the news aggregator server for adding source to the storage
 func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
-	feedCreateRequest := FeedCreateRequest{
+	feedCreateRequest := feedCreateRequest{
 		Url: feed.Spec.Url,
 	}
 
@@ -167,7 +169,7 @@ func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 
 // deleteFeed call the news aggregator server for delete source from the storage
 func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
-	deleteRequest := DeleteRequest{
+	deleteRequest := feedDeleteRequest{
 		Name: feed.Spec.Name,
 	}
 
@@ -209,7 +211,7 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 }
 
 func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
-	feedUpdateRequest := FeedUpdateRequest{
+	feedUpdateRequest := feedUpdateRequest{
 		Name: feed.Spec.Name,
 		Url:  feed.Spec.Url,
 	}
@@ -257,6 +259,22 @@ func (r *FeedReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+// feedCreateRequest contains the URL of the feed to save it
+type feedCreateRequest struct {
+	Url string `json:"url"`
+}
+
+// feedUpdateRequest contains the data of the feed to update it
+type feedUpdateRequest struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
+}
+
+// feedDeleteRequest contains the name of the feed to delete it
+type feedDeleteRequest struct {
+	Name string `json:"name"`
+}
+
 // containsString checks if a string exists in a slice.
 func containsString(slice []string, str string) bool {
 	for _, item := range slice {
@@ -277,17 +295,4 @@ func removeString(slice []string, str string) []string {
 		newSlice = append(newSlice, item)
 	}
 	return newSlice
-}
-
-// updateCondition updates or adds a condition in the feed's status
-func updateCondition(feed *aggregatorv1.Feed, conditionType aggregatorv1.ConditionType, statusBool bool, reason, message string) {
-	newCondition := aggregatorv1.Condition{
-		Type:           conditionType,
-		Success:        statusBool,
-		Reason:         reason,
-		Message:        message,
-		LastUpdateTime: metav1.Now(),
-	}
-
-	feed.Status.Conditions = append(feed.Status.Conditions, newCondition)
 }
