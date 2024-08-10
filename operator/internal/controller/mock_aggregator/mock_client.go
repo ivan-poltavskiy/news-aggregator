@@ -214,7 +214,7 @@ func (mr *MockClientMockRecorder) Scheme() *gomock.Call {
 // Status mocks base method.
 func (m *MockClient) Status() client.SubResourceWriter {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Status")
+	ret := m.ctrl.Call(m, "Success")
 	ret0, _ := ret[0].(client.SubResourceWriter)
 	return ret0
 }
@@ -222,7 +222,7 @@ func (m *MockClient) Status() client.SubResourceWriter {
 // Status indicates an expected call of Status.
 func (mr *MockClientMockRecorder) Status() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Status", reflect.TypeOf((*MockClient)(nil).Status))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Success", reflect.TypeOf((*MockClient)(nil).Status))
 }
 
 // SubResource mocks base method.

@@ -4,35 +4,40 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ConditionType represents a condition type for a Feed
+// ConditionType represents the type of condition in the Feed lifecycle
 type ConditionType string
 
 const (
 	// ConditionAdded indicates that the feed has been successfully added
 	ConditionAdded ConditionType = "Added"
+
+	// ConditionUpdated indicates that the feed has been successfully updated
+	ConditionUpdated ConditionType = "Updated"
+
 	// ConditionDeleted indicates that the feed has been successfully deleted
 	ConditionDeleted ConditionType = "Deleted"
 )
 
-// Condition represents the state of a Feed at a certain point.
+// Condition describes the states of a feed during its life cycle in the system
 type Condition struct {
 	// Type of the condition, e.g., Added, Updated, Deleted.
 	Type ConditionType `json:"type"`
-	// Status of the condition. Could be true or false
-	Status bool `json:"status"`
-	// If status is False, the reason should be populated
+	// Success of the condition. Could be true or false
+	Success bool `json:"status"`
+	// If Success is False, the reason should be populated
 	Reason string `json:"reason,omitempty"`
-	// If status is False, the message should be populated
+	// If Success is False, the message should be populated
 	Message string `json:"message,omitempty"`
 	// Last time the condition transitioned from one status to another.
 	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 }
 
-// FeedStatus defines the observed state of Feed
+// FeedStatus describes the status of a feed during its full life cycle in the system
 type FeedStatus struct {
 	Conditions []Condition `json:"conditions,omitempty"`
 }
 
+// FeedSpec contains the specification's fields of the Feed
 type FeedSpec struct {
 	Name string `json:"name,omitempty"`
 	Url  string `json:"url,omitempty"`
@@ -41,6 +46,7 @@ type FeedSpec struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
+// Feed describe the information of the news source for news aggregator in the K8S cluster
 type Feed struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

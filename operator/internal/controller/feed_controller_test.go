@@ -23,7 +23,7 @@ func TestFeedReconciler_addFeed(t *testing.T) {
 		expectedError    bool
 	}{
 		{
-			name: "Successful request",
+			name: "Success request",
 			feed: aggregatorv1.Feed{
 				Spec: aggregatorv1.FeedSpec{
 					Url: "http://example.com/feed",
@@ -99,7 +99,7 @@ func TestFeedReconciler_deleteFeed(t *testing.T) {
 		expectedError     bool
 	}{
 		{
-			name: "Successful delete request",
+			name: "Success delete request",
 			feed: aggregatorv1.Feed{
 				Spec: aggregatorv1.FeedSpec{
 					Name: "test-feed",

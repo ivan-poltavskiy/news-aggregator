@@ -28,7 +28,7 @@ func TestFetchNewsHandler(t *testing.T) {
 		expectedBody   string
 	}{
 		{
-			name: "Successful Fetch",
+			name: "Success Fetch",
 			mockFetchNews: func() {
 				expectedNews := []news.News{
 					{Title: "Sample News 1", Description: "Description 1", Link: "http://example.com/1"},

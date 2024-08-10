@@ -128,7 +128,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 	logrus.Info("UpdateCondition: ", feed.Status.Conditions)
 
-	logrus.Info("Status updated. Feed Name and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
+	logrus.Info("Success updated. Feed Name and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
 
 	return ctrl.Result{}, nil
 }
@@ -283,7 +283,7 @@ func removeString(slice []string, str string) []string {
 func updateCondition(feed *aggregatorv1.Feed, conditionType aggregatorv1.ConditionType, statusBool bool, reason, message string) {
 	newCondition := aggregatorv1.Condition{
 		Type:           conditionType,
-		Status:         statusBool,
+		Success:        statusBool,
 		Reason:         reason,
 		Message:        message,
 		LastUpdateTime: metav1.Now(),
