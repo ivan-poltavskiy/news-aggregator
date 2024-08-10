@@ -40,6 +40,26 @@ func (r *Feed) ValidateCreate() (admission.Warnings, error) {
 
 	logrus.Info("validate create", "name", r.Name)
 
+	return r.validateFeed()
+}
+
+// ValidateUpdate validates the input data at the time of Feed's update
+func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+
+	logrus.Info("validate update", "name", r.Name)
+
+	return r.validateFeed()
+}
+
+// ValidateDelete validates the input data at the time of Feed's delete
+func (r *Feed) ValidateDelete() (admission.Warnings, error) {
+	logrus.Info("validate delete", "name", r.Name)
+	return nil, nil
+}
+
+// validateFeed implements the common validation logic for both create and update operations.
+func (r *Feed) validateFeed() (admission.Warnings, error) {
+
 	// Validate name
 	if r.Spec.Name == "" {
 		return nil, errors.New("ValidateCreate: name cannot be empty")
@@ -59,49 +79,6 @@ func (r *Feed) ValidateCreate() (admission.Warnings, error) {
 	err := checkNameUniqueness(r)
 	if err != nil {
 		return nil, errors.New("ValidateCreate: name is already taken")
-	}
-
-	return nil, nil
-}
-
-// ValidateUpdate validates the input data at the time of Feed's update
-func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
-	logrus.Info("validate update", "name", r.Name)
-	// Validate name
-	if r.Spec.Name == "" {
-		return nil, errors.New("ValidateUpdate: name cannot be empty")
-	}
-	if len(r.Spec.Name) > 20 {
-		return nil, errors.New("ValidateUpdate: name must not exceed 20 characters")
-	}
-
-	// Validate link
-	if r.Spec.Url == "" {
-		return nil, errors.New("ValidateUpdate: link cannot be empty")
-	}
-	if !isValidURL(r.Spec.Url) {
-		return nil, errors.New("ValidateUpdate: link must be a valid URL")
-	}
-
-	err := checkNameUniqueness(r)
-	if err != nil {
-		return nil, errors.New("name is already taken")
-	}
-	return nil, nil
-}
-
-// ValidateDelete validates the input data at the time of Feed's delete
-func (r *Feed) ValidateDelete() (admission.Warnings, error) {
-	logrus.Info("validate delete", "name", r.Name)
-	return nil, nil
-}
-
-// validateFeed implements the common validation logic for both create and update operations.
-func (r *Feed) validateFeed() (admission.Warnings, error) {
-
-	err := checkNameUniqueness(r)
-	if err != nil {
-		return nil, err
 	}
 
 	return nil, nil
