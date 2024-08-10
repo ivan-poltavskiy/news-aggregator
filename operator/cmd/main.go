@@ -139,9 +139,10 @@ func main() {
 	if err = (&controller.FeedReconciler{
 		Client:     mgr.GetClient(),
 		Scheme:     mgr.GetScheme(),
-		HttpClient: *httpClient,
+		HttpClient: httpClient,
 		Finalizer:  finalizer,
 		HttpsLinks: controller.HttpsLinks{
+			//todo move to flags
 			LinkForCreateFeed: "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources",
 			LinkForDeleteFeed: "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources",
 		},

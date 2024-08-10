@@ -5,6 +5,7 @@ import (
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -17,14 +18,24 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
+// HttpClient defines methods that an HTTP client should implement
+//
+//go:generate mockgen -source=feed_controller.go -destination=mock_aggregator/mock_http_client.go -package=controller  news-aggregator/operator/internal/controller HttpClient
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+	Post(url, contentType string, body io.Reader) (*http.Response, error)
+}
+
 // FeedReconciler reconciles a Feed object
 type FeedReconciler struct {
 	Client     client.Client
 	Scheme     *runtime.Scheme
-	HttpClient http.Client
+	HttpClient HttpClient
 	Finalizer  string
 	HttpsLinks HttpsLinks
 }
+
+// todo
 type HttpsLinks struct {
 	LinkForCreateFeed string
 	LinkForDeleteFeed string
@@ -33,6 +44,12 @@ type HttpsLinks struct {
 // FeedCreateRequest contains the URL of the feed to save it
 type FeedCreateRequest struct {
 	Url string `json:"url"`
+}
+
+// FeedUpdateRequest contains the data of the feed to update it
+type FeedUpdateRequest struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 // DeleteRequest contains the name of the feed to delete it
@@ -81,12 +98,27 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, nil
 	}
 
-	if err := r.addFeed(feed); err != nil {
-		updateCondition(&feed, aggregatorv1.ConditionAdded, false, "Failed to add feed", err.Error())
-		if err := r.Client.Status().Update(ctx, &feed); err != nil {
+	var Condition aggregatorv1.ConditionType
+	for _, condition := range feed.Status.Conditions {
+		Condition = condition.Type
+	}
+
+	if Condition != aggregatorv1.ConditionAdded {
+		if err := r.addFeed(feed); err != nil {
+			updateCondition(&feed, aggregatorv1.ConditionAdded, false, "Failed to add feed", err.Error())
+			if err := r.Client.Status().Update(ctx, &feed); err != nil {
+				return ctrl.Result{}, err
+			}
 			return ctrl.Result{}, err
 		}
-		return ctrl.Result{}, err
+	} else {
+		if err := r.updateFeed(feed); err != nil {
+			updateCondition(&feed, aggregatorv1.ConditionAdded, false, "Failed to add feed", err.Error())
+			if err := r.Client.Status().Update(ctx, &feed); err != nil {
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{}, err
+		}
 	}
 
 	updateCondition(&feed, aggregatorv1.ConditionAdded, true, "", "")
@@ -94,12 +126,14 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, err
 	}
 
+	logrus.Info("UpdateCondition: ", feed.Status.Conditions)
+
 	logrus.Info("Status updated. Feed Name and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
 
 	return ctrl.Result{}, nil
 }
 
-// addFeed adds to the
+// addFeed call the news aggregator server for adding source to the storage
 func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 	feedCreateRequest := FeedCreateRequest{
 		Url: feed.Spec.Url,
@@ -126,11 +160,12 @@ func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		logrus.Error("Failed to create source, status code: ", resp.StatusCode, " response: ", string(body))
-		return err
+		return fmt.Errorf("failed to create source, status code: %d", resp.StatusCode)
 	}
 	return nil
 }
 
+// deleteFeed call the news aggregator server for delete source from the storage
 func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 	deleteRequest := DeleteRequest{
 		Name: feed.Spec.Name,
@@ -166,10 +201,42 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		logrus.Error("Failed to delete source, status code: ", resp.StatusCode, " response: ", string(body))
+		return fmt.Errorf("failed to delete source, status code: %d", resp.StatusCode)
+	}
+
+	logrus.Info("Feed removes successfully.")
+	return nil
+}
+
+func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
+	feedUpdateRequest := FeedUpdateRequest{
+		Name: feed.Spec.Name,
+		Url:  feed.Spec.Url,
+	}
+
+	reqBody, err := json.Marshal(feedUpdateRequest)
+	if err != nil {
+		logrus.Error("Failed to marshal source request: ", err)
 		return err
 	}
 
-	logrus.Info("Feed finalized successfully.")
+	resp, err := r.HttpClient.Post(r.HttpsLinks.LinkForCreateFeed, "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		logrus.Error("Failed to make POST request: ", err)
+		return err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		logrus.Error("Failed to update source, status code: ", resp.StatusCode, " response: ", string(body))
+		return fmt.Errorf("failed to update source, status code: %d", resp.StatusCode)
+	}
 	return nil
 }
 
@@ -220,12 +287,6 @@ func updateCondition(feed *aggregatorv1.Feed, conditionType aggregatorv1.Conditi
 		Reason:         reason,
 		Message:        message,
 		LastUpdateTime: metav1.Now(),
-	}
-	for i, condition := range feed.Status.Conditions {
-		if condition.Type == conditionType {
-			feed.Status.Conditions[i] = newCondition
-			return
-		}
 	}
 
 	feed.Status.Conditions = append(feed.Status.Conditions, newCondition)

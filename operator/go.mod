@@ -3,6 +3,7 @@ module com.teamdev/news-aggregator
 go 1.22.0
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.32.0
 	github.com/sirupsen/logrus v1.9.0

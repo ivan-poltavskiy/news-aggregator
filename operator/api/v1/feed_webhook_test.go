@@ -1,31 +1,169 @@
 package v1
 
 import (
-	. "github.com/onsi/ginkgo/v2"
+	"testing"
 )
 
-var _ = Describe("Feed Webhook", func() {
+func TestFeed_ValidateCreate(t *testing.T) {
+	tests := []struct {
+		name          string
+		feed          Feed
+		expectedError bool
+	}{
+		{
+			name: "Valid feed",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "valid-name",
+					Url:  "http://valid.url",
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name: "Empty name",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "",
+					Url:  "http://valid.url",
+				},
+			},
+			expectedError: true,
+		},
+		{
+			name: "Invalid URL",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "valid-name",
+					Url:  "invalid-url",
+				},
+			},
+			expectedError: true,
+		},
+	}
 
-	Context("When creating Feed under Defaulting Webhook", func() {
-		It("Should fill in the default value if a required field is empty", func() {
-
-			// TODO(user): Add your logic here
-
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := tt.feed.ValidateCreate()
+			if (err != nil) != tt.expectedError {
+				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+			}
 		})
-	})
+	}
+}
 
-	Context("When creating Feed under Validating Webhook", func() {
-		It("Should deny if a required field is empty", func() {
+func TestFeed_ValidateUpdate(t *testing.T) {
+	tests := []struct {
+		name          string
+		feed          Feed
+		expectedError bool
+	}{
+		{
+			name: "Valid feed",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "valid-name",
+					Url:  "http://valid.url",
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name: "Name too long",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "this-name-is-way-too-long",
+					Url:  "http://valid.url",
+				},
+			},
+			expectedError: true,
+		},
+	}
 
-			// TODO(user): Add your logic here
-
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldFeed := &Feed{}
+			_, err := tt.feed.ValidateUpdate(oldFeed)
+			if (err != nil) != tt.expectedError {
+				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+			}
 		})
+	}
+}
 
-		It("Should admit if all required fields are provided", func() {
+func TestFeed_ValidateDelete(t *testing.T) {
+	tests := []struct {
+		name          string
+		feed          Feed
+		expectedError bool
+	}{
+		{
+			name: "Valid feed for delete",
+			feed: Feed{
+				Spec: FeedSpec{
+					Name: "valid-name",
+					Url:  "http://valid.url",
+				},
+			},
+			expectedError: false,
+		},
+	}
 
-			// TODO(user): Add your logic here
-
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := tt.feed.ValidateDelete()
+			if (err != nil) != tt.expectedError {
+				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+			}
 		})
-	})
+	}
+}
 
-})
+//func TestFeed_validateFeed(t *testing.T) {
+//
+//	tests := []struct {
+//		name          string
+//		feed          Feed
+//		expectedError bool
+//	}{
+//		{
+//			name: "Valid feed",
+//			feed: Feed{
+//				Spec: FeedSpec{
+//					Name: "valid-name",
+//					Url:  "http://valid.url",
+//				},
+//			},
+//			expectedError: false,
+//		},
+//		{
+//			name: "Empty name",
+//			feed: Feed{
+//				Spec: FeedSpec{
+//					Name: "",
+//					Url:  "http://valid.url",
+//				},
+//			},
+//			expectedError: true,
+//		},
+//		{
+//			name: "Invalid URL",
+//			feed: Feed{
+//				Spec: FeedSpec{
+//					Name: "valid-name",
+//					Url:  "invalid-url",
+//				},
+//			},
+//			expectedError: true,
+//		},
+//	}
+//
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			_, err := tt.feed.validateFeed()
+//			if (err != nil) != tt.expectedError {
+//				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+//			}
+//		})
+//	}
+//}
