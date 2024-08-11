@@ -129,7 +129,6 @@ func TestFeed_ValidateDelete(t *testing.T) {
 func TestCheckNameUnique(t *testing.T) {
 	newScheme := runtime.NewScheme()
 	_ = AddToScheme(newScheme)
-	k8sClient = fake.NewClientBuilder().WithScheme(newScheme).Build()
 
 	existingFeed := &Feed{
 		Spec: FeedSpec{
