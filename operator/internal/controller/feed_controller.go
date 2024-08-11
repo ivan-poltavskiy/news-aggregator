@@ -139,7 +139,8 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 // addFeed call the news aggregator server for adding source to the storage
 func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 	feedCreateRequest := feedCreateRequest{
-		Url: feed.Spec.Url,
+		Url:  feed.Spec.Url,
+		Name: feed.Spec.Name,
 	}
 
 	reqBody, err := json.Marshal(feedCreateRequest)
@@ -271,7 +272,8 @@ func (r *FeedReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // feedCreateRequest contains the URL of the feed to save it
 type feedCreateRequest struct {
-	Url string `json:"url"`
+	Url  string `json:"url"`
+	Name string `json:"name"`
 }
 
 // feedUpdateRequest contains the data of the feed to update it

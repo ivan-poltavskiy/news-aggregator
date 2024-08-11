@@ -15,7 +15,6 @@ RUN go mod download
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
 COPY internal/controller/ internal/controller/
-COPY certificates/ /workspace/certificates/
 
 # Build
 RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o manager cmd/main.go
@@ -27,7 +26,6 @@ WORKDIR /
 
 # Copy the binary and certificates from the builder image
 COPY --from=builder /workspace/manager .
-COPY --from=builder /workspace/certificates/ /certificates/
 
 USER 65532:65532
 
