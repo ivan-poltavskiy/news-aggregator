@@ -233,9 +233,16 @@ func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
 	if err != nil {
 		return err
 	}
-	resp, err := r.HttpClient.Post(path, "application/json", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("PUT", path, bytes.NewBuffer(reqBody))
 	if err != nil {
-		logrus.Error("Failed to make POST request: ", err)
+		logrus.Error("Failed to create PUT request: ", err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := r.HttpClient.Do(req)
+	if err != nil {
+		logrus.Error("Failed to make PUT request: ", err)
 		return err
 	}
 	defer func(Body io.ReadCloser) {

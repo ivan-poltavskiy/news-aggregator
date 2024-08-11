@@ -1,8 +1,11 @@
 # operator
-// TODO(user): Add simple overview of use/purpose
-
+Operator of Feed CRD uses for work with the news source like K8S resources. It 
+controls the behavior of the Feed in K8s cluster.
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+There are three operations that can be performed on a feed as a Kubernetes resource, namely adding, modifying and deleting. The reconsile method communicates with the http server's news aggregator service to retrieve news, resources and, in general, to work with them. Thus, the operator uses the news aggregator server.
+To validate the input data, the operator uses web hooks with certain restrictions and rules for incoming data.
+
+Translated with DeepL.com (free version)
 
 ## Getting Started
 
@@ -16,7 +19,7 @@
 **Build and push your image to the location specified by `IMG`:**
 
 ```sh
-make docker-build docker-push IMG=<some-registry>/operator:tag
+make docker-build docker-push IMG=alanut93/news-aggregator-operator:v1.0.2
 ```
 
 **NOTE:** This image ought to be published in the personal registry you specified.
@@ -32,11 +35,8 @@ make install
 **Deploy the Manager to the cluster with the image specified by `IMG`:**
 
 ```sh
-make deploy IMG=<some-registry>/operator:tag
+make deploy IMG=alanut93/news-aggregator-operator:v1.0.2
 ```
-
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
 
 **Create instances of your solution**
 You can apply the samples (examples) from the config/sample:
@@ -45,7 +45,6 @@ You can apply the samples (examples) from the config/sample:
 kubectl apply -k config/samples/
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
 
 ### To Uninstall
 **Delete the instances (CRs) from the cluster:**
@@ -73,7 +72,7 @@ Following are the steps to build the installer and distribute this project to us
 1. Build the installer for the image built and published in the registry:
 
 ```sh
-make build-installer IMG=<some-registry>/operator:tag
+make build-installer IMG=alanut93/news-aggregator-operator:v1.0.2
 ```
 
 NOTE: The makefile target mentioned above generates an 'install.yaml'
@@ -88,27 +87,4 @@ Users can just run kubectl apply -f <URL for YAML BUNDLE> to install the project
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/<org>/operator/<tag or branch>/dist/install.yaml
 ```
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2024.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
