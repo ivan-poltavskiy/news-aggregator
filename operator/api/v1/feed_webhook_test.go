@@ -175,7 +175,7 @@ func TestCheckNameUnique(t *testing.T) {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: existingFeed.Namespace,
-					UID:       "valid-uid",
+					UID:       "test",
 				},
 			},
 			expectErr: true,
