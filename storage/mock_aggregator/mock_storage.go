@@ -153,6 +153,20 @@ func (mr *MockStorageMockRecorder) SaveSource(source interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSource", reflect.TypeOf((*MockStorage)(nil).SaveSource), source)
 }
 
+// UpdateSource mocks base method.
+func (m *MockStorage) UpdateSource(updatedSource source.Source, currentName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSource", updatedSource, currentName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSource indicates an expected call of UpdateSource.
+func (mr *MockStorageMockRecorder) UpdateSource(updatedSource, currentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSource", reflect.TypeOf((*MockStorage)(nil).UpdateSource), updatedSource, currentName)
+}
+
 // MockNews is a mock of News interface.
 type MockNews struct {
 	ctrl     *gomock.Controller
@@ -314,4 +328,18 @@ func (m *MockSource) SaveSource(source source.Source) error {
 func (mr *MockSourceMockRecorder) SaveSource(source interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSource", reflect.TypeOf((*MockSource)(nil).SaveSource), source)
+}
+
+// UpdateSource mocks base method.
+func (m *MockSource) UpdateSource(updatedSource source.Source, currentName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSource", updatedSource, currentName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSource indicates an expected call of UpdateSource.
+func (mr *MockSourceMockRecorder) UpdateSource(updatedSource, currentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSource", reflect.TypeOf((*MockSource)(nil).UpdateSource), updatedSource, currentName)
 }

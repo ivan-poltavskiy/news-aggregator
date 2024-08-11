@@ -70,3 +70,34 @@ func (service *Service) SaveSource(request AddSourceRequest) (source.Name, error
 	}
 	return sourceEntity.Name, nil
 }
+
+func (service *Service) UpdateSourceByName(currentName, newName, newURL string) error {
+	currentSource, err := service.storage.GetSourceByName(source.Name(currentName))
+	if err != nil {
+		logrus.Error("Failed to retrieve sources: ", err)
+		return err
+	}
+
+	if currentSource.Name == "" {
+		return fmt.Errorf("source with name %s does not exist", newName)
+	}
+
+	if newName == "" {
+		return fmt.Errorf("passed name is empty")
+	}
+
+	currentSource.Name = source.Name(newName)
+
+	if newURL != "" {
+		currentSource.Link = source.Link(newURL)
+	}
+
+	err = service.storage.UpdateSource(currentSource, currentName)
+	if err != nil {
+		logrus.Error("Failed to save updated sources: ", err)
+		return err
+	}
+
+	logrus.Info("Sources updated successfully")
+	return nil
+}

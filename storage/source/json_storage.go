@@ -182,3 +182,51 @@ func (storage *jsonStorage) GetSourceByName(name source.Name) (source.Source, er
 	logrus.Info("jsonStorage: source not found: ", name)
 	return source.Source{}, nil
 }
+
+// UpdateSource updates existing source in the JSON storage
+func (storage *jsonStorage) UpdateSource(updatedSource source.Source, currentName string) error {
+	logrus.Info("jsonStorage: Starting to update the source in storage")
+
+	existingSources, err := storage.GetSources()
+	if err != nil {
+		logrus.Error("jsonStorage: Failed to get sources: ", err)
+		return err
+	}
+
+	sourceFound := false
+
+	for i, existingSource := range existingSources {
+		if strings.ToLower(string(existingSource.Name)) == strings.ToLower(currentName) {
+			existingSources[i] = updatedSource
+			sourceFound = true
+			logrus.Info("jsonStorage: Source updated: ", updatedSource.Name)
+			break
+		}
+	}
+
+	if !sourceFound {
+		logrus.Error("jsonStorage: Source not found: ", currentName)
+		return fmt.Errorf("source with name '%s' not found", currentName)
+	}
+
+	file, err := os.Create(string(storage.pathToStorage))
+	if err != nil {
+		logrus.Error("jsonStorage: Failed to create storage file: ", err)
+		return err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			logrus.Error("jsonStorage: Error closing file: ", err)
+		}
+	}(file)
+
+	err = json.NewEncoder(file).Encode(existingSources)
+	if err != nil {
+		logrus.Error("jsonStorage: Failed to encode sources to JSON: ", err)
+		return err
+	}
+
+	logrus.Info("jsonStorage: Source successfully updated in storage")
+	return nil
+}
