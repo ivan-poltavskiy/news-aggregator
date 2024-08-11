@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
+	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -31,13 +32,13 @@ type FeedReconciler struct {
 	Scheme     *runtime.Scheme
 	HttpClient HttpClient
 	Finalizer  string
-	HttpsLinks HttpsLinks
+	HttpsLinks HttpsClientData
 }
 
-// todo
-type HttpsLinks struct {
-	LinkForCreateFeed string
-	LinkForDeleteFeed string
+// HttpsClientData contains information for connecting and working with the http client of news aggregator
+type HttpsClientData struct {
+	ServerUrl                 string
+	EndpointForSourceManaging string
 }
 
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=feeds,verbs=get;list;watch;create;update;patch;delete
@@ -146,8 +147,11 @@ func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 		logrus.Error("Failed to marshal source request: ", err)
 		return err
 	}
-
-	resp, err := r.HttpClient.Post(r.HttpsLinks.LinkForCreateFeed, "application/json", bytes.NewBuffer(reqBody))
+	path, err := url.JoinPath(r.HttpsLinks.ServerUrl, r.HttpsLinks.EndpointForSourceManaging)
+	if err != nil {
+		return err
+	}
+	resp, err := r.HttpClient.Post(path, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.Error("Failed to make POST request: ", err)
 		return err
@@ -180,8 +184,11 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 	}
 
 	logrus.Infof("Feed for delete name: %s", feed.Spec.Name)
-
-	req, err := http.NewRequest("DELETE", r.HttpsLinks.LinkForDeleteFeed, bytes.NewBuffer(reqBody))
+	path, err := url.JoinPath(r.HttpsLinks.ServerUrl, r.HttpsLinks.EndpointForSourceManaging)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("DELETE", path, bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.Error("Failed to create DELETE request: ", err)
 		return err
@@ -221,8 +228,11 @@ func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
 		logrus.Error("Failed to marshal source request: ", err)
 		return err
 	}
-
-	resp, err := r.HttpClient.Post(r.HttpsLinks.LinkForCreateFeed, "application/json", bytes.NewBuffer(reqBody))
+	path, err := url.JoinPath(r.HttpsLinks.ServerUrl, r.HttpsLinks.EndpointForSourceManaging)
+	if err != nil {
+		return err
+	}
+	resp, err := r.HttpClient.Post(path, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.Error("Failed to make POST request: ", err)
 		return err

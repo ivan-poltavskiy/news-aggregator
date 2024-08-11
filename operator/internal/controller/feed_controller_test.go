@@ -76,8 +76,8 @@ func TestFeedReconciler_addFeed(t *testing.T) {
 
 			reconciler := &FeedReconciler{
 				HttpClient: mockHttpClient,
-				HttpsLinks: HttpsLinks{
-					LinkForCreateFeed: "http://mock-server/create-feed",
+				HttpsLinks: HttpsClientData{
+					EndpointForSourceManaging: "http://mock-server/create-feed",
 				},
 			}
 
@@ -153,8 +153,8 @@ func TestFeedReconciler_deleteFeed(t *testing.T) {
 
 			reconciler := &FeedReconciler{
 				HttpClient: mockHttpClient,
-				HttpsLinks: HttpsLinks{
-					LinkForDeleteFeed: "http://mock-delete-url",
+				HttpsLinks: HttpsClientData{
+					EndpointForSourceManaging: "http://mock-delete-url",
 				},
 			}
 
