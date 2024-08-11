@@ -165,3 +165,83 @@ func TestFeedReconciler_deleteFeed(t *testing.T) {
 		})
 	}
 }
+
+func TestFeedReconciler_updateFeed(t *testing.T) {
+	tests := []struct {
+		name            string
+		feed            aggregatorv1.Feed
+		mockPutResponse *http.Response
+		mockPutError    error
+		expectedError   bool
+	}{
+		{
+			name: "Success update request",
+			feed: aggregatorv1.Feed{
+				Spec: aggregatorv1.FeedSpec{
+					Url:  "http://example.com/feed",
+					Name: "test-feed",
+				},
+			},
+			mockPutResponse: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(bytes.NewBufferString(`{}`)),
+			},
+			mockPutError:  nil,
+			expectedError: false,
+		},
+		{
+			name: "Failed update request with error",
+			feed: aggregatorv1.Feed{
+				Spec: aggregatorv1.FeedSpec{
+					Url:  "http://example.com/feed",
+					Name: "test-feed",
+				},
+			},
+			mockPutResponse: nil,
+			mockPutError:    errors.New("failed to make PUT request"),
+			expectedError:   true,
+		},
+		{
+			name: "Failed update request with non-200 status",
+			feed: aggregatorv1.Feed{
+				Spec: aggregatorv1.FeedSpec{
+					Url:  "http://example.com/feed",
+					Name: "test-feed",
+				},
+			},
+			mockPutResponse: &http.Response{
+				StatusCode: http.StatusInternalServerError,
+				Body:       io.NopCloser(bytes.NewBufferString(`{}`)),
+			},
+			mockPutError:  nil,
+			expectedError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockHttpClient := controller.NewMockHttpClient(ctrl)
+
+			mockHttpClient.EXPECT().
+				Do(gomock.Any()).
+				Return(tt.mockPutResponse, tt.mockPutError).
+				Times(1)
+
+			reconciler := &FeedReconciler{
+				HttpClient: mockHttpClient,
+				HttpsLinks: HttpsClientData{
+					EndpointForSourceManaging: "http://mock-server/update-feed",
+				},
+			}
+
+			err := reconciler.updateFeed(tt.feed)
+
+			if (err != nil) != tt.expectedError {
+				t.Errorf("updateFeed() error = %v, expectedError %v", err, tt.expectedError)
+			}
+		})
+	}
+}

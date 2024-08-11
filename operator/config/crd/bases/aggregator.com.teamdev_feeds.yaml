@@ -59,6 +59,8 @@ spec:
                         to another.
                       format: date-time
                       type: string
+                    lastUpdatedName:
+                      type: string
                     message:
                       description: If Success is False, the message should be populated
                       type: string

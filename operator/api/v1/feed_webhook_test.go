@@ -76,7 +76,7 @@ func TestFeed_ValidateUpdate(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name: "Name too long",
+			name: "NewName too long",
 			feed: Feed{
 				Spec: FeedSpec{
 					Name: "this-name-is-way-too-long",

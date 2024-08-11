@@ -24,7 +24,8 @@ type Condition struct {
 	// If Success is False, the reason should be populated
 	Reason string `json:"reason,omitempty"`
 	// If Success is False, the message should be populated
-	Message string `json:"message,omitempty"`
+	Message         string `json:"message,omitempty"`
+	LastUpdatedName string `json:"lastUpdatedName,omitempty"`
 	// Last time the condition transitioned from one status to another.
 	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 }
@@ -64,11 +65,12 @@ type FeedList struct {
 // AddCondition adds new condition to the Feed's status
 func (f *FeedStatus) AddCondition(condition Condition) {
 	newCondition := Condition{
-		Type:           condition.Type,
-		Success:        condition.Success,
-		Reason:         condition.Reason,
-		Message:        condition.Message,
-		LastUpdateTime: metav1.Now(),
+		Type:            condition.Type,
+		Success:         condition.Success,
+		Reason:          condition.Reason,
+		Message:         condition.Message,
+		LastUpdatedName: condition.LastUpdatedName,
+		LastUpdateTime:  metav1.Now(),
 	}
 
 	f.Conditions = append(f.Conditions, newCondition)

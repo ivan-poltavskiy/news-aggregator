@@ -120,18 +120,20 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 	}
 	feed.Status.AddCondition(aggregatorv1.Condition{
-		Type:    aggregatorv1.ConditionAdded,
-		Success: true,
-		Message: "",
-		Reason:  "",
+		Type:            aggregatorv1.ConditionAdded,
+		Success:         true,
+		LastUpdatedName: feed.Spec.Name,
+		Message:         "",
+		Reason:          "",
 	})
+
 	if err := r.Client.Status().Update(ctx, &feed); err != nil {
 		return ctrl.Result{}, err
 	}
 
 	logrus.Info("UpdateCondition: ", feed.Status.Conditions)
 
-	logrus.Info("Success updated. Feed Name and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
+	logrus.Info("Success updated. Feed NewName and Feed Link: ", feed.Spec.Name, feed.Spec.Url)
 
 	return ctrl.Result{}, nil
 }
@@ -220,8 +222,9 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 
 func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
 	feedUpdateRequest := feedUpdateRequest{
-		Name: feed.Spec.Name,
-		Url:  feed.Spec.Url,
+		NewName: feed.Spec.Name,
+		OldName: feed.Status.GetCurrentCondition().LastUpdatedName,
+		Url:     feed.Spec.Url,
 	}
 
 	reqBody, err := json.Marshal(feedUpdateRequest)
@@ -285,8 +288,9 @@ type feedCreateRequest struct {
 
 // feedUpdateRequest contains the data of the feed to update it
 type feedUpdateRequest struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	OldName string `json:"old_name"`
+	NewName string `json:"new_name"`
+	Url     string `json:"url"`
 }
 
 // feedDeleteRequest contains the name of the feed to delete it
