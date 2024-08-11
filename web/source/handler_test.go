@@ -83,11 +83,11 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 }
 
 // mockSaveSource mocks the SaveSource method
-func mockSaveSource(_ *Service, url string) (source.Name, error) {
-	if url == "" {
+func mockSaveSource(_ *Service, request AddSourceRequest) (source.Name, error) {
+	if request.URL == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
-	if url == "https://www.pravda.com.ua/" {
+	if request.URL == "https://www.pravda.com.ua/" {
 		return "pravda", nil
 	}
 	return "", fmt.Errorf("unknown error")
