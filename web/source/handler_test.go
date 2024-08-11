@@ -112,19 +112,19 @@ func TestAddSourceHandler(t *testing.T) {
 	}{
 		{
 			name:           "ValidRequest",
-			requestBody:    addSourceRequest{URL: "https://www.pravda.com.ua/"},
+			requestBody:    AddSourceRequest{URL: "https://www.pravda.com.ua/"},
 			expectedStatus: http.StatusOK,
 			expectedBody:   "News saved successfully. Name of source: pravda",
 		},
 		{
 			name:           "EmptyURL",
-			requestBody:    addSourceRequest{URL: ""},
+			requestBody:    AddSourceRequest{URL: ""},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   "passed url is empty",
 		},
 		{
 			name:           "UnknownURL",
-			requestBody:    addSourceRequest{URL: "https://unknown.com/"},
+			requestBody:    AddSourceRequest{URL: "https://unknown.com/"},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   "unknown error",
 		},

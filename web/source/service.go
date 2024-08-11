@@ -31,29 +31,27 @@ func (service *Service) DeleteSourceByName(name source.Name) error {
 }
 
 // SaveSource processes the source URL and returns the source entity
-func (service *Service) SaveSource(url string) (source.Name, error) {
+func (service *Service) SaveSource(request AddSourceRequest) (source.Name, error) {
 
-	if url == "" {
-		return "", fmt.Errorf("passed url is empty")
+	if request.URL == "" || request.Name == "" {
+		return "", fmt.Errorf("passed url or name are empty")
 	}
 
-	rssURL, err := feed.GetRssFeedLink(url)
+	rssURL, err := feed.GetRssFeedLink(request.URL)
 	if err != nil {
 		return "", err
 	}
 	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
 
-	domainName := feed.ExtractDomainName(url)
-
-	parsedNews, err := feed.ParseRssFeed(rssURL, domainName)
+	parsedNews, err := feed.ParseRssFeed(rssURL, request.Name)
 	if err != nil {
 		return "", err
 	}
 
 	sourceEntity := source.Source{
-		Name:       source.Name(domainName),
+		Name:       source.Name(request.Name),
 		SourceType: source.STORAGE,
-		Link:       source.Link(url),
+		Link:       source.Link(request.URL),
 	}
 	newsService := news.NewService(service.storage)
 	sourceEntity, err = newsService.SaveNews(sourceEntity, parsedNews)

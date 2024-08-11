@@ -105,13 +105,12 @@ func newsUnification(articles []news.News, existingArticles []news.News) []news.
 
 // updateSourceNews updating the news of the input source
 func updateSourceNews(inputSource source.Source, storage storage.Storage) error {
-	domainName := feed.ExtractDomainName(string(inputSource.Link))
 	rssURL, err := feed.GetRssFeedLink(string(inputSource.Link))
 	if err != nil {
 		return err
 	}
 
-	currentNews, err := feed.ParseRssFeed(rssURL, domainName)
+	currentNews, err := feed.ParseRssFeed(rssURL, string(inputSource.Name))
 	if err != nil {
 		return err
 	}

@@ -14,8 +14,9 @@ type deleteSourceRequest struct {
 	Name string `json:"name"`
 }
 
-type addSourceRequest struct {
-	URL string `json:"url"`
+type AddSourceRequest struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 type HandlerForSources struct {
@@ -75,7 +76,7 @@ func (h *HandlerForSources) DeleteSourceByNameHandler(w http.ResponseWriter, r *
 }
 
 func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Request) {
-	var requestBody addSourceRequest
+	var requestBody AddSourceRequest
 
 	if err := parseRequest(r, &requestBody); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -83,7 +84,7 @@ func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Requ
 	}
 	logrus.Info("AddSourceHandler: The URL from the request to add the source was successfully retrieved: ", requestBody.URL)
 
-	sourceName, err := h.service.SaveSource(requestBody.URL)
+	sourceName, err := h.service.SaveSource(requestBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -96,7 +97,7 @@ func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Requ
 }
 
 // get the URL of the source from the request
-func parseRequest(r *http.Request, requestBody *addSourceRequest) error {
+func parseRequest(r *http.Request, requestBody *AddSourceRequest) error {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Error("Failed to read request body: ", err)

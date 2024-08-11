@@ -61,7 +61,7 @@ func ExtractDomainName(url string) string {
 }
 
 // ParseRssFeed downloads the RSS feed and returns the parsed news
-func ParseRssFeed(rssURL, domainName string) ([]news.News, error) {
+func ParseRssFeed(rssURL, name string) ([]news.News, error) {
 	rssResponse, err := http.Get(rssURL)
 	if err != nil || rssResponse.StatusCode != http.StatusOK {
 		logrus.Error("Failed to download RSS feed: ", err)
@@ -93,7 +93,7 @@ func ParseRssFeed(rssURL, domainName string) ([]news.News, error) {
 		return nil, fmt.Errorf("failed to save RSS feed")
 	}
 
-	parsedNews, err := parser.Rss{}.Parse(source.PathToFile(tempFile.Name()), source.Name(domainName))
+	parsedNews, err := parser.Rss{}.Parse(source.PathToFile(tempFile.Name()), source.Name(name))
 	if err != nil {
 		logrus.Error("Failed to parse RSS feed: ", err)
 		return nil, fmt.Errorf("failed to parse RSS feed")
