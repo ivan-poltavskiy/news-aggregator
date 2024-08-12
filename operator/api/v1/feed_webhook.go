@@ -80,7 +80,6 @@ func (r *Feed) validateFeed() (admission.Warnings, error) {
 		errorsList = append(errorsList, field.Invalid(specPath.Child("name"), r.Spec.Name, err.Error()))
 	}
 
-	// Return the aggregated errors if any
 	if len(errorsList) > 0 {
 		return nil, errorsList.ToAggregate()
 	}
