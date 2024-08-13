@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"io"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
@@ -85,6 +86,13 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	titlesCount := hotNews.Spec.SummaryConfig.TitlesCount
+	if len(articles) < titlesCount {
+		titlesCount = len(articles)
+	}
+	hotNews.Status.ArticlesTitles = getTopTitles(articles, titlesCount)
+
 	hotNews.Status.ArticlesCount = len(articles)
 	hotNews.Status.NewsLink = url
 
@@ -104,7 +112,7 @@ func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) string {
 	}
 
 	if len(hotNews.Spec.Keywords) > 0 {
-		params.Add("keywords=", strings.Join(hotNews.Spec.Keywords, ","))
+		params.Add("keywords", strings.Join(hotNews.Spec.Keywords, ","))
 	}
 
 	if hotNews.Spec.DateStart != "" && hotNews.Spec.DateEnd != "" {
@@ -123,25 +131,6 @@ type News struct {
 	SourceName  string
 }
 
-func (r *HotNewsReconciler) fetchArticles(url string) ([]News, error) {
-	resp, err := r.HttpClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get articles from news aggregator: %s", resp.Status)
-	}
-
-	var articles []News
-	if err := json.NewDecoder(resp.Body).Decode(&articles); err != nil {
-		return nil, err
-	}
-
-	return articles, nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
@@ -158,4 +147,37 @@ func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			},
 		}).
 		Complete(r)
+}
+
+func (r *HotNewsReconciler) fetchArticles(url string) ([]News, error) {
+	resp, err := r.HttpClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logrus.Error("Failed to close response body")
+			return
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get articles from news aggregator: %s", resp.Status)
+	}
+
+	var articles []News
+	if err := json.NewDecoder(resp.Body).Decode(&articles); err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}
+
+func getTopTitles(articles []News, count int) []string {
+	var titles []string
+	for i := 0; i < len(articles) && i <= count; i++ {
+		titles = append(titles, articles[i].Title)
+	}
+	return titles
 }

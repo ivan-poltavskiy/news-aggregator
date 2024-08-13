@@ -8,9 +8,10 @@ metadata:
 spec:
   keywords:
     - "ukr"
-    - "trump"
   feedsName:
     - "nytimes"
     - "cbsnews"
+  dateStart: "2024-08-10"
+  dateEnd: "2024-08-15"
   summaryConfig:
     titlesCount: 10
