@@ -41,6 +41,7 @@ func init() {
 func main() {
 	var serverUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
 	var endpointForSourceManaging = "/sources"
+	var endpointForGetNews = "/news"
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
@@ -159,9 +160,14 @@ func main() {
 		}
 	}
 	if err = (&controller.HotNewsReconciler{
-		Client:     mgr.GetClient(),
-		Scheme:     mgr.GetScheme(),
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		HttpsLinks: controller.HttpsClientData{
+			ServerUrl:                 serverUrl,
+			EndpointForSourceManaging: endpointForGetNews,
+		},
 		HttpClient: httpClient,
+		Finalizer:  finalizer,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HotNews")
 		os.Exit(1)

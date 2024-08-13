@@ -25,10 +25,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
+	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"strings"
 	"time"
 )
 
@@ -37,6 +39,8 @@ type HotNewsReconciler struct {
 	client.Client
 	Scheme     *runtime.Scheme
 	HttpClient HttpClient
+	HttpsLinks HttpsClientData
+	Finalizer  string
 }
 
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=hotnews,verbs=get;list;watch;create;update;patch;delete
@@ -56,19 +60,59 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	articles, err := r.fetchArticles("https://news-aggregator-service.news-aggregator.svc.cluster.local:443/news?sources=kashtan")
+	if !containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+		hotNews.ObjectMeta.Finalizers = append(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+		if err := r.Client.Update(ctx, &hotNews); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() {
+		if containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+			hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+			if err := r.Client.Update(ctx, &hotNews); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		return ctrl.Result{}, nil
+	}
+
+	url := r.createUrl(hotNews)
+	logrus.Info("URL= ", url)
+
+	articles, err := r.fetchArticles(url)
 
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 	hotNews.Status.ArticlesCount = len(articles)
-	hotNews.Status.NewsLink = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443/news?sources=kashtan"
+	hotNews.Status.NewsLink = url
 
 	if err := r.Client.Status().Update(ctx, &hotNews); err != nil {
 		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) string {
+	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
+	params := url.Values{}
+
+	if len(hotNews.Spec.FeedsName) > 0 {
+		params.Add("sources", strings.Join(hotNews.Spec.FeedsName, ","))
+	}
+
+	if len(hotNews.Spec.Keywords) > 0 {
+		params.Add("keywords=", strings.Join(hotNews.Spec.Keywords, ","))
+	}
+
+	if hotNews.Spec.DateStart != "" && hotNews.Spec.DateEnd != "" {
+		params.Add("startDate", hotNews.Spec.DateStart)
+		params.Add("endDate", hotNews.Spec.DateEnd)
+	}
+
+	return baseUrl + "?" + params.Encode()
 }
 
 type News struct {
