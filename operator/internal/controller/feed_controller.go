@@ -24,6 +24,7 @@ import (
 type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 	Post(url, contentType string, body io.Reader) (*http.Response, error)
+	Get(url string) (resp *http.Response, err error)
 }
 
 // FeedReconciler reconciles a Feed object

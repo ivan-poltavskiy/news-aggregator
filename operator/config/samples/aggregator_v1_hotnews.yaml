@@ -1,0 +1,16 @@
+apiVersion: aggregator.com.teamdev/v1
+kind: HotNews
+metadata:
+  labels:
+    app.kubernetes.io/name: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: hotnews-sample
+spec:
+  keywords:
+    - "ukraine"
+  dateStart: "2024-08-06"
+  dateEnd: "2024-08-08"
+  feedsName:
+    - "nytimes"
+  summaryConfig:
+    titlesCount: 10

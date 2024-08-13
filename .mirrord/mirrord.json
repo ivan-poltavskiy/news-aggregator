@@ -9,7 +9,7 @@
     },
     "target": {
         "path": {
-            "pod": "operator-controller-manager-8c65f564-c4h5z"
+            "pod": "operator-controller-manager-66c9785f8f-kr44p"
         },
         "namespace": "operator-system"
     }
