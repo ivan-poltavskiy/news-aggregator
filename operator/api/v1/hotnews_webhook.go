@@ -119,7 +119,7 @@ func (r *HotNews) validateFeeds() error {
 
 	existingFeeds := make(map[string]bool)
 	for _, feed := range feedList.Items {
-		existingFeeds[feed.Name] = true
+		existingFeeds[feed.Spec.Name] = true
 	}
 
 	for _, feedName := range r.Spec.FeedsName {

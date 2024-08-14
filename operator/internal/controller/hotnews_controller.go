@@ -88,6 +88,23 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager sets up the controller with the Manager.
+func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&aggregatorv1.HotNews{}).
+		Watches(
+			&aggregatorv1.Feed{},
+			handler.EnqueueRequestsFromMapFunc(r.updateHotNews),
+		).
+		Watches(
+			&v1.ConfigMap{},
+			handler.EnqueueRequestsFromMapFunc(r.updateHotNews),
+		).
+		Complete(r)
+}
+
+// reconcileHotNews synchronizes the state of the HotNews custom resource
+// with the external news sources specified in the ConfigMap.
 func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) error {
 
 	url := r.createUrl(*hotNews, configMap)
@@ -110,6 +127,31 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, conf
 	return nil
 }
 
+// updateHotNews is a handler function that is triggered when relevant changes
+// occur to resources that the controller watches.
+func (r *HotNewsReconciler) updateHotNews(context.Context, client.Object) []reconcile.Request {
+	var hotNewsList aggregatorv1.HotNewsList
+	if err := r.List(context.TODO(), &hotNewsList); err != nil {
+		log.Log.Error(err, "Failed to list HotNews resources")
+		return nil
+	}
+	logrus.Info("Hello from updateHotNews()")
+
+	var requests []ctrl.Request
+	for _, hotNews := range hotNewsList.Items {
+		requests = append(requests, ctrl.Request{
+			NamespacedName: client.ObjectKey{
+				Name:      hotNews.Name,
+				Namespace: hotNews.Namespace,
+			},
+		})
+	}
+
+	return requests
+}
+
+// createUrl constructs the URL used to fetch news articles based on the
+// configuration provided in the HotNews resource and the related ConfigMap.
 func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v1.ConfigMap) string {
 	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
 	params := url.Values{}
@@ -141,7 +183,7 @@ func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v
 	return baseUrl + "?" + params.Encode()
 }
 
-type News struct {
+type news struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Link        string    `json:"url"`
@@ -149,43 +191,9 @@ type News struct {
 	SourceName  string
 }
 
-// SetupWithManager sets up the controller with the Manager.
-func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&aggregatorv1.HotNews{}).
-		Watches(
-			&aggregatorv1.Feed{},
-			handler.EnqueueRequestsFromMapFunc(r.reconcileAllHotNews),
-		).
-		Watches(
-			&v1.ConfigMap{},
-			handler.EnqueueRequestsFromMapFunc(r.reconcileAllHotNews),
-		).
-		Complete(r)
-}
-
-func (r *HotNewsReconciler) reconcileAllHotNews(context.Context, client.Object) []reconcile.Request {
-	var hotNewsList aggregatorv1.HotNewsList
-	if err := r.List(context.TODO(), &hotNewsList); err != nil {
-		log.Log.Error(err, "Failed to list HotNews resources")
-		return nil
-	}
-	logrus.Info("Hello from reconcileAllHotNews()")
-
-	var requests []ctrl.Request
-	for _, hotNews := range hotNewsList.Items {
-		requests = append(requests, ctrl.Request{
-			NamespacedName: client.ObjectKey{
-				Name:      hotNews.Name,
-				Namespace: hotNews.Namespace,
-			},
-		})
-	}
-
-	return requests
-}
-
-func (r *HotNewsReconciler) fetchNews(url string) ([]News, error) {
+// fetchNews sends an HTTP GET request to the specified URL to retrieve a list
+// of news articles
+func (r *HotNewsReconciler) fetchNews(url string) ([]news, error) {
 	resp, err := r.HttpClient.Get(url)
 	if err != nil {
 		return nil, err
@@ -202,7 +210,7 @@ func (r *HotNewsReconciler) fetchNews(url string) ([]News, error) {
 		return nil, fmt.Errorf("failed to get articles from news aggregator: %s", resp.Status)
 	}
 
-	var articles []News
+	var articles []news
 	if err := json.NewDecoder(resp.Body).Decode(&articles); err != nil {
 		return nil, err
 	}
@@ -210,7 +218,9 @@ func (r *HotNewsReconciler) fetchNews(url string) ([]News, error) {
 	return articles, nil
 }
 
-func getTopTitles(articles []News, count int) []string {
+// getTopTitles extracts the titles of the top news articles based on the
+// specified count.
+func getTopTitles(articles []news, count int) []string {
 	var titles []string
 	for i := 0; i < len(articles) && i <= count; i++ {
 		titles = append(titles, articles[i].Title)
