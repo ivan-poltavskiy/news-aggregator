@@ -48,6 +48,7 @@ func main() {
 	var secureMetrics bool
 	var enableHTTP2 bool
 	var tlsOpts []func(*tls.Config)
+	const configMapMame = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -159,6 +160,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 	if err = (&controller.HotNewsReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -166,8 +168,9 @@ func main() {
 			ServerUrl:                 serverUrl,
 			EndpointForSourceManaging: endpointForGetNews,
 		},
-		HttpClient: httpClient,
-		Finalizer:  finalizer,
+		HttpClient:    httpClient,
+		ConfigMapMame: configMapMame,
+		Finalizer:     finalizer,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HotNews")
 		os.Exit(1)

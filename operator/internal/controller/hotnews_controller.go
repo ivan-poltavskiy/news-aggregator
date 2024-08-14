@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
@@ -38,19 +39,31 @@ import (
 // HotNewsReconciler reconciles a HotNews object
 type HotNewsReconciler struct {
 	client.Client
-	Scheme     *runtime.Scheme
-	HttpClient HttpClient
-	HttpsLinks HttpsClientData
-	Finalizer  string
+	Scheme        *runtime.Scheme
+	HttpClient    HttpClient
+	HttpsLinks    HttpsClientData
+	Finalizer     string
+	ConfigMapMame string
 }
 
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=hotnews,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=hotnews/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=hotnews/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
 
 func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	var hotNews aggregatorv1.HotNews
+
+	var feedGroupConfigMap v1.ConfigMap
+	if err := r.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: r.ConfigMapMame}, &feedGroupConfigMap); err != nil {
+		if errors.IsNotFound(err) {
+			logrus.Print("ConfigMap not found")
+			return ctrl.Result{}, err
+		}
+		logrus.Printf("Error retrieving ConfigMap %s from k8s Cluster: %v", "feed-group-source", err)
+		return ctrl.Result{}, err
+	}
 
 	err := r.Client.Get(ctx, req.NamespacedName, &hotNews)
 	if err != nil {
@@ -78,23 +91,10 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
-	url := r.createUrl(hotNews)
-	logrus.Info("URL= ", url)
-
-	articles, err := r.fetchArticles(url)
-
+	err = r.reconcileHotNews(&hotNews, &feedGroupConfigMap)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-
-	titlesCount := hotNews.Spec.SummaryConfig.TitlesCount
-	if len(articles) < titlesCount {
-		titlesCount = len(articles)
-	}
-	hotNews.Status.ArticlesTitles = getTopTitles(articles, titlesCount)
-
-	hotNews.Status.ArticlesCount = len(articles)
-	hotNews.Status.NewsLink = url
 
 	if err := r.Client.Status().Update(ctx, &hotNews); err != nil {
 		return ctrl.Result{}, err
@@ -103,9 +103,42 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
-func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) string {
+func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) error {
+
+	url := r.createUrl(*hotNews, configMap)
+	logrus.Info("URL= ", url)
+
+	articles, err := r.fetchNews(url)
+
+	if err != nil {
+		return err
+	}
+
+	titlesCount := hotNews.Spec.SummaryConfig.TitlesCount
+	if len(articles) < titlesCount {
+		titlesCount = len(articles)
+	}
+	hotNews.Status.ArticlesTitles = getTopTitles(articles, titlesCount)
+	logrus.Info("Lenght of news: ", len(articles))
+	hotNews.Status.ArticlesCount = len(articles)
+	hotNews.Status.NewsLink = url
+	return nil
+}
+
+func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v1.ConfigMap) string {
 	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
 	params := url.Values{}
+
+	if len(hotNews.Spec.FeedGroups) > 0 {
+		var feedNames []string
+		for _, group := range hotNews.Spec.FeedGroups {
+			if feeds, found := configMap.Data[group]; found {
+				feedNames = append(feedNames, strings.Split(feeds, ",")...)
+			}
+		}
+		logrus.Info("Sources from feed groups: ", strings.Join(feedNames, ","))
+		hotNews.Spec.FeedsName = feedNames
+	}
 
 	if len(hotNews.Spec.FeedsName) > 0 {
 		params.Add("sources", strings.Join(hotNews.Spec.FeedsName, ","))
@@ -149,7 +182,7 @@ func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *HotNewsReconciler) fetchArticles(url string) ([]News, error) {
+func (r *HotNewsReconciler) fetchNews(url string) ([]News, error) {
 	resp, err := r.HttpClient.Get(url)
 	if err != nil {
 		return nil, err

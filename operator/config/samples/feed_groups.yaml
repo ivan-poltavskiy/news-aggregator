@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feed-group-source
+data:
+  ukr: "kashtan"
+  westMedias: "cbsnews,nytimes"
