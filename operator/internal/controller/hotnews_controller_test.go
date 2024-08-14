@@ -1,84 +1,96 @@
-/*
-Copyright 2024.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controller
 
 import (
-	"context"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	"bytes"
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
+	controller "com.teamdev/news-aggregator/internal/controller/mock_aggregator"
+	"context"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"io"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/scheme"
+	"net/http"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"testing"
 )
 
-var _ = Describe("HotNews Controller", func() {
-	Context("When reconciling a resource", func() {
-		const resourceName = "test-resource"
+func TestReconcileHotNews(t *testing.T) {
+	testScheme := runtime.NewScheme()
+	_ = scheme.AddToScheme(testScheme)
+	_ = aggregatorv1.AddToScheme(testScheme)
+	configMap := &v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-configmap",
+			Namespace: "default",
+		},
+		Data: map[string]string{
+			"group1": "source1,source2",
+		},
+	}
 
-		ctx := context.Background()
-
-		typeNamespacedName := types.NamespacedName{
-			Name:      resourceName,
-			Namespace: "default", // TODO(user):Modify as needed
-		}
-		hotnews := &aggregatorv1.HotNews{}
-
-		BeforeEach(func() {
-			By("creating the custom resource for the Kind HotNews")
-			err := k8sClient.Get(ctx, typeNamespacedName, hotnews)
-			if err != nil && errors.IsNotFound(err) {
-				resource := &aggregatorv1.HotNews{
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      resourceName,
-						Namespace: "default",
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(testScheme).
+		WithObjects(
+			&aggregatorv1.HotNews{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-hotnews",
+					Namespace: "default",
+					Finalizers: []string{
+						"test-finalizer",
 					},
-					// TODO(user): Specify other spec details if needed.
-				}
-				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
-			}
-		})
+				},
+				Spec: aggregatorv1.HotNewsSpec{
+					Keywords:   []string{"keyword1"},
+					DateStart:  "2024-01-01",
+					DateEnd:    "2024-01-31",
+					FeedsName:  []string{"feed1"},
+					FeedGroups: []string{"group1"},
+					SummaryConfig: aggregatorv1.SummaryConfig{
+						TitlesCount: 5,
+					},
+				},
+			},
+			configMap,
+		).Build()
 
-		AfterEach(func() {
-			// TODO(user): Cleanup logic after each test, like removing the resource instance.
-			resource := &aggregatorv1.HotNews{}
-			err := k8sClient.Get(ctx, typeNamespacedName, resource)
-			Expect(err).NotTo(HaveOccurred())
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-			By("Cleanup the specific resource instance HotNews")
-			Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
-		})
-		It("should successfully reconcile the resource", func() {
-			By("Reconciling the created resource")
-			controllerReconciler := &HotNewsReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
-			}
+	mockHttpClient := controller.NewMockHttpClient(ctrl)
 
-			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
-				NamespacedName: typeNamespacedName,
-			})
-			Expect(err).NotTo(HaveOccurred())
-			// TODO(user): Add more specific assertions depending on your controller's reconciliation logic.
-			// Example: If you expect a certain status condition after reconciliation, verify it here.
-		})
-	})
-})
+	expectedURL := "?endDate=2024-01-31&keywords=keyword1&sources=source1%2Csource2&startDate=2024-01-01"
+	mockHttpClient.EXPECT().
+		Get(gomock.Eq(expectedURL)).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewBufferString(`[{"Title": "News1"},{"Title": "News2"},{"Title": "News3"}]`)),
+		}, nil).
+		Times(1)
+
+	r := &HotNewsReconciler{
+		Client:        fakeClient,
+		Scheme:        testScheme,
+		HttpClient:    mockHttpClient,
+		HttpsLinks:    HttpsClientData{},
+		Finalizer:     "test-finalizer",
+		ConfigMapMame: "test-configmap",
+	}
+
+	req := reconcile.Request{
+		NamespacedName: client.ObjectKey{
+			Name:      "test-hotnews",
+			Namespace: "default",
+		},
+	}
+	result, err := r.Reconcile(context.Background(), req)
+	assert.Equal(t, reconcile.Result{}, result)
+
+	updatedHotNews := &aggregatorv1.HotNews{}
+	err = fakeClient.Get(context.TODO(), req.NamespacedName, updatedHotNews)
+	assert.NoError(t, err)
+}
