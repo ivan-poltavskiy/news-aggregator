@@ -4,4 +4,4 @@ metadata:
   name: feed-group-source
 data:
   ukr: "kashtan"
-  westMedias: "cbsnews,nytimes"
+  westMedias: "cbsnews"

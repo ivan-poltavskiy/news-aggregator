@@ -8,11 +8,12 @@ metadata:
 spec:
   keywords:
     - "Війна"
+    - "Biden"
   feedGroups:
     - "ukr"
-  feedsName:
-    - "nytimes"
-    - "cbsnews"
+#  feedsName:
+#    - "nytimes"
+#    - "cbsnews"
 #  dateStart: "2024-08-10"
 #  dateEnd: "2024-08-15"
   summaryConfig:
