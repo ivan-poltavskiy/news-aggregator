@@ -25,7 +25,7 @@ func (r *HotNews) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 var _ webhook.Defaulter = &HotNews{}
 
-// Default implements webhook.Defaulter so a webhook will be registered for the type
+// Default sets the default values to some field in the spec when the webhook works
 func (r *HotNews) Default() {
 	if r.Spec.SummaryConfig.TitlesCount == 0 {
 		r.Spec.SummaryConfig.TitlesCount = 10
@@ -53,26 +53,27 @@ func (r *HotNews) Default() {
 
 var _ webhook.Validator = &HotNews{}
 
-// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+// ValidateCreate validate the input data at the time of HotNews' creation
 func (r *HotNews) ValidateCreate() (admission.Warnings, error) {
 	logrus.Info("validate create", "name", r.Name)
 	return r.validateHotNews()
 }
 
-// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+// ValidateUpdate validate the input data at the time of HotNews' update
 func (r *HotNews) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	logrus.Info("validate update", "name", r.Name)
 
 	return r.validateHotNews()
 }
 
-// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+// ValidateDelete validate the input data validate the input data at the time of HotNews' update
 func (r *HotNews) ValidateDelete() (admission.Warnings, error) {
 	logrus.Info("validate delete", "name", r.Name)
 
 	return nil, nil
 }
 
+// validateHotNews validate the input data of the hot news and collect the errors to the errors list
 func (r *HotNews) validateHotNews() (admission.Warnings, error) {
 	var errorsList field.ErrorList
 	specPath := field.NewPath("spec")
@@ -102,13 +103,7 @@ func (r *HotNews) validateHotNews() (admission.Warnings, error) {
 	return nil, nil
 }
 
-func (r *HotNews) validateKeywords() error {
-	if len(r.Spec.Keywords) == 0 {
-		return fmt.Errorf("keywords is required")
-	}
-	return nil
-}
-
+// validateFeeds check that the input feeds are present in the namespace
 func (r *HotNews) validateFeeds() error {
 	feedList := &FeedList{}
 	listOpts := client.ListOptions{Namespace: r.Namespace}
@@ -131,6 +126,7 @@ func (r *HotNews) validateFeeds() error {
 	return nil
 }
 
+// validateDate checks that the type is correct and that either two dates or no dates have been transmitted.
 func (r *HotNews) validateDate() error {
 
 	if r.Spec.DateStart != "" || r.Spec.DateEnd != "" {

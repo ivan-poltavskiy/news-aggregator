@@ -41,6 +41,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	var hotNews aggregatorv1.HotNews
 
 	var feedGroupConfigMap v1.ConfigMap
+
 	if err := r.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: r.ConfigMapMame}, &feedGroupConfigMap); err != nil {
 		if errors.IsNotFound(err) {
 			logrus.Print("ConfigMap not found")
@@ -150,7 +151,7 @@ func (r *HotNewsReconciler) updateHotNews(context.Context, client.Object) []reco
 	return requests
 }
 
-// createUrl constructs the URL used to fetch news articles based on the
+// createUrl constructs the URL used to fetch news based on the
 // configuration provided in the HotNews resource and the related ConfigMap.
 func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v1.ConfigMap) string {
 	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
@@ -192,7 +193,7 @@ type news struct {
 }
 
 // fetchNews sends an HTTP GET request to the specified URL to retrieve a list
-// of news articles
+// of news
 func (r *HotNewsReconciler) fetchNews(url string) ([]news, error) {
 	resp, err := r.HttpClient.Get(url)
 	if err != nil {
@@ -218,7 +219,7 @@ func (r *HotNewsReconciler) fetchNews(url string) ([]news, error) {
 	return articles, nil
 }
 
-// getTopTitles extracts the titles of the top news articles based on the
+// getTopTitles extracts the titles of the top news based on the
 // specified count.
 func getTopTitles(articles []news, count int) []string {
 	var titles []string
