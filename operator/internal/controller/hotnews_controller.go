@@ -136,7 +136,6 @@ func (r *HotNewsReconciler) updateHotNews(context.Context, client.Object) []reco
 		log.Log.Error(err, "Failed to list HotNews resources")
 		return nil
 	}
-	logrus.Info("Hello from updateHotNews()")
 
 	var requests []ctrl.Request
 	for _, hotNews := range hotNewsList.Items {
