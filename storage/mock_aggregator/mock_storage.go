@@ -98,7 +98,7 @@ func (mr *MockStorageMockRecorder) GetSourceByName(arg0 interface{}) *gomock.Cal
 // GetSources mocks base method.
 func (m *MockStorage) GetSources() ([]source.Source, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllSources")
+	ret := m.ctrl.Call(m, "GetSources")
 	ret0, _ := ret[0].([]source.Source)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -107,7 +107,7 @@ func (m *MockStorage) GetSources() ([]source.Source, error) {
 // GetSources indicates an expected call of GetSources.
 func (mr *MockStorageMockRecorder) GetSources() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllSources", reflect.TypeOf((*MockStorage)(nil).GetSources))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockStorage)(nil).GetSources))
 }
 
 // IsSourceExists mocks base method.
@@ -290,7 +290,7 @@ func (mr *MockSourceMockRecorder) GetSourceByName(arg0 interface{}) *gomock.Call
 // GetSources mocks base method.
 func (m *MockSource) GetSources() ([]source.Source, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllSources")
+	ret := m.ctrl.Call(m, "GetSources")
 	ret0, _ := ret[0].([]source.Source)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -299,7 +299,7 @@ func (m *MockSource) GetSources() ([]source.Source, error) {
 // GetSources indicates an expected call of GetSources.
 func (mr *MockSourceMockRecorder) GetSources() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllSources", reflect.TypeOf((*MockSource)(nil).GetSources))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockSource)(nil).GetSources))
 }
 
 // IsSourceExists mocks base method.
