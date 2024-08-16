@@ -49,6 +49,9 @@ func main() {
 	http.HandleFunc("PUT /sources", func(w http.ResponseWriter, r *http.Request) {
 		handler.GetSourceHandler().UpdateSourceByName(w, r)
 	})
+	http.HandleFunc("GET /allSources", func(w http.ResponseWriter, r *http.Request) {
+		handler.GetSourceHandler().GetAllSources(w)
+	})
 	logrus.Info("Starting server on: " + *port)
 
 	err = http.ListenAndServeTLS(":"+*port, *pathToCertificate, *pathToKey, nil)
