@@ -6,7 +6,7 @@ env:
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
-  HELM_CHART_NAME: "news-aggregator111"
+  HELM_CHART_NAME: "news-aggregator"
 
 output:
   group:
