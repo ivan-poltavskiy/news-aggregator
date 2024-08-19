@@ -26,13 +26,10 @@ RUN go build -o /bin/main ./web/main.go ./web/handler.go
 
 # Stage 2: Build image
 FROM alpine:3.20.1
-COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=base /bin/main /usr/local/bin/main
 
 # Copy storage and resources to the root directory
 COPY --from=base /src/mnt /mnt
-
-COPY web/certificates web/certificates
 
 EXPOSE ${PORT}
 

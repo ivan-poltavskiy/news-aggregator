@@ -1,6 +1,6 @@
 replicaCount: 1
 containerPort: 443
-imageName: alanut93/news_aggregator:v1.0.19
+imageName: alanut93/news_aggregator:v1.0.20
 namespace: news-aggregator
 serviceAccount: news-aggregator-service-account
 

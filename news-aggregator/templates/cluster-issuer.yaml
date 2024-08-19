@@ -1,0 +1,7 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: news-aggregator-issuer
+  namespace: {{ .Values.namespace }}
+spec:
+  selfSigned: {}

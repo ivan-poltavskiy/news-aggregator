@@ -29,9 +29,15 @@ spec:
               cpu: {{ .Values.resources.requests.cpu }}
               memory: {{ .Values.resources.requests.memory }}
           volumeMounts:
+            - mountPath: /etc/tls-secret
+              name: tls-secret
+              readOnly: true
             - mountPath: "/mnt"
               name: news-aggregator-mnt
       volumes:
+        - name: tls-secret
+          secret:
+            secretName: news-aggregator-tls
         - name: news-aggregator-mnt
           persistentVolumeClaim:
             claimName: news-aggregator-pvc-mnt
