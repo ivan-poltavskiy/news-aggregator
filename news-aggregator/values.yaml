@@ -1,4 +1,5 @@
 replicaCount: 1
+name: news-aggregator
 containerPort: 443
 imageName: alanut93/news_aggregator:v1.0.20
 namespace: news-aggregator
@@ -17,6 +18,14 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
+
+vpa:
+  minAllowed:
+    cpu: "300m"
+    memory: "50Mi"
+  maxAllowed:
+    cpu: "500m"
+    memory: "500Mi"
 
 service:
   port: 443
