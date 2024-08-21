@@ -92,7 +92,10 @@ tasks:
   createChart:
     desc: "Creates a Helm chart for news-aggregator"
     cmds:
-      - helm create $HELM_CHART_NAME
+      - helm package ./helm-chart
+      - mkdir -p ./helm-chart
+      - mv *.tgz ./helm-chart/
+    silent: true
 
   installChart:
     desc: "Installs the Helm chart on the Kubernetes cluster"
