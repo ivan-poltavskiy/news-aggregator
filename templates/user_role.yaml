@@ -4,13 +4,6 @@ metadata:
   name: news-aggregator-role
   namespace: news-aggregator
 rules:
-  - apiGroups: [""]
-    resources: ["pods", "services", "configmaps"]
-    verbs: ["get", "create", "delete", "patch", "list"]
-
-  - apiGroups: ["apps/v1"]
-    resources: ["deployments"]
-    verbs: ["get", "create", "delete", "patch", "list"]
 
 
 ---
