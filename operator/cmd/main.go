@@ -62,6 +62,7 @@ func main() {
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
 	flag.StringVar(&serverUrl, "server-url", serverUrl, "The URL of the news aggregator service.")
 	flag.StringVar(&endpointForSourceManaging, "feed-managing-enpoint", endpointForSourceManaging, "The endpoint of the news aggregator service for managing feeds.")
+	flag.StringVar(&endpointForGetNews, "get-news-endpoint", endpointForGetNews, "The endpoint of the news aggregator service for getting news.")
 	opts := zap.Options{
 		Development: true,
 	}

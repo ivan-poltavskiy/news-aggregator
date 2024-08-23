@@ -60,23 +60,6 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	if !containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
-		hotNews.ObjectMeta.Finalizers = append(hotNews.ObjectMeta.Finalizers, r.Finalizer)
-		if err := r.Client.Update(ctx, &hotNews); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() {
-		if containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
-			hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
-			if err := r.Client.Update(ctx, &hotNews); err != nil {
-				return ctrl.Result{}, err
-			}
-		}
-		return ctrl.Result{}, nil
-	}
-
 	err = r.reconcileHotNews(&hotNews, &feedGroupConfigMap)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -130,9 +113,11 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, conf
 
 // updateHotNews is a handler function that is triggered when relevant changes
 // occur to resources that the controller watches.
-func (r *HotNewsReconciler) updateHotNews(context.Context, client.Object) []reconcile.Request {
+func (r *HotNewsReconciler) updateHotNews(ctx context.Context, obj client.Object) []reconcile.Request {
 	var hotNewsList aggregatorv1.HotNewsList
-	if err := r.List(context.TODO(), &hotNewsList); err != nil {
+
+	// List only the HotNews resources in the same namespace as the changed object
+	if err := r.List(ctx, &hotNewsList, client.InNamespace(obj.GetNamespace())); err != nil {
 		log.Log.Error(err, "Failed to list HotNews resources")
 		return nil
 	}

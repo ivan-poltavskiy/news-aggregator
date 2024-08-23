@@ -8,33 +8,8 @@ metadata:
 spec:
   keywords:
     - "Війна"
-    - "Biden"
+    - "Harris"
   feedGroups:
     - "ukr"
-#  feedsName:
-#    - "nytimes"
-#    - "cbsnews"
-#  dateStart: "2024-08-10"
-#  dateEnd: "2024-08-15"
-  summaryConfig:
-    titlesCount: 10
-
----
-
-apiVersion: aggregator.com.teamdev/v1
-kind: HotNews
-metadata:
-  labels:
-    app.kubernetes.io/name: operator
-    app.kubernetes.io/managed-by: kustomize
-  name: hot
-spec:
-  keywords:
-    - "Війна"
-    - "Biden"
-  feedsName:
-      - "nytimes"
-  dateStart: "2024-08-10"
-  dateEnd: "2024-08-15"
   summaryConfig:
     titlesCount: 10

@@ -98,6 +98,14 @@ func (service *Service) UpdateSourceByName(currentName, newName, newURL string) 
 		return err
 	}
 
+	_, err = service.SaveSource(AddSourceRequest{
+		Name: newName,
+		URL:  newURL,
+	})
+	if err != nil {
+		return err
+	}
+
 	logrus.Info("Sources updated successfully")
 	return nil
 }

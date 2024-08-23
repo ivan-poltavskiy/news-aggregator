@@ -93,7 +93,7 @@ func (r *HotNews) validateHotNews() (admission.Warnings, error) {
 		errorsList = append(errorsList, field.Required(specPath.Child("FeedsName"), err.Error()))
 	}
 
-	logrus.Info("Error list lenght: ", len(errorsList))
+	logrus.Info("Error list length: ", len(errorsList))
 	logrus.Info("Errors from error list: ", errorsList.ToAggregate())
 
 	if len(errorsList) > 0 {
