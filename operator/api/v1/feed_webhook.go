@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"time"
 )
 
 var k8sClient client.Client
@@ -95,9 +96,12 @@ func isValidURL(str string) bool {
 
 // checkNameUniqueness queries the Kubernetes API to ensure that no other Feed with the same name exists in the same namespace.
 func checkNameUniqueness(feed *Feed) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	feedList := &FeedList{}
 	listOpts := client.ListOptions{Namespace: feed.Namespace}
-	err := k8sClient.List(context.Background(), feedList, &listOpts)
+	err := k8sClient.List(ctx, feedList, &listOpts)
 	if err != nil {
 		return fmt.Errorf("checkNameUniqueness: failed to list feeds: %v", err)
 	}

@@ -27,6 +27,9 @@ var _ webhook.Defaulter = &HotNews{}
 
 // Default sets the default values to some field in the spec when the webhook works
 func (r *HotNews) Default() {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	if r.Spec.SummaryConfig.TitlesCount == 0 {
 		r.Spec.SummaryConfig.TitlesCount = 10
 	}
@@ -34,7 +37,8 @@ func (r *HotNews) Default() {
 	if len(r.Spec.FeedsName) == 0 && len(r.Spec.FeedGroups) == 0 {
 		feedList := &FeedList{}
 		listOpts := client.ListOptions{Namespace: r.Namespace}
-		err := k8sClient.List(context.Background(), feedList, &listOpts)
+
+		err := k8sClient.List(ctx, feedList, &listOpts)
 		if err != nil {
 			logrus.Errorf("validateFeeds: failed to list feeds: %v", err)
 		}
@@ -46,7 +50,6 @@ func (r *HotNews) Default() {
 	}
 
 	logrus.Info("default", "name", r.Name)
-
 }
 
 // +kubebuilder:webhook:path=/validate-aggregator-com-teamdev-v1-hotnews,mutating=false,failurePolicy=fail,sideEffects=None,groups=aggregator.com.teamdev,resources=hotnews,verbs=create;update,versions=v1,name=mhotnews.kb.io,admissionReviewVersions=v1
@@ -103,11 +106,14 @@ func (r *HotNews) validateHotNews() (admission.Warnings, error) {
 	return nil, nil
 }
 
-// validateFeeds check that the input feeds are present in the namespace
 func (r *HotNews) validateFeeds() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	feedList := &FeedList{}
 	listOpts := client.ListOptions{Namespace: r.Namespace}
-	err := k8sClient.List(context.Background(), feedList, &listOpts)
+
+	err := k8sClient.List(ctx, feedList, &listOpts)
 	if err != nil {
 		return fmt.Errorf("validateFeeds: failed to list feeds: %v", err)
 	}
