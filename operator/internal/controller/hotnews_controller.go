@@ -74,6 +74,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		return ctrl.Result{}, err
 	}
+
 	hotNews.Status.AddCondition(aggregatorv1.Condition{
 		Type:    aggregatorv1.ConditionAdded,
 		Success: true,
@@ -81,14 +82,8 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		Reason:  "",
 	})
 
-	if err := r.updateFeedOwnerReferences(ctx, &hotNews); err != nil {
+	if err := r.updateOwnerReferencesForFeeds(ctx, &hotNews); err != nil {
 		logrus.Errorf("Failed to update Feed ownerReferences: %v", err)
-		return ctrl.Result{}, err
-	}
-
-	// Remove owner references from feeds that are not used by HotNews anymore
-	if err := r.removeUnusedOwnerReferences(ctx, &hotNews); err != nil {
-		logrus.Errorf("Failed to remove unused Feed ownerReferences: %v", err)
 		return ctrl.Result{}, err
 	}
 
@@ -131,6 +126,11 @@ func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 // reconcileHotNews synchronizes the state of the HotNews custom resource
 // with the external news sources specified in the ConfigMap.
 func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) error {
+	feedNames, err := r.getFeedNamesFromConfigMap(hotNews, configMap)
+	if err != nil {
+		return err
+	}
+	hotNews.Spec.FeedsName = feedNames
 
 	createdUrl, err := r.createUrl(*hotNews, configMap)
 	if err != nil {
@@ -139,7 +139,6 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, conf
 	logrus.Info("URL= ", createdUrl)
 
 	articles, err := r.fetchNews(createdUrl)
-
 	if err != nil {
 		return err
 	}
@@ -152,30 +151,95 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, conf
 	logrus.Info("Length of news: ", len(articles))
 	hotNews.Status.ArticlesCount = len(articles)
 	hotNews.Status.NewsLink = createdUrl
+
 	return nil
 }
 
-func (r *HotNewsReconciler) updateFeedOwnerReferences(ctx context.Context, hotNews *aggregatorv1.HotNews) error {
-	feedList := &aggregatorv1.FeedList{}
-	listOpts := client.ListOptions{Namespace: hotNews.Namespace}
+// getFeedNamesFromConfigMap retrieves the list of feed names from the ConfigMap based on HotNews' FeedGroups.
+func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) ([]string, error) {
+	var feedNames []string
 
-	err := r.Client.List(ctx, feedList, &listOpts)
-	if err != nil {
-		return err
-	}
-
-	for _, feed := range feedList.Items {
-		if r.isFeedUsedInHotNews(&feed, hotNews) {
-			if err := r.addOwnerReference(ctx, &feed, hotNews); err != nil {
-				return fmt.Errorf("failed to add ownerReference to Feed %s: %w", feed.Name, err)
+	if len(hotNews.Spec.FeedGroups) > 0 {
+		for _, group := range hotNews.Spec.FeedGroups {
+			if feeds, found := configMap.Data[group]; found {
+				feedList := strings.Split(feeds, ",")
+				for _, feedName := range feedList {
+					feedName = strings.TrimSpace(feedName)
+					var currentFeed aggregatorv1.Feed
+					err := r.Client.Get(context.TODO(), client.ObjectKey{Namespace: hotNews.Namespace, Name: feedName}, &currentFeed)
+					if err != nil {
+						return nil, fmt.Errorf("failed to get Feed %s: %w", feedName, err)
+					}
+					feedNames = append(feedNames, currentFeed.Spec.Name)
+				}
+			} else {
+				logrus.Warnf("Feed group %s not found in ConfigMap", group)
 			}
 		}
 	}
 
-	return nil
+	return feedNames, nil
 }
 
-func (r *HotNewsReconciler) removeUnusedOwnerReferences(ctx context.Context, hotNews *aggregatorv1.HotNews) error {
+// createUrl constructs the URL used to fetch news based on the
+// configuration provided in the HotNews resource and the related ConfigMap.
+func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v1.ConfigMap) (string, error) {
+	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
+	params := url.Values{}
+
+	if len(hotNews.Spec.FeedsName) > 0 {
+		params.Add("sources", strings.Join(hotNews.Spec.FeedsName, ","))
+	}
+
+	if len(hotNews.Spec.Keywords) > 0 {
+		params.Add("keywords", strings.Join(hotNews.Spec.Keywords, ","))
+	}
+
+	if hotNews.Spec.DateStart != "" && hotNews.Spec.DateEnd != "" {
+		params.Add("startDate", hotNews.Spec.DateStart)
+		params.Add("endDate", hotNews.Spec.DateEnd)
+	}
+
+	return baseUrl + "?" + params.Encode(), nil
+}
+
+// fetchNews sends an HTTP GET request to the specified URL to retrieve a list of news articles.
+func (r *HotNewsReconciler) fetchNews(url string) ([]news, error) {
+	resp, err := r.HttpClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logrus.Error("Failed to close response body")
+			return
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get articles from news aggregator: %s", resp.Status)
+	}
+
+	var articles []news
+	if err := json.NewDecoder(resp.Body).Decode(&articles); err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}
+
+// getTopTitles extracts the titles of the top news based on the specified count.
+func getTopTitles(articles []news, count int) []string {
+	var titles []string
+	for i := 0; i < len(articles) && i < count; i++ { // Adjusted condition to correctly limit the number of titles
+		titles = append(titles, articles[i].Title)
+	}
+	return titles
+}
+
+// updateOwnerReferencesForFeeds manages owner references for feeds based on their usage in HotNews.
+func (r *HotNewsReconciler) updateOwnerReferencesForFeeds(ctx context.Context, hotNews *aggregatorv1.HotNews) error {
 	feedList := &aggregatorv1.FeedList{}
 	listOpts := client.ListOptions{Namespace: hotNews.Namespace}
 
@@ -185,7 +249,11 @@ func (r *HotNewsReconciler) removeUnusedOwnerReferences(ctx context.Context, hot
 	}
 
 	for _, feed := range feedList.Items {
-		if !r.isFeedUsedInHotNews(&feed, hotNews) {
+		if r.isFeedUsedInHotNews(&feed, hotNews.Spec.FeedsName) {
+			if err := r.addOwnerReference(ctx, &feed, hotNews); err != nil {
+				return fmt.Errorf("failed to add ownerReference to Feed %s: %w", feed.Name, err)
+			}
+		} else {
 			if err := r.removeOwnerReference(ctx, &feed, hotNews); err != nil {
 				return fmt.Errorf("failed to remove ownerReference from Feed %s: %w", feed.Name, err)
 			}
@@ -193,6 +261,54 @@ func (r *HotNewsReconciler) removeUnusedOwnerReferences(ctx context.Context, hot
 	}
 
 	return nil
+}
+
+// isFeedUsedInHotNews checks if a feed is used in the current HotNews resource.
+func (r *HotNewsReconciler) isFeedUsedInHotNews(feed *aggregatorv1.Feed, feedNames []string) bool {
+	for _, feedName := range feedNames {
+		if feedName == feed.Name {
+			return true
+		}
+	}
+	return false
+}
+
+// addOwnerReference adds an OwnerReference to a feed.
+func (r *HotNewsReconciler) addOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
+	ownerRef := metav1.OwnerReference{
+		APIVersion: hotNews.APIVersion,
+		Kind:       hotNews.Kind,
+		Name:       hotNews.Name,
+		UID:        hotNews.UID,
+	}
+
+	existingOwnerReferences := feed.ObjectMeta.OwnerReferences
+	for _, ref := range existingOwnerReferences {
+		if ref.UID == hotNews.UID {
+			return nil
+		}
+	}
+
+	feed.ObjectMeta.OwnerReferences = append(feed.ObjectMeta.OwnerReferences, ownerRef)
+	return r.Client.Update(ctx, feed)
+}
+
+// removeOwnerReference removes an OwnerReference from a feed.
+func (r *HotNewsReconciler) removeOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
+	var updatedOwnerReferences []metav1.OwnerReference
+
+	for _, ref := range feed.ObjectMeta.OwnerReferences {
+		if ref.UID != hotNews.UID {
+			updatedOwnerReferences = append(updatedOwnerReferences, ref)
+		}
+	}
+
+	if len(updatedOwnerReferences) == len(feed.ObjectMeta.OwnerReferences) {
+		return nil
+	}
+
+	feed.ObjectMeta.OwnerReferences = updatedOwnerReferences
+	return r.Client.Update(ctx, feed)
 }
 
 // updateHotNews is a handler function that is triggered when relevant changes
@@ -230,159 +346,10 @@ func (r *HotNewsReconciler) updateHotNews(ctx context.Context, obj client.Object
 	return requests
 }
 
-// createUrl constructs the URL used to fetch news based on the
-// configuration provided in the HotNews resource and the related ConfigMap.
-func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews, configMap *v1.ConfigMap) (string, error) {
-	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
-	params := url.Values{}
-
-	if len(hotNews.Spec.FeedGroups) > 0 {
-		var feedNames []string
-		for _, group := range hotNews.Spec.FeedGroups {
-			if feeds, found := configMap.Data[group]; found {
-				feedList := strings.Split(feeds, ",")
-				for _, feedName := range feedList {
-					feedName = strings.TrimSpace(feedName)
-					var currentFeed aggregatorv1.Feed
-					err := r.Client.Get(context.TODO(), client.ObjectKey{Namespace: hotNews.Namespace, Name: feedName}, &currentFeed)
-					if err != nil {
-						return "", fmt.Errorf("failed to get Feed %s: %w", feedName, err)
-					}
-					feedNames = append(feedNames, currentFeed.Spec.Name)
-				}
-			} else {
-				logrus.Warnf("Feed group %s not found in ConfigMap", group)
-			}
-		}
-		logrus.Info("Sources from feed groups: ", strings.Join(feedNames, ","))
-		hotNews.Spec.FeedsName = feedNames
-	}
-
-	if len(hotNews.Spec.FeedsName) > 0 {
-		params.Add("sources", strings.Join(hotNews.Spec.FeedsName, ","))
-	}
-
-	if len(hotNews.Spec.Keywords) > 0 {
-		params.Add("keywords", strings.Join(hotNews.Spec.Keywords, ","))
-	}
-
-	if hotNews.Spec.DateStart != "" && hotNews.Spec.DateEnd != "" {
-		params.Add("startDate", hotNews.Spec.DateStart)
-		params.Add("endDate", hotNews.Spec.DateEnd)
-	}
-
-	return baseUrl + "?" + params.Encode(), nil
-}
-
 type news struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Link        string    `json:"url"`
 	Date        time.Time `json:"publishedAt"`
 	SourceName  string
-}
-
-// fetchNews sends an HTTP GET request to the specified URL to retrieve a list
-// of news
-func (r *HotNewsReconciler) fetchNews(url string) ([]news, error) {
-	resp, err := r.HttpClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			logrus.Error("Failed to close response body")
-			return
-		}
-	}(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get articles from news aggregator: %s", resp.Status)
-	}
-
-	var articles []news
-	if err := json.NewDecoder(resp.Body).Decode(&articles); err != nil {
-		return nil, err
-	}
-
-	return articles, nil
-}
-
-// getTopTitles extracts the titles of the top news based on the
-// specified count.
-func getTopTitles(articles []news, count int) []string {
-	var titles []string
-	for i := 0; i < len(articles) && i <= count; i++ {
-		titles = append(titles, articles[i].Title)
-	}
-	return titles
-}
-
-func (r *HotNewsReconciler) isFeedUsedInHotNews(feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) bool {
-	for _, feedName := range hotNews.Spec.FeedsName {
-		if feedName == feed.Name {
-			return true
-		}
-	}
-	return false
-}
-
-func (r *HotNewsReconciler) addOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
-	ownerRef := metav1.OwnerReference{
-		APIVersion: hotNews.APIVersion,
-		Kind:       hotNews.Kind,
-		Name:       hotNews.Name,
-		UID:        hotNews.UID,
-	}
-
-	existingOwnerReferences := feed.ObjectMeta.OwnerReferences
-	for _, ref := range existingOwnerReferences {
-		if ref.UID == hotNews.UID {
-			return nil
-		}
-	}
-
-	feed.ObjectMeta.OwnerReferences = append(feed.ObjectMeta.OwnerReferences, ownerRef)
-	err := r.Client.Update(ctx, feed)
-	return err
-}
-
-func (r *HotNewsReconciler) getFeedsWithOwnerReferences(ctx context.Context, hotNews *aggregatorv1.HotNews) ([]aggregatorv1.Feed, error) {
-	var feedList aggregatorv1.FeedList
-	listOpts := client.ListOptions{Namespace: hotNews.Namespace}
-
-	err := r.Client.List(ctx, &feedList, &listOpts)
-	if err != nil {
-		return nil, err
-	}
-
-	var feedsWithOwnerReferences []aggregatorv1.Feed
-	for _, feed := range feedList.Items {
-		for _, ref := range feed.ObjectMeta.OwnerReferences {
-			if ref.UID == hotNews.UID {
-				feedsWithOwnerReferences = append(feedsWithOwnerReferences, feed)
-				break
-			}
-		}
-	}
-
-	return feedsWithOwnerReferences, nil
-}
-
-func (r *HotNewsReconciler) removeOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
-	var updatedOwnerReferences []metav1.OwnerReference
-
-	for _, ref := range feed.ObjectMeta.OwnerReferences {
-		if ref.UID != hotNews.UID {
-			updatedOwnerReferences = append(updatedOwnerReferences, ref)
-		}
-	}
-
-	if len(updatedOwnerReferences) == len(feed.ObjectMeta.OwnerReferences) {
-		return nil
-	}
-
-	feed.ObjectMeta.OwnerReferences = updatedOwnerReferences
-	return r.Client.Update(ctx, feed)
 }
