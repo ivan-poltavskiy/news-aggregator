@@ -23,9 +23,10 @@ type SummaryConfig struct {
 
 // HotNewsStatus defines the observed state of HotNews
 type HotNewsStatus struct {
-	ArticlesCount  int      `json:"articlesCount,omitempty"`
-	NewsLink       string   `json:"newsLink,omitempty"`
-	ArticlesTitles []string `json:"articlesTitles,omitempty"`
+	ArticlesCount  int         `json:"articlesCount,omitempty"`
+	NewsLink       string      `json:"newsLink,omitempty"`
+	ArticlesTitles []string    `json:"articlesTitles,omitempty"`
+	Conditions     []Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -47,6 +48,28 @@ type HotNewsList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []HotNews `json:"items"`
+}
+
+// AddCondition adds new condition to the HotNews's status
+func (f *HotNewsStatus) AddCondition(condition Condition) {
+	newCondition := Condition{
+		Type:            condition.Type,
+		Success:         condition.Success,
+		Reason:          condition.Reason,
+		Message:         condition.Message,
+		LastUpdatedName: condition.LastUpdatedName,
+		LastUpdateTime:  metav1.Now(),
+	}
+
+	f.Conditions = append(f.Conditions, newCondition)
+}
+
+// GetCurrentCondition returns the current condition of the HotNews
+func (f *HotNewsStatus) GetCurrentCondition() Condition {
+	if len(f.Conditions) == 0 {
+		return Condition{}
+	}
+	return f.Conditions[len(f.Conditions)-1]
 }
 
 func init() {

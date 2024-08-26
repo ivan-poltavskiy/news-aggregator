@@ -1,15 +1,49 @@
+#apiVersion: aggregator.com.teamdev/v1
+#kind: HotNews
+#metadata:
+#  labels:
+#    app.kubernetes.io/name: operator
+#    app.kubernetes.io/managed-by: kustomize
+#  name: hotnews-sample
+#spec:
+#  keywords:
+#    - "Війна"
+#    - "Harris"
+#    - "ukr"
+#  feedGroups:
+#    - "ukr"
+#  summaryConfig:
+#    titlesCount: 10
+#
+#---
+#
+#apiVersion: aggregator.com.teamdev/v1
+#kind: HotNews
+#metadata:
+#  labels:
+#    app.kubernetes.io/name: operator
+#    app.kubernetes.io/managed-by: kustomize
+#  name: west-media
+#spec:
+#  keywords:
+#    - "Harris"
+#    - "ukr"
+#    - "Biden"
+#  feedGroups:
+#    - "westMedias"
+#  summaryConfig:
+#    titlesCount: 10
 apiVersion: aggregator.com.teamdev/v1
 kind: HotNews
 metadata:
   labels:
     app.kubernetes.io/name: operator
     app.kubernetes.io/managed-by: kustomize
-  name: hotnews-sample
+  name: west-media
 spec:
   keywords:
-    - "Війна"
     - "Harris"
-  feedGroups:
     - "ukr"
+    - "Biden"
   summaryConfig:
     titlesCount: 10

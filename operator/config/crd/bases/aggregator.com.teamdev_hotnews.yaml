@@ -75,6 +75,35 @@ spec:
                 items:
                   type: string
                 type: array
+              conditions:
+                items:
+                  description: Condition describes the states of a feed during its
+                    life cycle in the system
+                  properties:
+                    lastUpdateTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    lastUpdatedName:
+                      type: string
+                    message:
+                      description: If Success is False, the message should be populated
+                      type: string
+                    reason:
+                      description: If Success is False, the reason should be populated
+                      type: string
+                    status:
+                      description: Success of the condition. Could be true or false
+                      type: boolean
+                    type:
+                      description: Type of the condition, e.g., Added, Deleted.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
               newsLink:
                 type: string
             type: object

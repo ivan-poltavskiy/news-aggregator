@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -53,6 +54,9 @@ func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 
 // ValidateDelete validates the input data at the time of Feed's delete
 func (r *Feed) ValidateDelete() (admission.Warnings, error) {
+	if len(r.OwnerReferences) > 0 {
+		return nil, errors.New("owner reference should be empty")
+	}
 	logrus.Info("validate delete", "name", r.Name)
 	return nil, nil
 }
