@@ -5,92 +5,352 @@ import (
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
 	controller "com.teamdev/news-aggregator/internal/controller/mock_aggregator"
 	"context"
+	"encoding/json"
+	"errors"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 	"io"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	"net/http"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"testing"
+	"time"
 )
 
-func TestReconcileHotNews(t *testing.T) {
-	testScheme := runtime.NewScheme()
-	_ = scheme.AddToScheme(testScheme)
-	_ = aggregatorv1.AddToScheme(testScheme)
-	configMap := &v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-configmap",
-			Namespace: "default",
-		},
-		Data: map[string]string{
-			"group1": "source1,source2",
-		},
-	}
+var _ = Describe("Negative reconcile tests", func() {
+	var configMapName = "feed-group-source"
+	var reconciler HotNewsReconciler
+	var httpClient *controller.MockHttpClient
+	var fakeClient client.Client
+	BeforeEach(func() {
+		t := GinkgoT()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	fakeClient := fake.NewClientBuilder().
-		WithScheme(testScheme).
-		WithObjects(
-			&aggregatorv1.HotNews{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test-hotnews",
-					Namespace: "default",
-					Finalizers: []string{
-						"test-finalizer",
-					},
-				},
-				Spec: aggregatorv1.HotNewsSpec{
-					Keywords:   []string{"keyword1"},
-					DateStart:  "2024-01-01",
-					DateEnd:    "2024-01-31",
-					FeedsName:  []string{"feed1"},
-					FeedGroups: []string{"group1"},
-					SummaryConfig: aggregatorv1.SummaryConfig{
-						TitlesCount: 5,
-					},
-				},
+		httpClient = controller.NewMockHttpClient(ctrl)
+		fakeClient = fake.NewClientBuilder().WithScheme(scheme.Scheme).WithStatusSubresource(&aggregatorv1.HotNews{}).Build()
+
+		reconciler = HotNewsReconciler{
+			Client:     fakeClient,
+			Scheme:     scheme.Scheme,
+			HttpClient: httpClient,
+			HttpsLinks: HttpsClientData{
+				ServerUrl:                 "serverUrl",
+				EndpointForSourceManaging: "endpointForGetNews",
 			},
-			configMap,
-		).Build()
+			Finalizer:     "feed.finalizers.news.teamdev.com",
+			ConfigMapMame: configMapName,
+		}
+	})
 
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	AfterEach(func() {})
 
-	mockHttpClient := controller.NewMockHttpClient(ctrl)
+	ctx := context.Background()
+	It("ConfigMap is not provided", func() {
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+	})
 
-	expectedURL := "?endDate=2024-01-31&keywords=keyword1&sources=source1%2Csource2&startDate=2024-01-01"
-	mockHttpClient.EXPECT().
-		Get(gomock.Eq(expectedURL)).
-		Return(&http.Response{
+	It("Hot News is not provided", func() {
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       nil,
+			BinaryData: nil,
+		}
+		fakeClient.Create(ctx, &configMap)
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+	})
+
+	It("Https server return error when it try to fetch news", func() {
+		feed := aggregatorv1.Feed{
+			TypeMeta: metav1.TypeMeta{},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test",
+				Url:  "test.com",
+			},
+			Status: aggregatorv1.FeedStatus{},
+		}
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ConfigMap",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       nil,
+			BinaryData: nil,
+		}
+		hotNews := aggregatorv1.HotNews{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "HotNews",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "hotnews",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.HotNewsSpec{
+				Keywords:      []string{"test"},
+				DateStart:     "",
+				DateEnd:       "",
+				FeedsName:     []string{"test"},
+				FeedGroups:    nil,
+				SummaryConfig: aggregatorv1.SummaryConfig{},
+			},
+			Status: aggregatorv1.HotNewsStatus{},
+		}
+		fakeClient.Create(ctx, &configMap)
+		fakeClient.Create(ctx, &feed)
+		fakeClient.Create(ctx, &hotNews)
+
+		httpClient.EXPECT().Get("serverUrlendpointForGetNews?keywords=test&sources=test").Return(nil, errors.New("TestErr"))
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+		conditions := hotNews.Status.GetCurrentCondition()
+		gomega.Expect(!conditions.Success)
+	})
+
+	It("Https server return not 200 status code when it try to fetch news", func() {
+		feed := aggregatorv1.Feed{
+			TypeMeta: metav1.TypeMeta{},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test",
+				Url:  "test.com",
+			},
+			Status: aggregatorv1.FeedStatus{},
+		}
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ConfigMap",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       nil,
+			BinaryData: nil,
+		}
+		hotNews := aggregatorv1.HotNews{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "HotNews",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "hotnews",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.HotNewsSpec{
+				Keywords:      []string{"test"},
+				DateStart:     "",
+				DateEnd:       "",
+				FeedsName:     []string{"test"},
+				FeedGroups:    nil,
+				SummaryConfig: aggregatorv1.SummaryConfig{},
+			},
+			Status: aggregatorv1.HotNewsStatus{},
+		}
+		fakeClient.Create(ctx, &configMap)
+		fakeClient.Create(ctx, &feed)
+		fakeClient.Create(ctx, &hotNews)
+
+		httpClient.EXPECT().Get("serverUrlendpointForGetNews?keywords=test&sources=test").Return(&http.Response{StatusCode: http.StatusBadGateway, Body: http.NoBody}, nil)
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+		conditions := hotNews.Status.GetCurrentCondition()
+		gomega.Expect(!conditions.Success)
+	})
+
+	It("Provided feeds is not present in the ConfigMap", func() {
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ConfigMap",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       nil,
+			BinaryData: nil,
+		}
+		hotNews := aggregatorv1.HotNews{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "HotNews",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "hotnews",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.HotNewsSpec{
+				Keywords:      []string{"test"},
+				DateStart:     "",
+				DateEnd:       "",
+				FeedsName:     nil,
+				FeedGroups:    []string{"test"},
+				SummaryConfig: aggregatorv1.SummaryConfig{},
+			},
+			Status: aggregatorv1.HotNewsStatus{},
+		}
+		fakeClient.Create(ctx, &configMap)
+		fakeClient.Create(ctx, &hotNews)
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+		conditions := hotNews.Status.GetCurrentCondition()
+		gomega.Expect(!conditions.Success)
+	})
+
+	It("Provided in the ConfigMap feeds is not present in the cluster ", func() {
+
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ConfigMap",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       map[string]string{"test": "test"},
+			BinaryData: nil,
+		}
+		hotNews := aggregatorv1.HotNews{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "HotNews",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "hotnews",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.HotNewsSpec{
+				Keywords:      []string{"test"},
+				DateStart:     "",
+				DateEnd:       "",
+				FeedsName:     nil,
+				FeedGroups:    []string{"test"},
+				SummaryConfig: aggregatorv1.SummaryConfig{},
+			},
+			Status: aggregatorv1.HotNewsStatus{},
+		}
+		fakeClient.Create(ctx, &configMap)
+		fakeClient.Create(ctx, &hotNews)
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
+		gomega.Expect(err)
+		conditions := hotNews.Status.GetCurrentCondition()
+		gomega.Expect(!conditions.Success)
+	})
+
+	It("Successfully fetches news from the server", func() {
+		feed := aggregatorv1.Feed{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Feed",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test",
+				Url:  "test.com",
+			},
+			Status: aggregatorv1.FeedStatus{},
+		}
+
+		configMap := v1.ConfigMap{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ConfigMap",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "default",
+				Name:      configMapName,
+			},
+			Immutable:  nil,
+			Data:       map[string]string{"test": "test"},
+			BinaryData: nil,
+		}
+
+		hotNews := aggregatorv1.HotNews{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "HotNews",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "hotnews",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.HotNewsSpec{
+				Keywords:      []string{"test"},
+				DateStart:     "",
+				DateEnd:       "",
+				FeedsName:     []string{"test"},
+				FeedGroups:    nil,
+				SummaryConfig: aggregatorv1.SummaryConfig{},
+			},
+			Status: aggregatorv1.HotNewsStatus{},
+		}
+
+		fakeClient.Create(ctx, &configMap)
+		fakeClient.Create(ctx, &feed)
+		fakeClient.Create(ctx, &hotNews)
+
+		returnedNews := []news{{
+			Title:       "TestTile",
+			Description: "test",
+			Link:        "test",
+			Date:        time.Time{},
+			SourceName:  "test"},
+		}
+		jsonData, err := json.Marshal(returnedNews)
+		readCloser := io.NopCloser(bytes.NewReader(jsonData))
+
+		httpClient.EXPECT().Get("serverUrlendpointForGetNews?keywords=test&sources=test").Return(&http.Response{
 			StatusCode: http.StatusOK,
-			Body:       io.NopCloser(bytes.NewBufferString(`[{"Title": "News1"},{"Title": "News2"},{"Title": "News3"}]`)),
-		}, nil).
-		Times(1)
+			Body:       readCloser,
+		}, nil)
 
-	r := &HotNewsReconciler{
-		Client:        fakeClient,
-		Scheme:        testScheme,
-		HttpClient:    mockHttpClient,
-		HttpsLinks:    HttpsClientData{},
-		Finalizer:     "test-finalizer",
-		ConfigMapMame: "test-configmap",
-	}
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
+		_, err = reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
 
-	req := reconcile.Request{
-		NamespacedName: client.ObjectKey{
-			Name:      "test-hotnews",
-			Namespace: "default",
-		},
-	}
-	result, err := r.Reconcile(context.Background(), req)
-	assert.Equal(t, reconcile.Result{}, result)
+		gomega.Expect(err).To(gomega.BeNil())
+	})
 
-	updatedHotNews := &aggregatorv1.HotNews{}
-	err = fakeClient.Get(context.TODO(), req.NamespacedName, updatedHotNews)
-	assert.NoError(t, err)
-}
+})
