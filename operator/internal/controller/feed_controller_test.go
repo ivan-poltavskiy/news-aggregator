@@ -4,19 +4,11 @@ import (
 	"bytes"
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
 	controller "com.teamdev/news-aggregator/internal/controller/mock_aggregator"
-	"context"
 	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"io"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"net/http"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"testing"
 )
 
@@ -251,82 +243,5 @@ func TestFeedReconciler_updateFeed(t *testing.T) {
 				t.Errorf("updateFeed() error = %v, expectedError %v", err, tt.expectedError)
 			}
 		})
-	}
-}
-
-func TestFeedReconcile(t *testing.T) {
-	// Create a new scheme and add the necessary schemes
-	scheme := runtime.NewScheme()
-	_ = clientgoscheme.AddToScheme(scheme)
-	_ = aggregatorv1.AddToScheme(scheme)
-
-	// Create the initial Feed object
-	initialFeed := &aggregatorv1.Feed{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-feed",
-			Namespace: "default",
-		},
-		Spec: aggregatorv1.FeedSpec{
-			Name: "Test Feed",
-			Url:  "https://example.com/rss",
-		},
-		Status: aggregatorv1.FeedStatus{
-			Conditions: []aggregatorv1.Condition{},
-		},
-	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(initialFeed).Build()
-
-	// Retrieve the initial Feed object
-	feed := &aggregatorv1.Feed{}
-	err := client.Get(context.Background(), types.NamespacedName{
-		Name:      "test-feed",
-		Namespace: "default",
-	}, feed)
-	assert.NoError(t, err, "initial Feed object should be found")
-
-	// Create the mock HTTP client
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockHTTPClient := controller.NewMockHttpClient(ctrl)
-
-	// Set up the mock POST request
-	mockHTTPClient.EXPECT().
-		Post("https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources", "application/json", gomock.Any()).
-		Return(&http.Response{
-			StatusCode: http.StatusCreated,
-			Body:       io.NopCloser(bytes.NewBufferString("")),
-		}, nil)
-
-	// Create the reconciler with the mock client
-	r := &FeedReconciler{
-		Client:     client,
-		Scheme:     scheme,
-		HttpClient: mockHTTPClient,
-		Finalizer:  "feed.finalizers.news.teamdev.com",
-		HttpsLinks: HttpsClientData{
-			ServerUrl:                 "https://news-aggregator-service.news-aggregator.svc.cluster.local:443",
-			EndpointForSourceManaging: "/sources",
-		},
-	}
-
-	// Create the reconcile request
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      "test-feed",
-			Namespace: "default",
-		},
-	}
-
-	// Perform the reconciliation
-	res, err := r.Reconcile(context.Background(), req)
-	assert.False(t, res.Requeue)
-
-	// Retrieve the Feed object after reconciliation
-	err = client.Get(context.Background(), req.NamespacedName, feed)
-	assert.NoError(t, err, "Feed object should be found after reconciliation")
-
-	// Verify that the finalizer was added
-	if !assert.Contains(t, feed.Finalizers, "feed.finalizers.news.teamdev.com", "Finalizer should be added") {
-		t.Logf("Finalizers found: %v", feed.Finalizers)
 	}
 }

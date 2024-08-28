@@ -139,6 +139,23 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	return ctrl.Result{}, nil
 }
 
+func (r *FeedReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&aggregatorv1.Feed{}).
+		WithEventFilter(predicate.Funcs{
+			CreateFunc: func(e event.CreateEvent) bool {
+				return true
+			},
+			DeleteFunc: func(e event.DeleteEvent) bool {
+				return !e.DeleteStateUnknown
+			},
+			UpdateFunc: func(e event.UpdateEvent) bool {
+				return e.ObjectNew.GetGeneration() != e.ObjectOld.GetGeneration()
+			},
+		}).
+		Complete(r)
+}
+
 // addFeed call the news aggregator server for adding source to the storage
 func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 	feedCreateRequest := feedCreateRequest{
@@ -262,23 +279,6 @@ func (r *FeedReconciler) updateFeed(feed aggregatorv1.Feed) error {
 		return fmt.Errorf("failed to update source, status code: %d", resp.StatusCode)
 	}
 	return nil
-}
-
-func (r *FeedReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&aggregatorv1.Feed{}).
-		WithEventFilter(predicate.Funcs{
-			CreateFunc: func(e event.CreateEvent) bool {
-				return true
-			},
-			DeleteFunc: func(e event.DeleteEvent) bool {
-				return !e.DeleteStateUnknown
-			},
-			UpdateFunc: func(e event.UpdateEvent) bool {
-				return e.ObjectNew.GetGeneration() != e.ObjectOld.GetGeneration()
-			},
-		}).
-		Complete(r)
 }
 
 // feedCreateRequest contains the URL of the feed to save it

@@ -2,6 +2,7 @@ package controller
 
 import (
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
+	customHandler "com.teamdev/news-aggregator/internal/controller/handler"
 	"com.teamdev/news-aggregator/internal/controller/predicate"
 	"context"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	"net/http"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -56,14 +58,31 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logrus.Info("HotNews resource not found. Cleaning up OwnerReferences.")
-			if cleanupErr := r.cleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
-				logrus.Error(cleanupErr, "Failed to clean up OwnerReferences after HotNews deletion")
-				return ctrl.Result{}, cleanupErr
-			}
 			return ctrl.Result{}, nil
 		}
 		logrus.Error(err, "Failed to get HotNews resource")
 		return ctrl.Result{}, err
+	}
+
+	if !containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+		hotNews.ObjectMeta.Finalizers = append(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+		if err := r.Client.Update(ctx, &hotNews); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() {
+		if containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+			if cleanupErr := r.cleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
+				logrus.Error(cleanupErr, "Failed to clean up OwnerReferences after HotNews deletion")
+				return ctrl.Result{}, cleanupErr
+			}
+			hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+			if err := r.Client.Update(ctx, &hotNews); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		return ctrl.Result{}, nil
 	}
 
 	err = r.reconcileHotNews(&hotNews, &feedGroupConfigMap)
@@ -116,16 +135,21 @@ func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return true
 		},
 	}
+
+	newsHandler := &customHandler.HotNewsHandler{
+		Client: r.Client,
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&aggregatorv1.HotNews{}).
 		WithEventFilter(customPredicates).
 		Watches(
 			&aggregatorv1.Feed{},
-			handler.EnqueueRequestsFromMapFunc(r.updateHotNews),
+			handler.EnqueueRequestsFromMapFunc(newsHandler.UpdateHotNews),
 		).
 		Watches(
 			&v1.ConfigMap{},
-			handler.EnqueueRequestsFromMapFunc(r.updateHotNews),
+			handler.EnqueueRequestsFromMapFunc(newsHandler.UpdateHotNews),
 		).
 		Complete(r)
 }
@@ -146,7 +170,7 @@ func (r *HotNewsReconciler) cleanupOwnerReferences(ctx context.Context, namespac
 		for _, ref := range feed.OwnerReferences {
 			if ref.Name == hotNewsName && ref.Kind == "HotNews" {
 				ownerReferenceRemoved = true
-				continue // Skip this reference to remove it
+				continue
 			}
 			updatedOwnerReferences = append(updatedOwnerReferences, ref)
 		}
@@ -322,10 +346,11 @@ func (r *HotNewsReconciler) isFeedUsedInHotNews(feed *aggregatorv1.Feed, feedNam
 // addOwnerReference adds an OwnerReference to a feed.
 func (r *HotNewsReconciler) addOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
 	ownerRef := metav1.OwnerReference{
-		APIVersion: hotNews.APIVersion,
-		Kind:       hotNews.Kind,
-		Name:       hotNews.Name,
-		UID:        hotNews.UID,
+		APIVersion:         hotNews.APIVersion,
+		Kind:               hotNews.Kind,
+		Name:               hotNews.Name,
+		UID:                hotNews.UID,
+		BlockOwnerDeletion: pointer.BoolPtr(false),
 	}
 
 	existingOwnerReferences := feed.ObjectMeta.OwnerReferences
