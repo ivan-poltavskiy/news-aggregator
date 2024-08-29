@@ -1,0 +1,28 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/created-by: operator
+    app.kubernetes.io/instance: validating-webhook-configuration
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: validatingwebhookconfiguration
+    app.kubernetes.io/part-of: operator
+  name: configmap-validator-webhook
+  annotations:
+    cert-manager.io/inject-ca-from: operator-system/operator-serving-cert
+webhooks:
+  - name: vconfigmap.k8s.io
+    sideEffects: None
+    admissionReviewVersions: ["v1", "v1beta1"]
+    clientConfig:
+      service:
+        name: operator-webhook-service
+        namespace: operator-system
+        path: "/validate-v1-configmap"
+      caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKRENDQWd5Z0F3SUJBZ0lRQ3liTjNwd0NzSHVCdkFwMCsrMXZUakFOQmdrcWhraUc5dzBCQVFzRkFEQUEKTUI0WERUSTBNRGd4TmpBNE16SXdNbG9YRFRJME1URXhOREE0TXpJd01sb3dBRENDQVNJd0RRWUpLb1pJaHZjTgpBUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBT2s1ZDlPZk5vZkZPTXNNaWpuQ05wekh1YnllTFJYUFpzMGsya0RFCktjTDMyTERhb2V1Z2phbHQveEZtRlFmbEpqc3NubUlPRlRxWW4rQlAxZzVQbkFZWGtNckdrVTM5OFFRc2dIL1UKMDhhWWlMdllTYy9sNENjcktUQWxwMjJMVFlOdWtvSVFLaTBtenFtL1JoajhMRjc4WTc3ZGc1enNhb0hzazB1cApudzNCYmFjQktMOTdUZGdBTk5kSFN1S21YK1NQcGdlR2NBeFg2OWNmWjRxWFdrMkpqWmorSTB3Q3VYMHMzbzZ5Ck1zSlUxdVRiTmRDTWpnd3JPNVNvT3ExSDRMbFJKck5xZzNmVy9ucUozSmNPWitpaDVTaUV6bmhHWjAxZCtSQjUKcXFRSitJcnIxOThTdEY4eEVkaHNCZDFMYlNsQU9qQVZMMWFGNlhVU0phVmlKYlVDQXdFQUFhT0JtVENCbGpBTwpCZ05WSFE4QkFmOEVCQU1DQmFBd0RBWURWUjBUQVFIL0JBSXdBREIyQmdOVkhSRUJBZjhFYkRCcWdpeHZjR1Z5CllYUnZjaTEzWldKb2IyOXJMWE5sY25acFkyVXViM0JsY21GMGIzSXRjM2x6ZEdWdExuTjJZNEk2YjNCbGNtRjAKYjNJdGQyVmlhRzl2YXkxelpYSjJhV05sTG05d1pYSmhkRzl5TFhONWMzUmxiUzV6ZG1NdVkyeDFjM1JsY2k1cwpiMk5oYkRBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUFFMjFxN010THNYMUs5VlVkeXRvZkZYZzZydm5MeU50CnNxaFVydE96b2pzUWNkWUxsL004OFROMzlHZllKR2dJMVQrWGRmWURmU2pETXozT29VaHlpelAwYkZiWjdBcGMKK05hUXBCcmFHUlprdDQ1OWRuZTNHVGlBMFpWVS9jYzZQNVNvZTBNQ2k3djZTNGNpWFhtWkVELzByWStEdVBSbwpOcWVyS1NEcnM3dC9WanUrZnpmMWE3bFRJdHdwWTBmdGlCdjVsV0tLK25WUWYxOHgrWStVY1hYTTJIdUp5TTF6Cjd3aHJMWUlCR3ZBbkluOEhwck9MOWJFV1hEQy9KL2J6Zm1HWnVXNkxQWDBZWUJuaGdtZUplZTNNQWNhWlpBNEUKMjBVWm9jVjI4U3B6Q2MrLzlzY1dza01ySjlYaWNLbXhzZkpEYWltM3lvbXNHSFpOWk9QWTN3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["configmaps"]

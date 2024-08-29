@@ -163,6 +163,26 @@ func main() {
 		}
 	}
 
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err = (&aggregatorv1.ConfigMapValidator{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMapValidator")
+			os.Exit(1)
+		}
+	}
+
+	//
+	//if err := (&aggregatorv1.ConfigMapValidator{
+	//	Client: mgr.GetClient(),
+	//}).SetupWebhookWithManager(mgr); err != nil {
+	//	setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMapValidator")
+	//	os.Exit(1)
+	//}
+	//
+	//if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	//	setupLog.Error(err, "problem running manager")
+	//	os.Exit(1)
+	//}
+
 	if err = (&controller.HotNewsReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
