@@ -50,6 +50,7 @@ func main() {
 	var tlsOpts []func(*tls.Config)
 	var configMapMame = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
+	var configmapNamespace = "default"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -66,6 +67,7 @@ func main() {
 	opts := zap.Options{
 		Development: true,
 	}
+	flag.StringVar(&configmapNamespace, "configmap-namespace", configmapNamespace, "The namespace of the configmap.")
 	flag.StringVar(&configMapMame, "config-map-name", configMapMame, "The name of the ConfigMap that will be used to store feed groups.")
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
@@ -164,24 +166,16 @@ func main() {
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&aggregatorv1.ConfigMapValidator{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMapValidator")
+		cfgValidator := &aggregatorv1.ConfigMapValidator{
+			Client:             mgr.GetClient(),
+			ConfigMapName:      configMapMame,
+			ConfigMapNamespace: configmapNamespace,
+		}
+		if err = cfgValidator.SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMap")
 			os.Exit(1)
 		}
 	}
-
-	//
-	//if err := (&aggregatorv1.ConfigMapValidator{
-	//	Client: mgr.GetClient(),
-	//}).SetupWebhookWithManager(mgr); err != nil {
-	//	setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMapValidator")
-	//	os.Exit(1)
-	//}
-	//
-	//if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-	//	setupLog.Error(err, "problem running manager")
-	//	os.Exit(1)
-	//}
 
 	if err = (&controller.HotNewsReconciler{
 		Client: mgr.GetClient(),

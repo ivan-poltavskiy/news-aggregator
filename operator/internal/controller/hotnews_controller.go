@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
 	"net/http"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -346,11 +345,10 @@ func (r *HotNewsReconciler) isFeedUsedInHotNews(feed *aggregatorv1.Feed, feedNam
 // addOwnerReference adds an OwnerReference to a feed.
 func (r *HotNewsReconciler) addOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
 	ownerRef := metav1.OwnerReference{
-		APIVersion:         hotNews.APIVersion,
-		Kind:               hotNews.Kind,
-		Name:               hotNews.Name,
-		UID:                hotNews.UID,
-		BlockOwnerDeletion: pointer.BoolPtr(false),
+		APIVersion: hotNews.APIVersion,
+		Kind:       hotNews.Kind,
+		Name:       hotNews.Name,
+		UID:        hotNews.UID,
 	}
 
 	existingOwnerReferences := feed.ObjectMeta.OwnerReferences
