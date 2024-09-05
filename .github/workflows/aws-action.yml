@@ -48,7 +48,14 @@ jobs:
             echo "No formatting changes detected."
           fi
       - name: Push Helm chart
-        run: task pushChart
+        run: |
+          task pushChart
+          task aws-image-push-server
+          task aws-image-push-updater
+          cd operator
+          task docker-build
+          task docker-push
+          cd ..
 
       - name: Push news aggregator server to AWS ECR
         run: task aws-image-push-server
