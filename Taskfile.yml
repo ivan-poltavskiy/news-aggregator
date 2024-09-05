@@ -122,13 +122,6 @@ tasks:
     desc: "Install Helm chart with provided access keys"
     cmds:
       - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
-#    vars:
-#      ACCESS_KEY:
-#        sh: |
-#          echo "{{.ACCESS_KEY}}"
-#      PRIVATE_ACCESS_KEY:
-#        sh: |
-#          echo "{{.PRIVATE_ACCESS_KEY}}"
 
   uninstallChart:
     desc: "Uninstalls the Helm chart from the Kubernetes cluster"
