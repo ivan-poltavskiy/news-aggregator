@@ -58,6 +58,7 @@ jobs:
 
       - name: Push operator to AWS ECR
         run: |
+          
           cd operator
           task docker-build
           task docker-push
