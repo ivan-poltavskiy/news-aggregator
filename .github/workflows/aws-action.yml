@@ -49,9 +49,10 @@ jobs:
           fi
       - name: Push Helm chart
         run: |
+          task aws-image-push-updater
           task pushChart
           task aws-image-push-server
-          task aws-image-push-updater
+          
           cd operator
           task docker-build
           task docker-push
