@@ -1,0 +1,60 @@
+name: Go
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    types: [ opened, ready_for_review ]
+    branches: [ "**" ]
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+
+      - name: Install Taskfile
+        run: |
+          sh -c "$(curl -sL https://taskfile.dev/install.sh)"
+          sudo mv ./bin/task /usr/local/bin/task
+
+      - name: Authenticate AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.PRIVATE_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
+
+      - name: Check for formatting changes
+        run: |
+          git diff --exit-code > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+            exit 1
+          else
+            echo "No formatting changes detected."
+          fi
+      - name: Push Helm chart
+        run: task pushChart
+
+      - name: Push news aggregator server to AWS ECR
+        run: task aws-image-push-server
+
+      - name: Push news aggregator updater to AWS ECR
+        run: task aws-image-push-updater
+
+      - name: Push operator to AWS ECR
+        run: |
+          cd operator
+          task docker-build
+          task docker-push

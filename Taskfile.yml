@@ -3,10 +3,17 @@ version: '3'
 env:
   DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
   DOCKER_IMAGE_TAG: "v1.0.18"
+  DOCKER_UPDATER_IMAGE_TAG: "v1.0.2"
   DOCKERFILE_PATH: ".Dockerfile"
+  UPDATER_DOCKERFILE_PATH: "operator/Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
+  AWS_REGION: "eu-west-1"
+  AWS_ACCOUNT_ID: "406477933661"
+  AWS_DEFAULT_REGION: "eu-west-1"
+  AWS_SERVER_IMAGE: "406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator"
+  AWS_UPDATER_IMAGE: "406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator-updater"
 
 output:
   group:
@@ -47,6 +54,18 @@ tasks:
     desc: "Run docker container"
     cmd: docker run -d -p $DOCKER_PORT:$SERVER_EXPOSE_PORT $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
+  aws-image-push-server:
+    desc: "Build and push the image of news aggregator server to te AWS ECR"
+    cmds:
+      - docker build -t $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
+      - docker image push $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG
+
+  aws-image-push-updater:
+    desc: "Build and push the image of news aggregator updater to te AWS ECR"
+    cmds:
+      - docker build -t $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG -f &UPDATER_DOCKERFILE_PATH .
+      - docker image push $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG
+
   cli-run:
     desc: "Run the CLI locally"
     cmd: go run cmd/command-line-client/main.go
@@ -66,13 +85,13 @@ tasks:
   create-namespace:
     desc: "Create a Kubernetes namespace if it does not exist"
     cmds:
-        - |
-          if ! kubectl get namespace news-aggregator >/dev/null 2>&1; then
-            kubectl create namespace news-aggregator
-            echo "Namespace news-aggregator created"
-          else
-            echo "Namespace news-aggregator already exists"
-          fi
+      - |
+        if ! kubectl get namespace news-aggregator >/dev/null 2>&1; then
+          kubectl create namespace news-aggregator
+          echo "Namespace news-aggregator created"
+        else
+          echo "Namespace news-aggregator already exists"
+        fi
 
   delete-namespace:
     cmd: kubectl delete namespace news-aggregator
@@ -90,17 +109,49 @@ tasks:
       - kubectl delete -f templates
 
   createChart:
-    desc: "Creates a Helm chart for news-aggregator"
+    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
     cmds:
-      - helm create $HELM_CHART_NAME
+      - helm dependency update ./$HELM_CHART_NAME
+      - helm lint ./$HELM_CHART_NAME
+      - helm package ./$HELM_CHART_NAME
+      - mkdir -p ./news-aggregator/charts
+      - mv *.tgz ./news-aggregator/charts
+    silent: true
 
   installChart:
-    desc: "Installs the Helm chart on the Kubernetes cluster"
-    deps: [ create-namespace ]
+    desc: "Install Helm chart with provided access keys"
     cmds:
-      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator
+      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
+#    vars:
+#      ACCESS_KEY:
+#        sh: |
+#          echo "{{.ACCESS_KEY}}"
+#      PRIVATE_ACCESS_KEY:
+#        sh: |
+#          echo "{{.PRIVATE_ACCESS_KEY}}"
 
   uninstallChart:
     desc: "Uninstalls the Helm chart from the Kubernetes cluster"
     cmds:
       - helm uninstall $HELM_CHART_NAME --namespace news-aggregator
+  aws-auth-helm:
+    desc: "Authenticate Helm with AWS ECR"
+    cmds:
+      - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  configureAWS:
+    cmds:
+      - aws configure set aws_access_key_id {{.AWS_ACCESS_KEY_ID}}
+      - aws configure set aws_secret_access_key {{.AWS_SECRET_ACCESS_KEY}}
+      - aws configure set region ${AWS_DEFAULT_REGION}
+      - aws configure set output json
+    vars:
+      AWS_ACCESS_KEY_ID: ""
+      AWS_SECRET_ACCESS_KEY: ""
+  pushChart:
+    desc: "Pushes chart to the Helm repository"
+    deps:
+      - aws-auth-helm
+      - createChart
+    cmds:
+      - helm push charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    silent: true
