@@ -57,10 +57,6 @@ tasks:
   aws-image-push-server:
     desc: "Build and push the image of news aggregator server to te AWS ECR"
     cmds:
-      - aws configure set aws_access_key_id {{.AWS_ACCESS_KEY_ID}}
-      - aws configure set aws_secret_access_key {{.AWS_SECRET_ACCESS_KEY}}
-      - aws configure set region ${AWS_DEFAULT_REGION}
-      - aws configure set output json
       - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - docker build -t $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
       - docker image push $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG
