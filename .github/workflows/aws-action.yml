@@ -59,6 +59,7 @@ jobs:
           task aws-image-push-server
           task aws-image-push-updater
           cd operator
+          task docker_login
           task docker-build
           task docker-push
           cd ..

@@ -64,8 +64,8 @@ tasks:
   aws-image-push-updater:
     desc: "Build and push the image of news aggregator updater to te AWS ECR"
     cmds:
-      - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      - docker build -t $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG -f &UPDATER_DOCKERFILE_PATH .
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - docker build -t $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG -f $UPDATER_DOCKERFILE_PATH .
       - docker image push $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG
 
   cli-run:
