@@ -214,7 +214,9 @@ tasks:
         ln -sf $LOCALBIN/setup-envtest-{{.ENVTEST_VERSION}} $LOCALBIN/setup-envtest
   docker_login:
     desc: "Login to the ECR registry"
-    cmd: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    cmds:
+      - aws ecr get-login-password --region {{.AWS_REGION}} | docker login --username AWS --password-stdin {{.AWS_ACCOUNT_ID}}.dkr.ecr.{{.AWS_REGION}}.amazonaws.com
+
   golangci-lint:
     desc: "Download golangci-lint locally if necessary."
     cmds:
