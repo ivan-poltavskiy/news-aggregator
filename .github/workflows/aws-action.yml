@@ -61,3 +61,4 @@ jobs:
           cd operator
           task docker-build
           task docker-push
+          cd ..
