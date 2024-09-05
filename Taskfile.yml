@@ -138,7 +138,7 @@ tasks:
       - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   docker_login:
     desc: "Login to the ECR registry"
-    cmd: aws ecr get-login-password --region &AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    cmd: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   configureAWS:
     cmds:
       - aws configure set aws_access_key_id {{.AWS_ACCESS_KEY_ID}}
