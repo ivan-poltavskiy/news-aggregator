@@ -15,7 +15,7 @@ var _ = Describe("News Updater", func() {
 	var (
 		Storage *client.MockStorage
 		service Service
-		logHook *test.Hook // Тестовый хук для логирования
+		logHook *test.Hook
 	)
 
 	BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("News Updater", func() {
 	AfterEach(func() {
 		logHook.Reset()
 	})
-	Context("Negative cases for UpdateNews methods", func() {
+	Context("Negative cases for UpdateNews method", func() {
 		It("UpdateNews should returns and log error when GetSources return error", func() {
 			Storage.EXPECT().GetSources().Return(nil, errors.New("storage errors"))
 			service.UpdateNews()
@@ -62,6 +62,31 @@ var _ = Describe("News Updater", func() {
 			}
 
 			Expect(found).To(BeTrue(), "Expected log entry with error message not found")
+		})
+	})
+	Context("Negative cases for updateSourceNews method", func() {
+		It("updateSourceNews should returns error when GetRssFeedLink return err", func() {
+			testSource := source.Source{
+				Name:       "Test Source",
+				Link:       "",
+				SourceType: source.STORAGE,
+			}
+			err := updateSourceNews(testSource, nil)
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("updateSourceNews should returns error when SaveNews return err", func() {
+
+			testSource := source.Source{
+				Name:       "Test Source",
+				Link:       "https://www.cbsnews.com/world/",
+				SourceType: source.STORAGE,
+			}
+
+			Storage.EXPECT().SaveNews(gomock.Any(), gomock.Any()).Return(source.Source{Name: "pravda"}, errors.New("storage errors"))
+
+			err := updateSourceNews(testSource, Storage)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })
