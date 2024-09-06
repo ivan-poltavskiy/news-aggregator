@@ -9,7 +9,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: news-aggregator-service-account
+          serviceAccountName: cronjob-service-account
           containers:
             - name: news-aggregator-updater
               image: alanut93/updater:v1.0.2
