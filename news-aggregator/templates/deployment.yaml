@@ -17,7 +17,7 @@ spec:
     spec:
       serviceAccountName: {{ .Values.serviceAccount }}
       imagePullSecrets:
-        - name: ecr-registry-secret
+        - name: regcred
       containers:
         - name: news-aggregator
           image: {{ .Values.imageName }}
