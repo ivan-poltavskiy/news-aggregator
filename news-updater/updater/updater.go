@@ -30,7 +30,7 @@ func (service Service) UpdateNews() {
 			if src.SourceType == source.STORAGE {
 				err := updateSourceNews(src, service.Storage)
 				if err != nil {
-					logrus.Error("Failed to update news for source: ", src.Name, err)
+					logrus.Error("Failed to update news for source: ", src.Name)
 				}
 			}
 		}(src)
