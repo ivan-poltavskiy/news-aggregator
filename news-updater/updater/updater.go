@@ -39,7 +39,7 @@ func (service Service) UpdateNews() {
 	logrus.Info("Update of news completed")
 }
 
-// updateSourceNews updates the news of the input source.
+// updateSourceNews updates the news of the input source
 func updateSourceNews(inputSource source.Source, storage storage.Storage) error {
 	domainName := feed.ExtractDomainName(string(inputSource.Link))
 	rssURL, err := feed.GetRssFeedLink(string(inputSource.Link))
