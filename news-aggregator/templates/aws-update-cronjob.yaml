@@ -3,6 +3,9 @@ kind: CronJob
 metadata:
   name: aws-update-cronjob
   namespace: news-aggregator
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   schedule: "0 0 * * *"
   jobTemplate:
