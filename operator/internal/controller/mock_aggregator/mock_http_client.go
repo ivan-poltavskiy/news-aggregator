@@ -50,6 +50,21 @@ func (mr *MockHttpClientMockRecorder) Do(req interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockHttpClient)(nil).Do), req)
 }
 
+// Get mocks base method.
+func (m *MockHttpClient) Get(url string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", url)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockHttpClientMockRecorder) Get(url interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockHttpClient)(nil).Get), url)
+}
+
 // Post mocks base method.
 func (m *MockHttpClient) Post(url, contentType string, body io.Reader) (*http.Response, error) {
 	m.ctrl.T.Helper()

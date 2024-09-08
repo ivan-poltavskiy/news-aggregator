@@ -8,15 +8,17 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/kubernetes/scheme"
 	"net/http"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"testing"
 )
 
@@ -254,79 +256,147 @@ func TestFeedReconciler_updateFeed(t *testing.T) {
 	}
 }
 
-func TestFeedReconcile(t *testing.T) {
-	// Create a new scheme and add the necessary schemes
-	scheme := runtime.NewScheme()
-	_ = clientgoscheme.AddToScheme(scheme)
-	_ = aggregatorv1.AddToScheme(scheme)
+var _ = Describe("Negative FeedReconcile tests", func() {
+	var reconciler FeedReconciler
+	var httpClient *controller.MockHttpClient
+	var fakeClient client.Client
 
-	// Create the initial Feed object
-	initialFeed := &aggregatorv1.Feed{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-feed",
-			Namespace: "default",
-		},
-		Spec: aggregatorv1.FeedSpec{
-			Name: "Test Feed",
-			Url:  "https://example.com/rss",
-		},
-		Status: aggregatorv1.FeedStatus{
-			Conditions: []aggregatorv1.Condition{},
-		},
-	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(initialFeed).Build()
+	BeforeEach(func() {
+		t := GinkgoT()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	// Retrieve the initial Feed object
-	feed := &aggregatorv1.Feed{}
-	err := client.Get(context.Background(), types.NamespacedName{
-		Name:      "test-feed",
-		Namespace: "default",
-	}, feed)
-	assert.NoError(t, err, "initial Feed object should be found")
+		httpClient = controller.NewMockHttpClient(ctrl)
+		fakeClient = fake.NewClientBuilder().WithScheme(scheme.Scheme).WithStatusSubresource(&aggregatorv1.Feed{}).Build()
 
-	// Create the mock HTTP client
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockHTTPClient := controller.NewMockHttpClient(ctrl)
+		reconciler = FeedReconciler{
+			Client: fakeClient,
+			Scheme: scheme.Scheme,
+			HttpsLinks: HttpsClientData{
+				ServerUrl:                 "http://newsaggregator.com/manage",
+				EndpointForSourceManaging: "/source",
+			},
+			HttpClient: httpClient,
+			Finalizer:  "feed.finalizers.news.teamdev.com",
+		}
+	})
 
-	// Set up the mock POST request
-	mockHTTPClient.EXPECT().
-		Post("https://news-aggregator-service.news-aggregator.svc.cluster.local:443/sources", "application/json", gomock.Any()).
-		Return(&http.Response{
-			StatusCode: http.StatusCreated,
-			Body:       io.NopCloser(bytes.NewBufferString("")),
-		}, nil)
+	AfterEach(func() {})
 
-	// Create the reconciler with the mock client
-	r := &FeedReconciler{
-		Client:     client,
-		Scheme:     scheme,
-		HttpClient: mockHTTPClient,
-		Finalizer:  "feed.finalizers.news.teamdev.com",
-		HttpsLinks: HttpsClientData{
-			ServerUrl:                 "https://news-aggregator-service.news-aggregator.svc.cluster.local:443",
-			EndpointForSourceManaging: "/sources",
-		},
-	}
+	ctx := context.Background()
 
-	// Create the reconcile request
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      "test-feed",
-			Namespace: "default",
-		},
-	}
+	It("Feed resource is not found", func() {
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "non-existent-feed"}
+		_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
+		Expect(err).To(BeNil(), "Expected no error when Feed is not found")
+	})
 
-	// Perform the reconciliation
-	res, err := r.Reconcile(context.Background(), req)
-	assert.False(t, res.Requeue)
+	It("Cannot update the status", func() {
+		feed := aggregatorv1.Feed{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test-feed",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test-feed",
+				Url:  "http://example.com",
+			},
+			Status: aggregatorv1.FeedStatus{},
+		}
+		fakeClient.Create(ctx, &feed)
+		reconciler.Client = fake.NewClientBuilder().WithScheme(scheme.Scheme).WithInterceptorFuncs(
+			interceptor.Funcs{Update: func(ctx context.Context, client client.WithWatch, obj client.Object, opts ...client.UpdateOption) error {
+				return errors.New("new error")
+			}}).WithStatusSubresource(&aggregatorv1.Feed{}).Build()
 
-	// Retrieve the Feed object after reconciliation
-	err = client.Get(context.Background(), req.NamespacedName, feed)
-	assert.NoError(t, err, "Feed object should be found after reconciliation")
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "non-existent-feed"}
+		_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
+		Expect(err)
+	})
 
-	// Verify that the finalizer was added
-	if !assert.Contains(t, feed.Finalizers, "feed.finalizers.news.teamdev.com", "Finalizer should be added") {
-		t.Logf("Finalizers found: %v", feed.Finalizers)
-	}
-}
+	It("Https server returned the error from POST request", func() {
+		feed := aggregatorv1.Feed{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test-feed",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test-feed",
+				Url:  "http://example.com",
+			},
+			Status: aggregatorv1.FeedStatus{},
+		}
+		fakeClient.Create(ctx, &feed)
+
+		reconciler.Client = fakeClient
+
+		expectedURL := "http://newsaggregator.com/manage/source"
+		httpClient.EXPECT().Post(expectedURL, "application/json", gomock.Any()).Return(&http.Response{StatusCode: http.StatusBadRequest}, errors.New("new error"))
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "test-feed"}
+		_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
+		Expect(err).To(HaveOccurred(), "Expected error when updating feed finalizer fails")
+		Expect(feed.Status.GetCurrentCondition().Success == false)
+	})
+
+	It("Failed to create the Feed resource in the system", func() {
+		reconciler.Client = fake.NewClientBuilder().WithScheme(scheme.Scheme).WithInterceptorFuncs(
+			interceptor.Funcs{Create: func(ctx context.Context, client client.WithWatch, obj client.Object, opts ...client.CreateOption) error {
+				return errors.New("failed to create resource")
+			}}).Build()
+
+		feed := aggregatorv1.Feed{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "failed-create-feed",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "failed-create-feed",
+				Url:  "http://example.com",
+			},
+		}
+		fakeClient.Create(ctx, &feed)
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "failed-create-feed"}
+		_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
+
+		Expect(err)
+	})
+
+	It("Https server returns error on PUT request", func() {
+		feed := aggregatorv1.Feed{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "test-feed-to-update",
+				Namespace: "default",
+			},
+			Spec: aggregatorv1.FeedSpec{
+				Name: "test-feed-to-update",
+				Url:  "http://example.com",
+			},
+			Status: aggregatorv1.FeedStatus{
+				Conditions: []aggregatorv1.Condition{
+					{Type: aggregatorv1.ConditionAdded},
+				},
+			},
+		}
+		fakeClient.Create(ctx, &feed)
+
+		reconciler.Client = fakeClient
+
+		expectedURL := "http://newsaggregator.com/manage/source"
+		httpClient.EXPECT().
+			Do(gomock.Any()).
+			DoAndReturn(func(req *http.Request) (*http.Response, error) {
+				if req.URL.String() == expectedURL && req.Method == http.MethodPut {
+					return &http.Response{StatusCode: http.StatusInternalServerError}, errors.New("PUT error")
+				}
+				return nil, errors.New("unexpected request")
+			})
+
+		namespacedName := types.NamespacedName{Namespace: "default", Name: "test-feed-to-update"}
+		_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
+
+		Expect(err)
+		Expect(feed.Status.GetCurrentCondition().Success == false)
+	})
+
+})
