@@ -118,7 +118,8 @@ tasks:
       - helm lint ./$HELM_CHART_NAME
       - helm package ./$HELM_CHART_NAME
       - mkdir -p ./news-aggregator/charts
-      - mv *.tgz ./news-aggregator/charts
+      - ls -l ./news-aggregator/charts
+      - mv ./*.tgz ./news-aggregator/charts
     silent: true
 
   installChart:
@@ -157,7 +158,7 @@ tasks:
       - aws-auth-helm
       - createChart
     cmds:
-      - helm push news_aggregator/charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push ./news-aggregator/charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true
 
   createAwsChart:
@@ -167,7 +168,8 @@ tasks:
       - helm lint ./$AWS_AUTH_HELM_CHART_NAME
       - helm package ./$AWS_AUTH_HELM_CHART_NAME
       - mkdir -p ./aws-auth-chart/charts
-      - mv *.tgz ./aws-auth-chart/charts
+      - ls -l ./aws-auth-chart/charts
+      - mv ./*.tgz ./aws-auth-chart/charts
     silent: true
 
   pushAwsAuthChart:
@@ -176,5 +178,5 @@ tasks:
       - aws-auth-helm
       - createAwsChart
     cmds:
-      - helm push aws-auth-chart/charts/aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push ./aws-auth-chart/charts/aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true
