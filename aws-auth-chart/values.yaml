@@ -1,0 +1,9 @@
+aws_account_id: "406477933661"
+aws_region: "eu-west-1"
+docker_secret_name: "regcred"
+accessKey: ""
+privateAccessKey: ""
+news_aggregator:
+  namespace: news-aggregator
+operator_system:
+  namespace: operator-system

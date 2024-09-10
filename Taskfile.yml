@@ -9,6 +9,7 @@ env:
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
+  AWS_AUTH_HELM_CHART_NAME: "aws-auth-chart"
   AWS_REGION: "eu-west-1"
   AWS_ACCOUNT_ID: "406477933661"
   AWS_DEFAULT_REGION: "eu-west-1"
@@ -124,6 +125,10 @@ tasks:
     desc: "Install Helm chart with provided access keys"
     cmds:
       - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
+  install_aws_auth_chart:
+    desc: "Install Helm chart with provided access keys"
+    cmds:
+      - helm install $AWS_AUTH_HELM_CHART_NAME ./$AWS_AUTH_HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
 
   uninstallChart:
     desc: "Uninstalls the Helm chart from the Kubernetes cluster"
@@ -145,11 +150,31 @@ tasks:
     vars:
       AWS_ACCESS_KEY_ID: ""
       AWS_SECRET_ACCESS_KEY: ""
+
   pushChart:
-    desc: "Pushes chart to the Helm repository"
+    desc: "Pushes news aggregator chart to the ECR"
     deps:
       - aws-auth-helm
       - createChart
     cmds:
-      - helm push charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push news_aggregator/charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    silent: true
+
+  createAwsChart:
+    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
+    cmds:
+      - helm dependency update ./$AWS_AUTH_HELM_CHART_NAME
+      - helm lint ./$AWS_AUTH_HELM_CHART_NAME
+      - helm package ./$AWS_AUTH_HELM_CHART_NAME
+      - mkdir -p ./aws-auth-chart/charts
+      - mv *.tgz ./aws-auth-chart/charts
+    silent: true
+
+  pushAwsAuthChart:
+    desc: "Pushes aws auth chart to the ECR"
+    deps:
+      - aws-auth-helm
+      - createAwsChart
+    cmds:
+      - helm push aws-auth-chart/charts/aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true

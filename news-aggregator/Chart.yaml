@@ -1,6 +1,7 @@
 apiVersion: v2
 name: news_aggregator_chart
 version: 0.1.0
+type: application
 appVersion: "1.0.19"
 dependencies:
   - name: vertical-pod-autoscaler
