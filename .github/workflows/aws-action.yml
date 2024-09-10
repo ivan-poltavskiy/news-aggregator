@@ -2,10 +2,11 @@ name: Go
 
 on:
   push:
-    branches: [ "**" ]
+    branches:
+      - master
   pull_request:
-    types: [ opened, ready_for_review ]
-    branches: [ "**" ]
+    branches:
+      - master
 
 
 jobs:
