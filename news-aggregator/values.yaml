@@ -1,8 +1,8 @@
 replicaCount: 1
 name: news-aggregator
 containerPort: 443
-imageName: 406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator:v1
-updaterImageName: 406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator-updater:v1.0.2
+imageName: 406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server:v1.0.18
+updaterImageName: 406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater:v1.0.2
 namespace: news-aggregator
 serviceAccount: news-aggregator-service-account
 accessKey: ""

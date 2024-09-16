@@ -1,5 +1,5 @@
 aws_account_id: "406477933661"
-aws_region: "eu-west-1"
+aws_region: "eu-west-2"
 docker_secret_name: "regcred"
 accessKey: ""
 privateAccessKey: ""

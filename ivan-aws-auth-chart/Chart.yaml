@@ -1,5 +1,5 @@
 apiVersion: v2
-name: aws-auth-chart
+name: ivan-aws-auth-chart
 version: 0.1.0
 type: application
 appVersion: "1.0.1"

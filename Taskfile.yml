@@ -1,7 +1,7 @@
 version: '3'
 
 env:
-  DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
+  DOCKER_IMAGE_NAME: "ivan-news-aggregator-server"
   DOCKER_IMAGE_TAG: "v1.0.18"
   DOCKER_UPDATER_IMAGE_TAG: "v1.0.2"
   DOCKERFILE_PATH: ".Dockerfile"
@@ -9,12 +9,12 @@ env:
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
-  AWS_AUTH_HELM_CHART_NAME: "aws-auth-chart"
-  AWS_REGION: "eu-west-1"
+  AWS_AUTH_HELM_CHART_NAME: "ivan-aws-auth-chart"
+  AWS_REGION: "eu-west-2"
   AWS_ACCOUNT_ID: "406477933661"
-  AWS_DEFAULT_REGION: "eu-west-1"
-  AWS_SERVER_IMAGE: "406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator"
-  AWS_UPDATER_IMAGE: "406477933661.dkr.ecr.eu-west-1.amazonaws.com/ivan-news-aggregator-updater"
+  AWS_DEFAULT_REGION: "eu-west-2"
+  AWS_SERVER_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server"
+  AWS_UPDATER_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater"
 
 output:
   group:
@@ -157,7 +157,7 @@ tasks:
       - aws-auth-helm
       - createChart
     cmds:
-      - helm push ./charts/news_aggregator_chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push ./charts/ivan-news-aggregator-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true
 
   createAwsChart:
@@ -176,5 +176,5 @@ tasks:
       - aws-auth-helm
       - createAwsChart
     cmds:
-      - helm push ./charts/aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push ./charts/ivan-aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true
