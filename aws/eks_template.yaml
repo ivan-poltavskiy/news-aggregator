@@ -1,8 +1,36 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template to deploy EKS Cluster with VPC, Subnets, Roles, and Security Groups.
+Parameters:
+  InstanceType:
+    Description: Node instance type
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t3.medium
+      - t2.medium
+      - t2.large
+
+  VpcCniAddonVersion:
+    Type: String
+    Default: 'v1.18.1-eksbuild.3'
+    Description: 'Version of the Amazon VPC CNI plugin'
+
+  KubeProxyAddonVersion:
+    Type: String
+    Default: 'v1.30.0-eksbuild.3'
+    Description: 'Version of the kubernetes proxy'
+
+  CoreDnsAddonVersion:
+    Type: String
+    Default: 'v1.11.1-eksbuild.8'
+    Description: 'Version of the CoreDNS'
+
+  PodIdentityAddonVersion:
+    Type: String
+    Default: 'v1.3.2-eksbuild.2'
+    Description: 'Version of the Amazon EKS Pod Identity Webhook'
 
 Resources:
-  # VPC
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -13,14 +41,41 @@ Resources:
         - Key: Name
           Value: eks-vpc
 
-  # Public Subnets
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: eks-internet-gateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: eks-route-table
+
+  Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
-      AvailabilityZone: !Select [0, !GetAZs '']
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags:
         - Key: Name
           Value: eks-public-subnet-1
@@ -31,10 +86,22 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: true
-      AvailabilityZone: !Select [1, !GetAZs '']
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags:
         - Key: Name
           Value: eks-public-subnet-2
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref RouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref RouteTable
 
   EKSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -42,7 +109,17 @@ Resources:
       GroupDescription: Allow communication between EKS nodes and control plane
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        - IpProtocol: -1
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -96,24 +173,57 @@ Resources:
         - Key: Name
           Value: eks-node-instance-role
 
+  # EKS Node Group
   EKSNodeGroup:
     Type: AWS::EKS::Nodegroup
     Properties:
+      DiskSize: 20
       ClusterName: !Ref EKSCluster
       NodeRole: !GetAtt NodeInstanceRole.Arn
       Subnets:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       ScalingConfig:
-        MinSize: 2
+        MinSize: 1
         MaxSize: 4
         DesiredSize: 2
       AmiType: AL2_x86_64
       InstanceTypes:
-        - t3.medium
-      Tags:
-        - Key: Name
-          Value: eks-nodegroup
+        - !Ref InstanceType
+      RemoteAccess:
+        Ec2SshKey: ivan-kp
+
+  VpcCniAddon:
+    Type: 'AWS::EKS::Addon'
+    Properties:
+      AddonName: vpc-cni
+      ClusterName: !Ref EKSCluster
+      AddonVersion: !Ref VpcCniAddonVersion
+      ResolveConflicts: OVERWRITE
+
+  CoreDnsAddon:
+    Type: 'AWS::EKS::Addon'
+    Properties:
+      AddonName: coredns
+      ClusterName: !Ref EKSCluster
+      AddonVersion: !Ref CoreDnsAddonVersion
+      ResolveConflicts: OVERWRITE
+
+  KubeProxyAddon:
+    Type: 'AWS::EKS::Addon'
+    Properties:
+      AddonName: kube-proxy
+      ClusterName: !Ref EKSCluster
+      AddonVersion: !Ref KubeProxyAddonVersion
+      ResolveConflicts: OVERWRITE
+
+  PodIdentityAddon:
+    Type: 'AWS::EKS::Addon'
+    Properties:
+      AddonName: eks-pod-identity-agent
+      ClusterName: !Ref EKSCluster
+      AddonVersion: !Ref PodIdentityAddonVersion
+      ResolveConflicts: OVERWRITE
 
 Outputs:
   ClusterName:
@@ -127,3 +237,4 @@ Outputs:
   VPCId:
     Description: VPC ID
     Value: !Ref VPC
+
