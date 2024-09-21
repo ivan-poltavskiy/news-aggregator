@@ -15,19 +15,11 @@ type CdkStackProps struct {
 	awscdk.StackProps
 }
 
-func NewCdkStack(scope constructs.Construct, id string, props *CdkStackProps) awscdk.Stack {
-	var sprops awscdk.StackProps
-	if props != nil {
-		sprops = props.StackProps
-	}
-	stack := awscdk.NewStack(scope, &id, &sprops)
-
-	return stack
-}
-
+// NewCdkIvanStack Returns the new stack with the cluster, nodegroup and another additional resources
 func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps) awscdk.Stack {
 	stack := awscdk.NewStack(scope, &id, &props.StackProps)
 
+	//creates new vpc with 10.0.0.0/16 cidr, one private subnet, and one public subnet
 	vpc := awsec2.NewVpc(stack, jsii.String("ivan-cdk-vpc"), &awsec2.VpcProps{
 		IpAddresses: awsec2.IpAddresses_Cidr(jsii.String("10.0.0.0/16")),
 		MaxAzs:      jsii.Number(2),
@@ -47,6 +39,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		VpcName: jsii.String("ivan-cdk-vpc"),
 	})
 
+	// creates new route table with id of the vpc
 	routeTable := awsec2.NewCfnRouteTable(stack, jsii.String("ivan-cdk-rt"), &awsec2.CfnRouteTableProps{
 		VpcId: vpc.VpcId(),
 		Tags: &[]*awscdk.CfnTag{
@@ -57,13 +50,14 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		},
 	})
 
-	// Add a route to the route table that directs traffic to the internet gateway
+	// add a route to the route table that directs traffic to the internet gateway
 	awsec2.NewCfnRoute(stack, jsii.String("ivan-cdk-route"), &awsec2.CfnRouteProps{
 		RouteTableId:         routeTable.AttrRouteTableId(),
 		DestinationCidrBlock: jsii.String("0.0.0.0/0"),
 		GatewayId:            vpc.InternetGatewayId(),
 	})
 
+	// creates route table association for each public subnets in the vpc
 	publicSubnets := vpc.PublicSubnets()
 	for i, subnet := range *publicSubnets {
 		awsec2.NewCfnSubnetRouteTableAssociation(stack, jsii.String(fmt.Sprintf("SubnetAssociation%d", i)), &awsec2.CfnSubnetRouteTableAssociationProps{
@@ -71,16 +65,22 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 			RouteTableId: routeTable.Ref(),
 		})
 	}
+
+	// creates new security group for the current vpc
 	securityGroup := awsec2.NewSecurityGroup(stack, jsii.String("ivan-cdk-sg"), &awsec2.SecurityGroupProps{
 		Vpc:               vpc,
 		SecurityGroupName: jsii.String("ivan-cdk-sg"),
 		AllowAllOutbound:  jsii.Bool(true),
 	})
 
+	// adds new ingress rule for security group for HTTP traffic
 	securityGroup.AddIngressRule(awsec2.Peer_AnyIpv4(), awsec2.Port_Tcp(jsii.Number(80)), jsii.String("HTTP"), jsii.Bool(true))
+	// adds new ingress rule for security group for HTTPS traffic
 	securityGroup.AddIngressRule(awsec2.Peer_AnyIpv4(), awsec2.Port_Tcp(jsii.Number(443)), jsii.String("HTTPS"), jsii.Bool(true))
+	// adds new ingress rule for security group for SSH traffic
 	securityGroup.AddIngressRule(awsec2.Peer_AnyIpv4(), awsec2.Port_Tcp(jsii.Number(22)), jsii.String("SSH"), jsii.Bool(true))
 
+	// creates new IAM role for the cluster with provided policies
 	clusterRole := awsiam.NewRole(stack, jsii.String("eks-cdk-cluster-role"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(jsii.String("eks.amazonaws.com"), nil),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
@@ -89,6 +89,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		},
 	})
 
+	// creates new EKS cluster with 1.30 version of K8S, provided VPC, Security Group, and Cluster Role.
 	eksCluster := awseks.NewCluster(stack, jsii.String("eks-cdk-cluster"), &awseks.ClusterProps{
 		Version:         awseks.KubernetesVersion_Of(jsii.String("1.30")),
 		ClusterName:     jsii.String("eks-cdk-cluster"),
@@ -98,6 +99,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		Role:            clusterRole,
 	})
 
+	// adds user to the mapping in the AWS for managing this cluster
 	eksCluster.AwsAuth().AddUserMapping(awsiam.User_FromUserArn(stack, jsii.String("ivan"), jsii.String("arn:aws:iam::406477933661:user/ivan")), &awseks.AwsAuthMapping{
 		Username: jsii.String("ivan"),
 		Groups: &[]*string{
@@ -105,6 +107,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		},
 	})
 
+	// creates the IAM role for node group with the provided policies
 	nodeGroupRole := awsiam.NewRole(stack, jsii.String("node-group-role"), &awsiam.RoleProps{
 		AssumedBy:   awsiam.NewServicePrincipal(jsii.String("ec2.amazonaws.com"), nil),
 		Description: jsii.String("Role for EKS Node Group"),
@@ -117,6 +120,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		RoleName: jsii.String("node-group-role"),
 	})
 
+	// creates new node group
 	eksCluster.AddNodegroupCapacity(jsii.String("node-group"), &awseks.NodegroupOptions{
 		InstanceTypes: &[]awsec2.InstanceType{
 			awsec2.NewInstanceType(jsii.String("t2.medium")),
@@ -135,6 +139,7 @@ func NewCdkIvanStack(scope constructs.Construct, id string, props *CdkStackProps
 		DiskSize: jsii.Number(20),
 	})
 
+	// Addons
 	awseks.NewCfnAddon(stack, jsii.String("VPCCNIAddon"), &awseks.CfnAddonProps{
 		ClusterName:      eksCluster.ClusterName(),
 		AddonName:        jsii.String("vpc-cni"),
