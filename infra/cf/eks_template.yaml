@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template to deploy EKS Cluster with VPC, Subnets, Roles, and Security Groups.
+
 Parameters:
   InstanceType:
     Description: Node instance type
@@ -10,25 +11,23 @@ Parameters:
       - t2.medium
       - t2.large
 
-  VpcCniAddonVersion:
+  KubernetesVersion:
     Type: String
-    Default: 'v1.18.1-eksbuild.3'
-    Description: 'Version of the Amazon VPC CNI plugin'
+    Default: '1.30'
+    Description: 'Version of Kubernetes to deploy'
 
-  KubeProxyAddonVersion:
-    Type: String
-    Default: 'v1.30.0-eksbuild.3'
-    Description: 'Version of the kubernetes proxy'
-
-  CoreDnsAddonVersion:
-    Type: String
-    Default: 'v1.11.1-eksbuild.8'
-    Description: 'Version of the CoreDNS'
-
-  PodIdentityAddonVersion:
-    Type: String
-    Default: 'v1.3.2-eksbuild.2'
-    Description: 'Version of the Amazon EKS Pod Identity Webhook'
+Mappings:
+  KubernetesVersionMapping:
+    '1.29':
+      VpcCniVersion: v1.17.1-eksbuild.3
+      KubeProxyVersion: v1.29.0-eksbuild.3
+      CoreDnsVersion: v1.10.1-eksbuild.8
+      PodIdentityAgentVersion: v1.3.1-eksbuild.2
+    '1.30':
+      VpcCniVersion: v1.18.1-eksbuild.3
+      KubeProxyVersion: v1.30.0-eksbuild.3
+      CoreDnsVersion: v1.11.1-eksbuild.8
+      PodIdentityAgentVersion: v1.3.2-eksbuild.2
 
 Resources:
   VPC:
@@ -36,7 +35,6 @@ Resources:
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
-      EnableDnsHostnames: true
       Tags:
         - Key: Name
           Value: eks-vpc
@@ -147,13 +145,15 @@ Resources:
     Properties:
       Name: eks-cluster
       RoleArn: !GetAtt EKSClusterRole.Arn
+      Version: !Ref KubernetesVersion
       ResourcesVpcConfig:
         SubnetIds:
           - !Ref PublicSubnet1
           - !Ref PublicSubnet2
         SecurityGroupIds:
           - !Ref EKSSecurityGroup
-
+      UpgradePolicy:
+        SupportType: STANDARD
   NodeInstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -173,7 +173,6 @@ Resources:
         - Key: Name
           Value: eks-node-instance-role
 
-  # EKS Node Group
   EKSNodeGroup:
     Type: AWS::EKS::Nodegroup
     Properties:
@@ -194,35 +193,35 @@ Resources:
         Ec2SshKey: ivan-kp
 
   VpcCniAddon:
-    Type: 'AWS::EKS::Addon'
+    Type: AWS::EKS::Addon
     Properties:
       AddonName: vpc-cni
       ClusterName: !Ref EKSCluster
-      AddonVersion: !Ref VpcCniAddonVersion
+      AddonVersion: !FindInMap [ KubernetesVersionMapping, !Ref KubernetesVersion, VpcCniVersion ]
       ResolveConflicts: OVERWRITE
 
   CoreDnsAddon:
-    Type: 'AWS::EKS::Addon'
+    Type: AWS::EKS::Addon
     Properties:
       AddonName: coredns
       ClusterName: !Ref EKSCluster
-      AddonVersion: !Ref CoreDnsAddonVersion
+      AddonVersion: !FindInMap [ KubernetesVersionMapping, !Ref KubernetesVersion, CoreDnsVersion ]
       ResolveConflicts: OVERWRITE
 
   KubeProxyAddon:
-    Type: 'AWS::EKS::Addon'
+    Type: AWS::EKS::Addon
     Properties:
       AddonName: kube-proxy
       ClusterName: !Ref EKSCluster
-      AddonVersion: !Ref KubeProxyAddonVersion
+      AddonVersion: !FindInMap [ KubernetesVersionMapping, !Ref KubernetesVersion, KubeProxyVersion ]
       ResolveConflicts: OVERWRITE
 
   PodIdentityAddon:
-    Type: 'AWS::EKS::Addon'
+    Type: AWS::EKS::Addon
     Properties:
       AddonName: eks-pod-identity-agent
       ClusterName: !Ref EKSCluster
-      AddonVersion: !Ref PodIdentityAddonVersion
+      AddonVersion: !FindInMap [ KubernetesVersionMapping, !Ref KubernetesVersion, PodIdentityAgentVersion ]
       ResolveConflicts: OVERWRITE
 
 Outputs:
@@ -235,6 +234,17 @@ Outputs:
     Value: !Ref EKSNodeGroup
 
   VPCId:
-    Description: VPC ID
+    Description: ID of the VPC
     Value: !Ref VPC
 
+  PublicSubnet1Id:
+    Description: ID of the first public subnet
+    Value: !Ref PublicSubnet1
+
+  PublicSubnet2Id:
+    Description: ID of the second public subnet
+    Value: !Ref PublicSubnet2
+
+  SecurityGroupId:
+    Description: ID of the EKS Security Group
+    Value: !Ref EKSSecurityGroup
