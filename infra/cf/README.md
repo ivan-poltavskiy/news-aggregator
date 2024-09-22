@@ -14,7 +14,7 @@ The following services are deployed through this CloudFormation template:
 - EKS Node Group: A scalable group of EC2 worker nodes to run your workloads.
 - Addons
 
-`**Before deploying this stack, ensure that you have:**`
+`Before deploying this stack, ensure that you have:`
 
 - An AWS account with the necessary permissions to create the resources listed above.
 
