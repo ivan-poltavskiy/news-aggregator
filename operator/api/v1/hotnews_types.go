@@ -6,11 +6,22 @@ import (
 
 // HotNewsSpec contains the specification's fields of the HotNews CRD
 type HotNewsSpec struct {
-	Keywords      []string      `json:"keywords,omitempty"`
-	DateStart     string        `json:"dateStart,omitempty"`
-	DateEnd       string        `json:"dateEnd,omitempty"`
-	FeedsName     []string      `json:"feedsName,omitempty"`
-	FeedGroups    []string      `json:"feedGroups,omitempty"`
+	// Keywords specifies the list of keywords used to filter news articles
+	Keywords []string `json:"keywords,omitempty"`
+
+	// DateStart defines the start date for collecting news, in the format YYYY-MM-DD
+	DateStart string `json:"dateStart,omitempty"`
+
+	// DateEnd defines the end date for collecting news, in the format YYYY-MM-DD
+	DateEnd string `json:"dateEnd,omitempty"`
+
+	// FeedsName lists the names of the news sources to collect articles from
+	FeedsName []string `json:"feedsName,omitempty"`
+
+	// FeedGroups specifies the groups of news sources for aggregation
+	FeedGroups []string `json:"feedGroups,omitempty"`
+
+	// SummaryConfig contains configuration options for summarizing the news
 	SummaryConfig SummaryConfig `json:"summaryConfig,omitempty"`
 }
 
@@ -23,10 +34,17 @@ type SummaryConfig struct {
 
 // HotNewsStatus defines the observed state of HotNews
 type HotNewsStatus struct {
-	ArticlesCount  int         `json:"articlesCount,omitempty"`
-	NewsLink       string      `json:"newsLink,omitempty"`
-	ArticlesTitles []string    `json:"articlesTitles,omitempty"`
-	Conditions     []Condition `json:"conditions,omitempty"`
+	// ArticlesCount is the number of news articles collected
+	ArticlesCount int `json:"articlesCount,omitempty"`
+
+	// NewsLink provides a URL to access the aggregated news
+	NewsLink string `json:"newsLink,omitempty"`
+
+	// ArticlesTitles lists the titles of the collected news articles
+	ArticlesTitles []string `json:"articlesTitles,omitempty"`
+
+	// Conditions represent the current state or conditions of the HotNews resource
+	Conditions []Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
