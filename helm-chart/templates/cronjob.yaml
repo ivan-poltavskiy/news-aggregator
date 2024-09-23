@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: news-aggregator-cronjob
-  namespace: news-aggregator
+  namespace: {{ .Values.namespace }}
 spec:
   schedule: "0 9 * * *"
   jobTemplate:

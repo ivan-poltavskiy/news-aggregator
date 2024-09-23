@@ -99,9 +99,8 @@ tasks:
 
   installChart:
     desc: "Installs the Helm chart on the Kubernetes cluster"
-    deps: [ create-namespace ]
     cmds:
-      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator
+      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --create-namespace
 
   uninstallChart:
     desc: "Uninstalls the Helm chart from the Kubernetes cluster"
