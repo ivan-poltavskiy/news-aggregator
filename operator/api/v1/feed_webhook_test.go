@@ -1,10 +1,14 @@
 package v1
 
 import (
+	"context"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"testing"
 )
 
@@ -177,4 +181,29 @@ func TestCheckNameUnique(t *testing.T) {
 			}
 		})
 	}
+}
+func TestCheckNameUniqueness_ErrorOnList(t *testing.T) {
+	newScheme := runtime.NewScheme()
+	_ = AddToScheme(newScheme)
+
+	k8sClient = fake.NewClientBuilder().WithScheme(newScheme).WithInterceptorFuncs(interceptor.Funcs{
+		List: func(ctx context.Context, client client.WithWatch, list client.ObjectList, opts ...client.ListOption) error {
+			return fmt.Errorf("test error")
+		},
+	}).Build()
+
+	feed := &Feed{
+		Spec: FeedSpec{
+			Name: "test-feed",
+			Url:  "http://test.url",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+		},
+	}
+
+	err := checkNameUniqueness(feed)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "checkNameUniqueness: failed to list feeds")
 }
