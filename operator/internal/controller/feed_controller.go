@@ -67,9 +67,10 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	}
 
 	if !feed.ObjectMeta.DeletionTimestamp.IsZero() && containsFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer) {
+
 		if err := r.deleteFeed(&feed.Spec.Name); err != nil {
 
-			feed.Status.AddCondition(aggregatorv1.Condition{
+			feed.Status.SetCondition(aggregatorv1.Condition{
 				Type:    aggregatorv1.ConditionDeleted,
 				Success: false,
 				Message: "Reconcile: Failed to delete feed",
@@ -92,7 +93,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	if feed.Status.GetCurrentCondition().Type != aggregatorv1.ConditionAdded {
 		if err := r.addFeed(feed); err != nil {
 
-			feed.Status.AddCondition(aggregatorv1.Condition{
+			feed.Status.SetCondition(aggregatorv1.Condition{
 				Type:    aggregatorv1.ConditionAdded,
 				Success: false,
 				Message: "Reconcile: Failed to add feed",
@@ -106,7 +107,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 	} else {
 		if err := r.updateFeed(feed); err != nil {
-			feed.Status.AddCondition(aggregatorv1.Condition{
+			feed.Status.SetCondition(aggregatorv1.Condition{
 				Type:    aggregatorv1.ConditionAdded,
 				Success: false,
 				Message: "Reconcile: Failed to update feed",
@@ -119,7 +120,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 	}
 
-	aggregatorv1.AddPositiveCondition(feed)
+	aggregatorv1.AddPositiveCondition(&feed)
 
 	if err := r.Client.Status().Update(ctx, &feed); err != nil {
 		return ctrl.Result{}, err

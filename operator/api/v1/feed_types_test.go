@@ -95,7 +95,7 @@ func TestAddCondition(t *testing.T) {
 		LastUpdateTime:  initialTime,
 	}
 
-	feedStatus.AddCondition(condition)
+	feedStatus.SetCondition(condition)
 	assert.Equal(t, len(feedStatus.Conditions), 1)
 
 	latestCondition := feedStatus.GetCurrentCondition()
