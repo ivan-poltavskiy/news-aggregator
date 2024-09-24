@@ -23,7 +23,7 @@ import (
 )
 
 //go:generate mockgen -destination=mock_aggregator/mock_client.go -package=controller  sigs.k8s.io/controller-runtime/pkg/client Client
-//go:generate mockgen -destination=mock_aggregator/mock_status_client.go -package=mocks sigs.k8s.io/controller-runtime/pkg/client StatusClient
+//go:generate mockgen -destination=mock_aggregator/mock_status_client.go -package=controller sigs.k8s.io/controller-runtime/pkg/client StatusClient
 func TestFeedReconciler_addFeed(t *testing.T) {
 	tests := []struct {
 		name             string
@@ -168,7 +168,7 @@ func TestFeedReconciler_deleteFeed(t *testing.T) {
 				},
 			}
 
-			err := reconciler.deleteFeed(&tt.feed)
+			err := reconciler.deleteFeed(&tt.feed.Spec.Name)
 			if (err != nil) != tt.expectedError {
 				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
 			}

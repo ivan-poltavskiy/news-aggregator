@@ -204,7 +204,7 @@ func (r *FeedReconciler) deleteFeed(feedName *string) error {
 		return err
 	}
 
-	logrus.Infof("Feed for delete name: %s", feedName)
+	logrus.Infof("Feed for delete name: %s", *feedName)
 	path, err := url.JoinPath(r.HttpsLinks.ServerUrl, r.HttpsLinks.EndpointForSourceManaging)
 	if err != nil {
 		return err
