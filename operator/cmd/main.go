@@ -39,7 +39,7 @@ func init() {
 }
 
 func main() {
-	var serverUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
+	var defaultServerUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
 	var endpointForSourceManaging = "/sources"
 	var metricsAddr string
 	var enableLeaderElection bool
@@ -58,7 +58,7 @@ func main() {
 		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
-	flag.StringVar(&serverUrl, "server-url", serverUrl, "The URL of the news aggregator service.")
+	flag.StringVar(&defaultServerUrl, "server-url", defaultServerUrl, "The URL of the news aggregator service.")
 	flag.StringVar(&endpointForSourceManaging, "feed-managing-enpoint", endpointForSourceManaging, "The endpoint of the news aggregator service for managing feeds.")
 	opts := zap.Options{
 		Development: true,
@@ -145,7 +145,7 @@ func main() {
 		HttpClient: httpClient,
 		Finalizer:  finalizer,
 		HttpsLinks: controller.HttpsClientData{
-			ServerUrl:                 serverUrl,
+			ServerUrl:                 defaultServerUrl,
 			EndpointForSourceManaging: endpointForSourceManaging,
 		},
 	}).SetupWithManager(mgr); err != nil {

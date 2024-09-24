@@ -59,7 +59,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, err
 	}
 
-	if !containsString(feed.ObjectMeta.Finalizers, r.Finalizer) {
+	if !containsFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer) {
 		feed.ObjectMeta.Finalizers = append(feed.ObjectMeta.Finalizers, r.Finalizer)
 		if err := r.Client.Update(ctx, &feed); err != nil {
 			return ctrl.Result{}, err
@@ -67,8 +67,8 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	}
 
 	if !feed.ObjectMeta.DeletionTimestamp.IsZero() {
-		if containsString(feed.ObjectMeta.Finalizers, r.Finalizer) {
-			if err := r.deleteFeed(&feed); err != nil {
+		if containsFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer) {
+			if err := r.deleteFeed(&feed.Spec.Name); err != nil {
 
 				feed.Status.AddCondition(aggregatorv1.Condition{
 					Type:    aggregatorv1.ConditionDeleted,
@@ -83,7 +83,7 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 				return ctrl.Result{}, err
 			}
 
-			feed.ObjectMeta.Finalizers = removeString(feed.ObjectMeta.Finalizers, r.Finalizer)
+			feed.ObjectMeta.Finalizers = removeFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer)
 			if err := r.Client.Update(ctx, &feed); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -193,9 +193,9 @@ func (r *FeedReconciler) addFeed(feed aggregatorv1.Feed) error {
 }
 
 // deleteFeed call the news aggregator server for delete source from the storage
-func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
+func (r *FeedReconciler) deleteFeed(feedName *string) error {
 	deleteRequest := feedDeleteRequest{
-		Name: feed.Spec.Name,
+		Name: *feedName,
 	}
 
 	reqBody, err := json.Marshal(deleteRequest)
@@ -204,7 +204,7 @@ func (r *FeedReconciler) deleteFeed(feed *aggregatorv1.Feed) error {
 		return err
 	}
 
-	logrus.Infof("Feed for delete name: %s", feed.Spec.Name)
+	logrus.Infof("Feed for delete name: %s", feedName)
 	path, err := url.JoinPath(r.HttpsLinks.ServerUrl, r.HttpsLinks.EndpointForSourceManaging)
 	if err != nil {
 		return err
@@ -299,8 +299,8 @@ type feedDeleteRequest struct {
 	Name string `json:"name"`
 }
 
-// containsString checks if a string exists in a slice.
-func containsString(slice []string, str string) bool {
+// containsFinalizer checks if a string exists in a slice.
+func containsFinalizer(slice []string, str string) bool {
 	for _, item := range slice {
 		if item == str {
 			return true
@@ -309,8 +309,8 @@ func containsString(slice []string, str string) bool {
 	return false
 }
 
-// removeString removes a string from a slice.
-func removeString(slice []string, str string) []string {
+// removeFinalizer removes a string from a slice.
+func removeFinalizer(slice []string, str string) []string {
 	var newSlice []string
 	for _, item := range slice {
 		if item == str {
