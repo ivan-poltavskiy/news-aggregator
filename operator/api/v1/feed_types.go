@@ -84,6 +84,18 @@ func (f *FeedStatus) GetCurrentCondition() Condition {
 	return f.Conditions[len(f.Conditions)-1]
 }
 
+// AddPositiveCondition Set the success status to the condition of the feed
+func AddPositiveCondition(feed Feed) {
+
+	feed.Status.AddCondition(Condition{
+		Type:            ConditionAdded,
+		Success:         true,
+		LastUpdatedName: feed.Spec.Name,
+		Message:         "",
+		Reason:          "",
+	})
+}
+
 func init() {
 	SchemeBuilder.Register(&Feed{}, &FeedList{})
 }

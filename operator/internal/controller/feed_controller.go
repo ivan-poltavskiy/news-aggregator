@@ -66,27 +66,25 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 	}
 
-	if !feed.ObjectMeta.DeletionTimestamp.IsZero() {
-		if containsFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer) {
-			if err := r.deleteFeed(&feed.Spec.Name); err != nil {
+	if !feed.ObjectMeta.DeletionTimestamp.IsZero() && containsFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer) {
+		if err := r.deleteFeed(&feed.Spec.Name); err != nil {
 
-				feed.Status.AddCondition(aggregatorv1.Condition{
-					Type:    aggregatorv1.ConditionDeleted,
-					Success: false,
-					Message: "Reconcile: Failed to delete feed",
-					Reason:  err.Error(),
-				})
+			feed.Status.AddCondition(aggregatorv1.Condition{
+				Type:    aggregatorv1.ConditionDeleted,
+				Success: false,
+				Message: "Reconcile: Failed to delete feed",
+				Reason:  err.Error(),
+			})
 
-				if err := r.Client.Status().Update(ctx, &feed); err != nil {
-					return ctrl.Result{}, err
-				}
+			if err := r.Client.Status().Update(ctx, &feed); err != nil {
 				return ctrl.Result{}, err
 			}
+			return ctrl.Result{}, err
+		}
 
-			feed.ObjectMeta.Finalizers = removeFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer)
-			if err := r.Client.Update(ctx, &feed); err != nil {
-				return ctrl.Result{}, err
-			}
+		feed.ObjectMeta.Finalizers = removeFinalizer(feed.ObjectMeta.Finalizers, r.Finalizer)
+		if err := r.Client.Update(ctx, &feed); err != nil {
+			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, nil
 	}
@@ -120,13 +118,8 @@ func (r *FeedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 			return ctrl.Result{}, err
 		}
 	}
-	feed.Status.AddCondition(aggregatorv1.Condition{
-		Type:            aggregatorv1.ConditionAdded,
-		Success:         true,
-		LastUpdatedName: feed.Spec.Name,
-		Message:         "",
-		Reason:          "",
-	})
+
+	aggregatorv1.AddPositiveCondition(feed)
 
 	if err := r.Client.Status().Update(ctx, &feed); err != nil {
 		return ctrl.Result{}, err
