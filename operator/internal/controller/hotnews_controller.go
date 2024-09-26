@@ -42,6 +42,11 @@ type HotNewsReconciler struct {
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups=news-aggregator.com.teamdev,resources=feeds,verbs=get;list;watch;create;update;patch;delete
 
+// Reconcile
+// Note:
+// In case, when provided both variants of feds, namely FeedsName and FeedGroups, the Hot News will use the feeds from
+// config map. Feeds from FeedGroups will ignore.
+
 func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	logrus.Info("Starting hot news reconcile")
@@ -174,10 +179,8 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 	}
 
 	if err == nil {
-		feedNames, err := r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap, ctx)
-		if err != nil {
-			return err
-		}
+		feedNames := r.getFeedNamesFromConfigMap(&feedGroupConfigMap)
+
 		if len(feedNames) != 0 {
 			hotNews.Spec.FeedsName = feedNames
 		}
@@ -206,28 +209,16 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 	return nil
 }
 
-// getFeedNamesFromConfigMap retrieves the list of feed names from the ConfigMap based on HotNews' FeedGroups.
-func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap, ctx context.Context) ([]string, error) {
+// getFeedNamesFromConfigMap retrieves the list of feed names from the ConfigMap and removes spaces around feed names.
+func (r *HotNewsReconciler) getFeedNamesFromConfigMap(configMap *v1.ConfigMap) []string {
 	var feedNames []string
 
-	for _, group := range hotNews.Spec.FeedGroups {
-		if feeds, found := configMap.Data[group]; found {
-			feedList := strings.Split(feeds, ",")
-			for _, feedName := range feedList {
-				feedName = strings.TrimSpace(feedName)
-				var currentFeed aggregatorv1.Feed
-				err := r.Client.Get(ctx, client.ObjectKey{Namespace: hotNews.Namespace, Name: feedName}, &currentFeed)
-				if err != nil {
-					return nil, fmt.Errorf("failed to get Feed %s: %w", feedName, err)
-				}
-				feedNames = append(feedNames, currentFeed.Spec.Name)
-			}
-		} else {
-			return nil, fmt.Errorf("feed group %s not found in ConfigMap", group)
+	for _, feeds := range configMap.Data {
+		for _, feed := range strings.Split(feeds, ",") {
+			feedNames = append(feedNames, strings.TrimSpace(feed))
 		}
 	}
-
-	return feedNames, nil
+	return feedNames
 }
 
 // createUrl constructs the URL used to fetch news based on the
