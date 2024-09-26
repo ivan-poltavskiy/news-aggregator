@@ -52,21 +52,6 @@ tasks:
     cmds:
       - "go test $(go list ./... | grep -v /e2e) -coverprofile cover.out"
 
-  test-e2e:
-    desc: "Run the e2e tests against a Kind k8s instance that is spun up."
-    cmds:
-      - "go test ./test/e2e/ -v -ginkgo.v"
-
-  lint:
-    desc: "Run golangci-lint linter"
-    cmds:
-      - "golangci-lint run"
-
-  lint-fix:
-    desc: "Run golangci-lint linter and perform fixes"
-    cmds:
-      - "golangci-lint run --fix"
-
   build:
     desc: "Build manager binary."
     cmds:
