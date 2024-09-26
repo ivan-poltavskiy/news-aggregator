@@ -41,24 +41,33 @@ spec:
               CRD
             properties:
               dateEnd:
+                description: DateEnd defines the end date for collecting news, in
+                  the format YYYY-MM-DD
                 type: string
               dateStart:
+                description: DateStart defines the start date for collecting news,
+                  in the format YYYY-MM-DD
                 type: string
               feedGroups:
+                description: FeedGroups specifies the groups of news sources for aggregation
                 items:
                   type: string
                 type: array
               feedsName:
+                description: FeedsName lists the names of the news sources to collect
+                  articles from
                 items:
                   type: string
                 type: array
               keywords:
+                description: Keywords specifies the list of keywords used to filter
+                  news articles
                 items:
                   type: string
                 type: array
               summaryConfig:
-                description: SummaryConfig contains the summary configuration of the
-                  HotNews CRD
+                description: SummaryConfig contains configuration options for summarizing
+                  the news
                 properties:
                   titlesCount:
                     description: TitlesCount contains the quantity of the titles which
@@ -70,12 +79,17 @@ spec:
             description: HotNewsStatus defines the observed state of HotNews
             properties:
               articlesCount:
+                description: ArticlesCount is the number of news articles collected
                 type: integer
               articlesTitles:
+                description: ArticlesTitles lists the titles of the collected news
+                  articles
                 items:
                   type: string
                 type: array
               conditions:
+                description: Conditions represent the current state or conditions
+                  of the HotNews resource
                 items:
                   description: Condition describes the states of a feed during its
                     life cycle in the system
@@ -105,6 +119,7 @@ spec:
                   type: object
                 type: array
               newsLink:
+                description: NewsLink provides a URL to access the aggregated news
                 type: string
             type: object
         type: object

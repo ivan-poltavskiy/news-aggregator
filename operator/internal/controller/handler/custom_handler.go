@@ -27,12 +27,25 @@ func (h *HotNewsHandler) UpdateHotNews(ctx context.Context, obj client.Object) [
 
 	var requests []ctrl.Request
 	for _, hotNews := range hotNewsList.Items {
-		requests = append(requests, ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      hotNews.Name,
-				Namespace: hotNews.Namespace,
-			},
-		})
+		if isOwner(hotNews, obj) {
+
+			requests = append(requests, ctrl.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      hotNews.Name,
+					Namespace: hotNews.Namespace,
+				},
+			})
+		}
 	}
 	return requests
+}
+
+// check that provided object is the child of provided hot news
+func isOwner(hotNews aggregatorv1.HotNews, obj client.Object) bool {
+	for _, ownerRef := range obj.GetOwnerReferences() {
+		if ownerRef.UID == hotNews.UID {
+			return true
+		}
+	}
+	return false
 }
