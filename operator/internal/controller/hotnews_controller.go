@@ -174,7 +174,7 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 	}
 
 	if err == nil {
-		feedNames, err := r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap)
+		feedNames, err := r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap, ctx)
 		if err != nil {
 			return err
 		}
@@ -207,10 +207,8 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 }
 
 // getFeedNamesFromConfigMap retrieves the list of feed names from the ConfigMap based on HotNews' FeedGroups.
-func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) ([]string, error) {
+func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap, ctx context.Context) ([]string, error) {
 	var feedNames []string
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 
 	for _, group := range hotNews.Spec.FeedGroups {
 		if feeds, found := configMap.Data[group]; found {
