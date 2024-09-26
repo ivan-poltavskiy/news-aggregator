@@ -179,8 +179,8 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 	}
 
 	if err == nil {
-		feedNames := r.getFeedNamesFromConfigMap(&feedGroupConfigMap)
-
+		feedNames := r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap)
+		logrus.Info("feeds name from config map length: ", len(feedNames))
 		if len(feedNames) != 0 {
 			hotNews.Spec.FeedsName = feedNames
 		}
@@ -210,14 +210,19 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 }
 
 // getFeedNamesFromConfigMap retrieves the list of feed names from the ConfigMap and removes spaces around feed names.
-func (r *HotNewsReconciler) getFeedNamesFromConfigMap(configMap *v1.ConfigMap) []string {
+func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) []string {
 	var feedNames []string
 
-	for _, feeds := range configMap.Data {
-		for _, feed := range strings.Split(feeds, ",") {
-			feedNames = append(feedNames, strings.TrimSpace(feed))
+	for _, feedGroup := range hotNews.Spec.FeedGroups {
+
+		if feeds, found := configMap.Data[feedGroup]; found {
+
+			for _, feed := range strings.Split(feeds, ",") {
+				feedNames = append(feedNames, strings.TrimSpace(feed))
+			}
 		}
 	}
+
 	return feedNames
 }
 
