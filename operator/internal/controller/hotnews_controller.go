@@ -46,15 +46,6 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	logrus.Info("Starting hot news reconcile")
 	var hotNews aggregatorv1.HotNews
-	var feedGroupConfigMap v1.ConfigMap
-
-	if err := r.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: r.ConfigMapMame}, &feedGroupConfigMap); err != nil {
-		if errors.IsNotFound(err) {
-			logrus.Print("ConfigMap not found")
-			return ctrl.Result{}, err
-		}
-		return ctrl.Result{}, err
-	}
 
 	err := r.Client.Get(ctx, req.NamespacedName, &hotNews)
 	if err != nil {
@@ -84,7 +75,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileHotNews(&hotNews, &feedGroupConfigMap)
+	err = r.reconcileHotNews(&hotNews, req.Namespace, ctx)
 	if err != nil {
 		hotNews.Status.SetCondition(aggregatorv1.Condition{
 			Type:    aggregatorv1.ConditionAdded,
@@ -174,16 +165,27 @@ func (r *HotNewsReconciler) cleanupOwnerReferences(ctx context.Context, namespac
 
 // reconcileHotNews synchronizes the state of the HotNews custom resource
 // with the external news sources specified in the ConfigMap.
-func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, configMap *v1.ConfigMap) error {
-	feedNames, err := r.getFeedNamesFromConfigMap(hotNews, configMap)
+func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, namespace string, ctx context.Context) error {
+	var feedGroupConfigMap v1.ConfigMap
+
+	err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: r.ConfigMapMame}, &feedGroupConfigMap)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+
+	if err == nil {
+		feedNames, err := r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap)
+		if err != nil {
+			return err
+		}
+		if len(feedNames) != 0 {
+			hotNews.Spec.FeedsName = feedNames
+		}
+	}
+	createdUrl, err := r.createUrl(*hotNews)
 	if err != nil {
 		return err
 	}
-	if len(feedNames) != 0 {
-		hotNews.Spec.FeedsName = feedNames
-	}
-
-	createdUrl := r.createUrl(*hotNews)
 
 	logrus.Info("URL= ", createdUrl)
 
@@ -210,22 +212,20 @@ func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotN
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if len(hotNews.Spec.FeedGroups) > 0 {
-		for _, group := range hotNews.Spec.FeedGroups {
-			if feeds, found := configMap.Data[group]; found {
-				feedList := strings.Split(feeds, ",")
-				for _, feedName := range feedList {
-					feedName = strings.TrimSpace(feedName)
-					var currentFeed aggregatorv1.Feed
-					err := r.Client.Get(ctx, client.ObjectKey{Namespace: hotNews.Namespace, Name: feedName}, &currentFeed)
-					if err != nil {
-						return nil, fmt.Errorf("failed to get Feed %s: %w", feedName, err)
-					}
-					feedNames = append(feedNames, currentFeed.Spec.Name)
+	for _, group := range hotNews.Spec.FeedGroups {
+		if feeds, found := configMap.Data[group]; found {
+			feedList := strings.Split(feeds, ",")
+			for _, feedName := range feedList {
+				feedName = strings.TrimSpace(feedName)
+				var currentFeed aggregatorv1.Feed
+				err := r.Client.Get(ctx, client.ObjectKey{Namespace: hotNews.Namespace, Name: feedName}, &currentFeed)
+				if err != nil {
+					return nil, fmt.Errorf("failed to get Feed %s: %w", feedName, err)
 				}
-			} else {
-				return nil, fmt.Errorf("feed group %s not found in ConfigMap", group)
+				feedNames = append(feedNames, currentFeed.Spec.Name)
 			}
+		} else {
+			return nil, fmt.Errorf("feed group %s not found in ConfigMap", group)
 		}
 	}
 
@@ -234,12 +234,14 @@ func (r *HotNewsReconciler) getFeedNamesFromConfigMap(hotNews *aggregatorv1.HotN
 
 // createUrl constructs the URL used to fetch news based on the
 // configuration provided in the HotNews resource and the related ConfigMap.
-func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) string {
+func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) (string, error) {
 	baseUrl := r.HttpsLinks.ServerUrl + r.HttpsLinks.EndpointForSourceManaging
 	params := url.Values{}
 
 	if len(hotNews.Spec.FeedsName) > 0 {
 		params.Add("sources", strings.Join(hotNews.Spec.FeedsName, ","))
+	} else {
+		return "", fmt.Errorf("feeds and config maps not present")
 	}
 
 	if len(hotNews.Spec.Keywords) > 0 {
@@ -251,7 +253,7 @@ func (r *HotNewsReconciler) createUrl(hotNews aggregatorv1.HotNews) string {
 		params.Add("endDate", hotNews.Spec.DateEnd)
 	}
 
-	return baseUrl + "?" + params.Encode()
+	return baseUrl + "?" + params.Encode(), nil
 }
 
 // fetchNews sends an HTTP GET request to the specified URL to retrieve a list of news articles.
