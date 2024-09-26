@@ -54,7 +54,7 @@ func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 // ValidateDelete validates the input data at the time of Feed's delete
 func (r *Feed) ValidateDelete() (admission.Warnings, error) {
 	if len(r.OwnerReferences) > 0 {
-		return nil, fmt.Errorf("this Feed is used in the %s", r.OwnerReferences)
+		return nil, fmt.Errorf("this Feed is used in the following OwnerReferences: %+v", r.OwnerReferences)
 	}
 	logrus.Info("validate delete", "name", r.Name)
 	return nil, nil

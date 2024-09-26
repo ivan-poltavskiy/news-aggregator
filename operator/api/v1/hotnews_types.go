@@ -68,18 +68,17 @@ type HotNewsList struct {
 	Items           []HotNews `json:"items"`
 }
 
-// AddCondition adds new condition to the HotNews's status
-func (f *HotNewsStatus) AddCondition(condition Condition) {
-	newCondition := Condition{
-		Type:            condition.Type,
-		Success:         condition.Success,
-		Reason:          condition.Reason,
-		Message:         condition.Message,
-		LastUpdatedName: condition.LastUpdatedName,
-		LastUpdateTime:  metav1.Now(),
+// SetCondition adds new condition to the HotNews's status
+func (f *HotNewsStatus) SetCondition(condition Condition) {
+
+	for i, currentCondition := range f.Conditions {
+		if currentCondition.Type == condition.Type {
+			f.Conditions[i] = condition
+			return
+		}
 	}
 
-	f.Conditions = append(f.Conditions, newCondition)
+	f.Conditions = append(f.Conditions, condition)
 }
 
 // GetCurrentCondition returns the current condition of the HotNews

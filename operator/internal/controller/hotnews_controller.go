@@ -50,17 +50,14 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			logrus.Print("ConfigMap not found")
 			return ctrl.Result{}, err
 		}
-		logrus.Printf("Error retrieving ConfigMap %s from k8s Cluster: %v", "feed-group-source", err)
 		return ctrl.Result{}, err
 	}
 
 	err := r.Client.Get(ctx, req.NamespacedName, &hotNews)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logrus.Info("HotNews resource not found. Cleaning up OwnerReferences.")
 			return ctrl.Result{}, nil
 		}
-		logrus.Error(err, "Failed to get HotNews resource")
 		return ctrl.Result{}, err
 	}
 
@@ -74,7 +71,6 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() {
 		if containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
 			if cleanupErr := r.cleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
-				logrus.Error(cleanupErr, "Failed to clean up OwnerReferences after HotNews deletion")
 				return ctrl.Result{}, cleanupErr
 			}
 			hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
@@ -87,7 +83,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	err = r.reconcileHotNews(&hotNews, &feedGroupConfigMap)
 	if err != nil {
-		hotNews.Status.AddCondition(aggregatorv1.Condition{
+		hotNews.Status.SetCondition(aggregatorv1.Condition{
 			Type:    aggregatorv1.ConditionAdded,
 			Success: false,
 			Message: "Hot News Reconcile Failed",
@@ -99,7 +95,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	hotNews.Status.AddCondition(aggregatorv1.Condition{
+	hotNews.Status.SetCondition(aggregatorv1.Condition{
 		Type:    aggregatorv1.ConditionAdded,
 		Success: true,
 		Message: "",
@@ -107,7 +103,6 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	})
 
 	if err := r.updateOwnerReferencesForFeeds(ctx, &hotNews); err != nil {
-		logrus.Errorf("Failed to update Feed ownerReferences: %v", err)
 		return ctrl.Result{}, err
 	}
 
