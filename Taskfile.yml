@@ -2,7 +2,7 @@ version: '3'
 
 env:
   DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
-  DOCKER_IMAGE_TAG: "v1.0.18"
+  DOCKER_IMAGE_TAG: "v1.0.19"
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
