@@ -50,7 +50,8 @@ func main() {
 		handler.GetSourceHandler().UpdateSourceByName(w, r)
 	})
 	http.HandleFunc("GET /allSources", func(w http.ResponseWriter, r *http.Request) {
-		handler.GetSourceHandler().GetAllSources(w)
+		err := handler.GetSourceHandler().GetAllSources(w)
+		logrus.Error(err)
 	})
 	logrus.Info("Starting server on: " + *port)
 

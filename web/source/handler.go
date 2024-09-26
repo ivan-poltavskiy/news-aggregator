@@ -102,7 +102,7 @@ func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Requ
 }
 
 // GetAllSources returns the all sources and write him to the response
-func (h *HandlerForSources) GetAllSources(w http.ResponseWriter) {
+func (h *HandlerForSources) GetAllSources(w http.ResponseWriter) error {
 	sources, err := h.service.GetAllSources()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -111,8 +111,9 @@ func (h *HandlerForSources) GetAllSources(w http.ResponseWriter) {
 	err = json.NewEncoder(w).Encode(sources)
 	if err != nil {
 		logrus.Error("Failed to write response: ", err)
+		return err
 	}
-
+	return nil
 }
 
 func (h *HandlerForSources) UpdateSourceByName(w http.ResponseWriter, r *http.Request) {
