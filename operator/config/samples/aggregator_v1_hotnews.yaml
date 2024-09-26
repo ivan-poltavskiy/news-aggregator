@@ -12,6 +12,8 @@ spec:
     - "ukr"
   feedGroups:
     - "westMedias"
+  feedsName:
+    - "kashtan"
   summaryConfig:
     titlesCount: 10
 
