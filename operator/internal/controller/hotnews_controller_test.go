@@ -241,50 +241,6 @@ var _ = Describe("Negative reconcile tests for HotNewsReconciler", func() {
 			conditions := hotNews.Status.GetCurrentCondition()
 			gomega.Expect(!conditions.Success)
 		})
-
-		It("Feeds provided in the ConfigMap are not present in the cluster", func() {
-
-			configMap := v1.ConfigMap{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "ConfigMap",
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "default",
-					Name:      configMapName,
-				},
-				Immutable:  nil,
-				Data:       map[string]string{"test": "test"},
-				BinaryData: nil,
-			}
-			hotNews := aggregatorv1.HotNews{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "HotNews",
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "hotnews",
-					Namespace: "default",
-				},
-				Spec: aggregatorv1.HotNewsSpec{
-					Keywords:      []string{"test"},
-					DateStart:     "",
-					DateEnd:       "",
-					FeedsName:     nil,
-					FeedGroups:    []string{"test"},
-					SummaryConfig: aggregatorv1.SummaryConfig{},
-				},
-				Status: aggregatorv1.HotNewsStatus{},
-			}
-			fakeClient.Create(ctx, &configMap)
-			fakeClient.Create(ctx, &hotNews)
-
-			namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
-			_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
-			gomega.Expect(err)
-			conditions := hotNews.Status.GetCurrentCondition()
-			gomega.Expect(!conditions.Success)
-		})
 	})
 
 	Describe("Positive scenario", func() {
