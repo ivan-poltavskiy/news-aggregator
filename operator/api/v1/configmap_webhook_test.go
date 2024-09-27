@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
@@ -9,6 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 )
 
 var _ = Describe("Tests for ConfigMap Webhook", func() {
@@ -89,6 +91,21 @@ var _ = Describe("Tests for ConfigMap Webhook", func() {
 			_, err = webhook.checkFeedsExist(existingFeeds, configMap)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("feed fakeFeed does not exist in namespace"))
+		})
+
+		It("should return an error if listing feeds fails", func() {
+			fakeClient = fake.NewClientBuilder().WithScheme(scheme.Scheme).WithInterceptorFuncs(interceptor.Funcs{List: func(ctx context.Context, client client.WithWatch, list client.ObjectList, opts ...client.ListOption) error {
+				return fmt.Errorf("fake list error")
+			}}).Build()
+			webhook = &ConfigMapValidator{
+				Client:             fakeClient,
+				ConfigMapNamespace: "non-existent-namespace",
+				ConfigMapName:      "configmap",
+			}
+
+			_, err := webhook.getFeedsFromContext(ctx, configMap)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("failed to list feeds"))
 		})
 
 		It("should succeed when valid feeds are provided", func() {
