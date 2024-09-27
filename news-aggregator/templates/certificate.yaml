@@ -9,3 +9,5 @@ spec:
     name: news-aggregator-issuer
     kind: Issuer
   commonName: news-aggregator.com
+  dnsNames:
+    - {{ .Values.serviceName }}.com
