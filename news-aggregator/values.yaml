@@ -19,7 +19,11 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
 
+hpa:
+  enabled: true
+
 vpa:
+  enabled: true
   minAllowed:
     cpu: "300m"
     memory: "50Mi"
