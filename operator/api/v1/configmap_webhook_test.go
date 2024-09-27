@@ -25,13 +25,19 @@ var _ = Describe("Tests for ConfigMap Webhook", func() {
 		testFeed1 := &Feed{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "testFeed1",
-				Namespace: "default",
+				Namespace: "operator-system",
+			},
+			Spec: FeedSpec{
+				Name: "testFeed1",
 			},
 		}
 		testFeed2 := &Feed{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "testFeed2",
-				Namespace: "default",
+				Namespace: "operator-system",
+			},
+			Spec: FeedSpec{
+				Name: "testFeed2",
 			},
 		}
 
@@ -39,14 +45,14 @@ var _ = Describe("Tests for ConfigMap Webhook", func() {
 
 		webhook = &ConfigMapValidator{
 			Client:             fakeClient,
-			ConfigMapNamespace: "default",
+			ConfigMapNamespace: "operator-system",
 			ConfigMapName:      "configmap",
 		}
 
 		configMap = &v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "feed-groups",
-				Namespace: "default",
+				Namespace: "operator-system",
 			},
 			Data: map[string]string{
 				"testCategory1": "testFeed1",
@@ -70,18 +76,29 @@ var _ = Describe("Tests for ConfigMap Webhook", func() {
 			Expect(err)
 		})
 	})
-	Context("When webhook validate that feeds in the config map is provided ", func() {
+	Context("When webhook validates feeds in the config map", func() {
+		It("should return error when invalid feeds are provided", func() {
+			// Adding a fake feed not present in the namespace
+			configMap.Data["testCategory1"] = "fakeFeed"
 
-		It("should return error when invalid feeds provided in the config map", func() {
-			configMap.Data["test"] = "fakeFeed"
-			_, err := webhook.checkFeedsExist(ctx, configMap)
-			Expect(err)
+			// Get the list of existing feeds from context
+			existingFeeds, err := webhook.getFeedsFromContext(ctx, configMap)
+			Expect(err).ToNot(HaveOccurred())
+
+			// Check if feeds exist
+			_, err = webhook.checkFeedsExist(existingFeeds, configMap)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("feed fakeFeed does not exist in namespace"))
 		})
 
-		It("should work correctly when provided feeds are correct", func() {
-			_, err := webhook.checkFeedsExist(ctx, configMap)
+		It("should succeed when valid feeds are provided", func() {
+			// Get the list of existing feeds from context
+			existingFeeds, err := webhook.getFeedsFromContext(ctx, configMap)
+			Expect(err).ToNot(HaveOccurred())
+
+			// Check if feeds exist
+			_, err = webhook.checkFeedsExist(existingFeeds, configMap)
 			Expect(err).ToNot(HaveOccurred())
 		})
-
 	})
 })
