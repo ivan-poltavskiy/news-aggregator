@@ -2,8 +2,6 @@ package controller
 
 import (
 	aggregatorv1 "com.teamdev/news-aggregator/api/v1"
-	customHandler "com.teamdev/news-aggregator/internal/controller/handler"
-	"com.teamdev/news-aggregator/internal/controller/predicate"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,10 +14,10 @@ import (
 	"net/http"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	predicate2 "sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"strings"
 	"time"
@@ -115,21 +113,22 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 // SetupWithManager sets up the controller with the Manager.
 func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	hotNewsHandler := &customHandler.HotNewsHandler{
-		Client: r.Client,
-	}
+	//hotNewsHandler := &customHandler.HotNewsHandler{
+	//	Client: r.Client,
+	//}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&aggregatorv1.HotNews{}).
-		WithEventFilter(predicate.HotNewsPredicate()).
-		Watches(
-			&aggregatorv1.Feed{},
-			handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateHotNews),
-		).
+		WithEventFilter(predicate2.GenerationChangedPredicate{}).
+		//Watches(
+		//	&aggregatorv1.Feed{},
+		//	handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateHotNews),
+		//).
 		Watches(
 			&v1.ConfigMap{},
-			handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateConfigMap),
-			builder.WithPredicates(predicate.ConfigMapNamePredicate(r.ConfigMapName)),
+			&handler.EnqueueRequestForObject{},
+			//handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateConfigMap),
+			//builder.WithPredicates(predicate.ConfigMapNamePredicate(r.ConfigMapName)),
 		).
 		Complete(r)
 }
