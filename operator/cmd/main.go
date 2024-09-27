@@ -48,7 +48,7 @@ func main() {
 	var secureMetrics bool
 	var enableHTTP2 bool
 	var tlsOpts []func(*tls.Config)
-	var configMapMame = "feed-group-source"
+	var configMapName = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -66,7 +66,7 @@ func main() {
 	opts := zap.Options{
 		Development: true,
 	}
-	flag.StringVar(&configMapMame, "config-map-name", configMapMame, "The name of the ConfigMap that will be used to store feed groups.")
+	flag.StringVar(&configMapName, "config-map-name", configMapName, "The name of the ConfigMap that will be used to store feed groups.")
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
@@ -171,7 +171,7 @@ func main() {
 			EndpointForSourceManaging: endpointForGetNews,
 		},
 		HttpClient:    httpClient,
-		ConfigMapMame: configMapMame,
+		ConfigMapName: configMapName,
 		Finalizer:     finalizer,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HotNews")

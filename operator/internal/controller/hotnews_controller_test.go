@@ -50,7 +50,7 @@ var _ = Describe("Negative reconcile tests for HotNewsReconciler", func() {
 				EndpointForSourceManaging: "endpointForGetNews",
 			},
 			Finalizer:     "feed.finalizers.news.teamdev.com",
-			ConfigMapMame: configMapName,
+			ConfigMapName: configMapName,
 		}
 	})
 

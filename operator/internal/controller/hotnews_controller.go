@@ -33,7 +33,7 @@ type HotNewsReconciler struct {
 	HttpClient    HttpClient
 	HttpsLinks    HttpsClientData
 	Finalizer     string
-	ConfigMapMame string
+	ConfigMapName string
 }
 
 // +kubebuilder:rbac:groups=aggregator.com.teamdev,resources=hotnews,verbs=get;list;watch;create;update;patch;delete
@@ -42,11 +42,7 @@ type HotNewsReconciler struct {
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups=news-aggregator.com.teamdev,resources=feeds,verbs=get;list;watch;create;update;patch;delete
 
-// Reconcile
-// Note:
-// In case, when provided both variants of feds, namely FeedsName and FeedGroups, the Hot News will use the feeds from
-// config map. Feeds from FeedGroups will ignore.
-
+// TODO: rewrite docs for all methods
 func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	logrus.Info("Starting hot news reconcile")
@@ -129,7 +125,7 @@ func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&v1.ConfigMap{},
 			handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateConfigMap),
-			builder.WithPredicates(predicate.ConfigMapNamePredicate(r.ConfigMapMame)),
+			builder.WithPredicates(predicate.ConfigMapNamePredicate(r.ConfigMapName)),
 		).
 		Complete(r)
 }
@@ -173,7 +169,7 @@ func (r *HotNewsReconciler) cleanupOwnerReferences(ctx context.Context, namespac
 func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, namespace string, ctx context.Context) error {
 	var feedGroupConfigMap v1.ConfigMap
 	var feedNames []string
-	err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: r.ConfigMapMame}, &feedGroupConfigMap)
+	err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: r.ConfigMapName}, &feedGroupConfigMap)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
