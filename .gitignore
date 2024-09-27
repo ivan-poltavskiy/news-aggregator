@@ -12,3 +12,6 @@
 /.idea/vcs.xml
 /.idea/workspace.xml
 /.idea/modules.xml
+/news-aggregator/Chart.lock
+/.idea/misc.xml
+/news-aggregator/charts/*
