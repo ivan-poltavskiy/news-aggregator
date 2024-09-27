@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
 	"net/http"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -42,7 +41,12 @@ type HotNewsReconciler struct {
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups=news-aggregator.com.teamdev,resources=feeds,verbs=get;list;watch;create;update;patch;delete
 
-// TODO: rewrite docs for all methods
+// The Reconcile method brings the current state of the HotNews object to the desired state.
+// It checks the existence of the object in the system. Additionally, the method manages
+// finalizers and owner references of the HotNews object. When attempting to delete the object,
+// it checks for the presence of the owner reference and finalizer.
+// The method also retrieves the news from the server based on the parameters defined in HotNewsSpec.
+// Regardless of the success of the operation, the method updates the current state of the object in its status.
 func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	logrus.Info("Starting hot news reconcile")
@@ -97,7 +101,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		Reason:  "",
 	})
 
-	if err := r.updateOwnerReferencesForFeeds(ctx, &hotNews); err != nil {
+	if err := r.UpdateOwnerReferencesForFeeds(ctx, &hotNews); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -280,83 +284,6 @@ func getTopTitles(articles []news, count int) []string {
 		titles = append(titles, articles[i].Title)
 	}
 	return titles
-}
-
-// updateOwnerReferencesForFeeds manages owner references for feeds based on their usage in HotNews.
-func (r *HotNewsReconciler) updateOwnerReferencesForFeeds(ctx context.Context, hotNews *aggregatorv1.HotNews) error {
-	feedList := &aggregatorv1.FeedList{}
-	listOpts := client.ListOptions{Namespace: hotNews.Namespace}
-
-	err := r.Client.List(ctx, feedList, &listOpts)
-	if err != nil {
-		return err
-	}
-
-	for _, feed := range feedList.Items {
-		logrus.Info("updateOwnerReferencesForFeeds: FEED NAME: ", &feed.Spec.Name)
-		logrus.Info("updateOwnerReferencesForFeeds: hotNews.Spec.FeedsName: ", hotNews.Spec.FeedsName)
-
-		if r.isFeedUsedInHotNews(&feed, hotNews.Spec.FeedsName) {
-			if err := r.addOwnerReference(ctx, &feed, hotNews); err != nil {
-				return fmt.Errorf("failed to add ownerReference to Feed %s: %w", feed.Name, err)
-			}
-		} else {
-			if err := r.removeOwnerReference(ctx, &feed, hotNews); err != nil {
-				return fmt.Errorf("failed to remove ownerReference from Feed %s: %w", feed.Name, err)
-			}
-		}
-	}
-
-	return nil
-}
-
-// isFeedUsedInHotNews checks if a feed is used in the current HotNews resource.
-func (r *HotNewsReconciler) isFeedUsedInHotNews(feed *aggregatorv1.Feed, feedNames []string) bool {
-	for _, feedName := range feedNames {
-		if feedName == feed.Spec.Name {
-			return true
-		}
-	}
-	return false
-}
-
-// addOwnerReference adds an OwnerReference to a feed.
-func (r *HotNewsReconciler) addOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
-	ownerRef := metav1.OwnerReference{
-		APIVersion:         hotNews.APIVersion,
-		Kind:               hotNews.Kind,
-		Name:               hotNews.Name,
-		UID:                hotNews.UID,
-		BlockOwnerDeletion: pointer.BoolPtr(false),
-	}
-
-	existingOwnerReferences := feed.ObjectMeta.OwnerReferences
-	for _, ref := range existingOwnerReferences {
-		if ref.UID == hotNews.UID {
-			return nil
-		}
-	}
-
-	feed.ObjectMeta.OwnerReferences = append(feed.ObjectMeta.OwnerReferences, ownerRef)
-	return r.Client.Update(ctx, feed)
-}
-
-// removeOwnerReference removes an OwnerReference from a feed.
-func (r *HotNewsReconciler) removeOwnerReference(ctx context.Context, feed *aggregatorv1.Feed, hotNews *aggregatorv1.HotNews) error {
-	var updatedOwnerReferences []metav1.OwnerReference
-
-	for _, ref := range feed.ObjectMeta.OwnerReferences {
-		if ref.UID != hotNews.UID {
-			updatedOwnerReferences = append(updatedOwnerReferences, ref)
-		}
-	}
-
-	if len(updatedOwnerReferences) == len(feed.ObjectMeta.OwnerReferences) {
-		return nil
-	}
-
-	feed.ObjectMeta.OwnerReferences = updatedOwnerReferences
-	return r.Client.Update(ctx, feed)
 }
 
 // updateHotNews is a handler function that is triggered when relevant changes
