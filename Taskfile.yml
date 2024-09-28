@@ -9,7 +9,7 @@ env:
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
-  AWS_AUTH_HELM_CHART_NAME: "ivan-aws-auth-chart"
+  AWS_AUTH_HELM_CHART_NAME: "aws-auth-chart"
   AWS_REGION: "eu-west-2"
   AWS_ACCOUNT_ID: "406477933661"
   AWS_DEFAULT_REGION: "eu-west-2"
@@ -176,5 +176,5 @@ tasks:
       - aws-auth-helm
       - createAwsChart
     cmds:
-      - helm push ./charts/ivan-aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - helm push ./charts/aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     silent: true
