@@ -10,6 +10,48 @@ Parameters:
       - t3.medium
       - t2.medium
       - t2.large
+  NodeGroupKeyPairName:
+    Description: Name of the  existing SSH key pair for node group
+    Type: String
+    Default: ivan-kp
+
+  PublicSubnet1Cidr:
+    Description: CIDR block for the first public subnet
+    Type: String
+    Default: 10.0.1.0/24
+
+  PublicSubnet2Cidr:
+    Description: CIDR block for the second public subnet
+    Type: String
+    Default: 10.0.2.0/24
+
+  NodeGroupDiskSize:
+    Description: Size of the disk for node group
+    Type: Number
+    Default: 20
+
+  NodeGroupScalingConfigMinSize:
+    Description: Minimum number of nodes in the Node Group
+    Type: Number
+    Default: 1
+
+  NodeGroupScalingConfigMaxSize:
+    Description: Maximum number of nodes in the Node Group
+    Type: Number
+    Default: 4
+
+  NodeGroupScalingConfigDesiredSize:
+    Description: Desired number of nodes in the Node Group
+    Type: Number
+    Default: 2
+
+  NodeGroupAMIType:
+    Description: AMI type for node group
+    Type: String
+    Default: AL2_x86_64
+    AllowedValues:
+      - AL2_ARM_64
+      - AL2_x86_64
 
   KubernetesVersion:
     Type: String
@@ -71,7 +113,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Ref PublicSubnet1Cidr
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags:
@@ -82,7 +124,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.2.0/24
+      CidrBlock: !Ref PublicSubnet2Cidr
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags:
@@ -176,21 +218,21 @@ Resources:
   EKSNodeGroup:
     Type: AWS::EKS::Nodegroup
     Properties:
-      DiskSize: 20
+      DiskSize: !Ref NodeGroupDiskSize
       ClusterName: !Ref EKSCluster
       NodeRole: !GetAtt NodeInstanceRole.Arn
       Subnets:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
       ScalingConfig:
-        MinSize: 1
-        MaxSize: 4
-        DesiredSize: 2
-      AmiType: AL2_x86_64
+        MinSize: !Ref NodeGroupScalingConfigMinSize
+        MaxSize: !Ref NodeGroupScalingConfigMaxSize
+        DesiredSize: !Ref NodeGroupScalingConfigDesiredSize
+      AmiType: !Ref NodeGroupAMIType
       InstanceTypes:
         - !Ref InstanceType
       RemoteAccess:
-        Ec2SshKey: ivan-kp
+        Ec2SshKey: !Ref NodeGroupKeyPairName
 
   VpcCniAddon:
     Type: AWS::EKS::Addon
