@@ -14,10 +14,11 @@ import (
 	"net/http"
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-	predicate2 "sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"strings"
 	"time"
@@ -113,21 +114,47 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 // SetupWithManager sets up the controller with the Manager.
 func (r *HotNewsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	//hotNewsHandler := &customHandler.HotNewsHandler{
-	//	Client: r.Client,
-	//}
-
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&aggregatorv1.HotNews{}).
-		WithEventFilter(predicate2.GenerationChangedPredicate{}).
+		For(&aggregatorv1.HotNews{}, builder.WithPredicates(predicate.GenerationChangedPredicate{})).
 		//Watches(
 		//	&aggregatorv1.Feed{},
 		//	handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateHotNews),
 		//).
 		Watches(
 			&v1.ConfigMap{},
-			&handler.EnqueueRequestForObject{},
-			//handler.EnqueueRequestsFromMapFunc(hotNewsHandler.UpdateConfigMap),
+			//&handler.EnqueueRequestForObject{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []reconcile.Request {
+				configMap, ok := object.(*v1.ConfigMap)
+				var requests []ctrl.Request
+				if !ok {
+					logrus.Info("Object isn't ConfigMap: ", object)
+					return requests
+				}
+
+				namespace := configMap.Namespace
+				hotNewsList := &aggregatorv1.HotNewsList{}
+				err := r.Client.List(ctx, hotNewsList, client.InNamespace(namespace))
+				if err != nil {
+					logrus.Info("Error listing HotNews in namespace ", namespace, err)
+					return requests
+				}
+
+				for _, hotNews := range hotNewsList.Items {
+					//feedGroups := getFeedsNamesFromFeedGroups(*configMap, hotNews)
+					//if len(feedGroups) > 0 {
+					requests = append(requests, ctrl.Request{
+						NamespacedName: client.ObjectKey{
+							Namespace: hotNews.Namespace,
+							Name:      hotNews.Name,
+						},
+					})
+					//}
+				}
+
+				logrus.Info("Completed UpdateConfigMap")
+
+				return requests
+			}),
 			//builder.WithPredicates(predicate.ConfigMapNamePredicate(r.ConfigMapName)),
 		).
 		Complete(r)
