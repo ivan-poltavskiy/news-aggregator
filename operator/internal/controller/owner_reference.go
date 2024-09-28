@@ -86,3 +86,37 @@ func (r *HotNewsReconciler) RemoveOwnerReference(ctx context.Context, feed *aggr
 	feed.ObjectMeta.OwnerReferences = updatedOwnerReferences
 	return r.Client.Update(ctx, feed)
 }
+
+// CleanupOwnerReferences removes OwnerReferences to the deleted HotNews from all related Feeds
+func (r *HotNewsReconciler) CleanupOwnerReferences(ctx context.Context, namespace, hotNewsName string) error {
+	var feedList aggregatorv1.FeedList
+	listOpts := client.ListOptions{Namespace: namespace}
+
+	if err := r.Client.List(ctx, &feedList, &listOpts); err != nil {
+		return fmt.Errorf("failed to list Feeds: %w", err)
+	}
+
+	for _, feed := range feedList.Items {
+		var updatedOwnerReferences []metav1.OwnerReference
+		ownerReferenceRemoved := false
+
+		for _, ref := range feed.OwnerReferences {
+			if ref.Name == hotNewsName && ref.Kind == "HotNews" {
+				ownerReferenceRemoved = true
+				continue
+			}
+			updatedOwnerReferences = append(updatedOwnerReferences, ref)
+		}
+
+		if ownerReferenceRemoved {
+			feed.OwnerReferences = updatedOwnerReferences
+			if err := r.Client.Update(ctx, &feed); err != nil {
+				logrus.Errorf("Failed to remove OwnerReference from Feed %s: %v", feed.Name, err)
+				return fmt.Errorf("failed to update Feed %s: %w", feed.Name, err)
+			}
+			logrus.Infof("Successfully removed OwnerReference from Feed %s", feed.Name)
+		}
+	}
+
+	return nil
+}
