@@ -13,3 +13,4 @@
 /.idea/workspace.xml
 /.idea/modules.xml
 /charts/*
+/aws-auth-chart/charts/*
