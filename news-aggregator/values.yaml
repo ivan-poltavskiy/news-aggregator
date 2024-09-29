@@ -2,6 +2,7 @@ replicaCount: 1
 containerPort: 443
 imageName: alanut93/news_aggregator:v1.0.20
 namespace: news-aggregator
+appName: news-aggregator
 serviceName: news-aggregator-service
 secretName: news-aggregator-tls
 

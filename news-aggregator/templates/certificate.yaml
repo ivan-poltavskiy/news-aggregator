@@ -10,4 +10,4 @@ spec:
     kind: Issuer
   commonName: news-aggregator.com
   dnsNames:
-    - {{ .Values.serviceName }}.com
+    - {{ .Values.serviceName }}.{{ .Values.appName }}.svc.cluster.local.com
