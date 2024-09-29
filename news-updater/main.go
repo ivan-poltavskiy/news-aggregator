@@ -15,15 +15,20 @@ func main() {
 	logrus.Info("Path to storage: " + constant.PathToStorage)
 
 	newsJsonStorage, newsStorageErr := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
+
+	if newsStorageErr != nil {
+		logrus.Fatal(newsStorageErr)
+	}
+
 	sourceJsonStorage, sourceStorageErr := sourceStorage.NewJsonStorage(source.PathToFile(constant.PathToStorage))
 
-	if sourceStorageErr == nil && newsStorageErr == nil {
-		resourcesStorage := storage.NewStorage(newsJsonStorage, sourceJsonStorage)
-
-		service := updater.Service{Storage: resourcesStorage}
-		service.UpdateNews()
-	} else {
-		logrus.Fatal(sourceStorageErr, newsStorageErr)
+	if sourceStorageErr != nil {
+		logrus.Fatal(sourceStorageErr)
 	}
+
+	resourcesStorage := storage.NewStorage(newsJsonStorage, sourceJsonStorage)
+
+	service := updater.Service{Storage: resourcesStorage}
+	service.UpdateNews()
 
 }
