@@ -14,8 +14,14 @@ type deleteSourceRequest struct {
 	Name string `json:"name"`
 }
 
-type addSourceRequest struct {
-	URL string `json:"url"`
+type AddSourceRequest struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+type updateSourceRequest struct {
+	OldName string `json:"old_name"`
+	NewName string `json:"new_name"`
+	URL     string `json:"url"`
 }
 
 type HandlerForSources struct {
@@ -75,7 +81,7 @@ func (h *HandlerForSources) DeleteSourceByNameHandler(w http.ResponseWriter, r *
 }
 
 func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Request) {
-	var requestBody addSourceRequest
+	var requestBody AddSourceRequest
 
 	if err := parseRequest(r, &requestBody); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -83,7 +89,7 @@ func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Requ
 	}
 	logrus.Info("AddSourceHandler: The URL from the request to add the source was successfully retrieved: ", requestBody.URL)
 
-	sourceName, err := h.service.SaveSource(requestBody.URL)
+	sourceName, err := h.service.SaveSource(requestBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -95,8 +101,47 @@ func (h *HandlerForSources) AddSourceHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+func (h *HandlerForSources) UpdateSourceByName(w http.ResponseWriter, r *http.Request) {
+	var request updateSourceRequest
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		logrus.Error("Failed to read request body: ", err)
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logrus.Error("Failed to close request body: ", err)
+		}
+	}(r.Body)
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		logrus.Error("Invalid request body or name parameter is missing")
+		http.Error(w, "Invalid request body or name parameter is missing", http.StatusBadRequest)
+		return
+	}
+
+	logrus.Infof("Request to update source received: %s", request.OldName)
+
+	err = h.service.UpdateSourceByName(request.OldName, request.NewName, request.URL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("Source updated successfully"))
+	if err != nil {
+		logrus.Error("Failed to write response for update source: ", err)
+		return
+	}
+	logrus.Info("Response for update source written successfully")
+}
+
 // get the URL of the source from the request
-func parseRequest(r *http.Request, requestBody *addSourceRequest) error {
+func parseRequest(r *http.Request, requestBody *AddSourceRequest) error {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Error("Failed to read request body: ", err)

@@ -47,4 +47,5 @@ type Source interface {
 	// IsSourceExists check
 	IsSourceExists(source.Name) bool
 	GetSourceByName(source.Name) (source.Source, error)
+	UpdateSource(updatedSource source.Source, currentName string) error
 }

@@ -72,17 +72,19 @@ func TestSaveSource(t *testing.T) {
 	}()
 
 	tests := []struct {
-		name    string
-		url     string
-		want    source.Name
-		wantErr bool
-		setup   func()
+		name       string
+		url        string
+		sourceName string
+		want       source.Name
+		wantErr    bool
+		setup      func()
 	}{
 		{
-			name:    "Add valid RSS source",
-			url:     "https://www.pravda.com.ua/",
-			want:    "pravda",
-			wantErr: false,
+			name:       "Add valid RSS source",
+			url:        "https://www.pravda.com.ua/",
+			sourceName: "pravda",
+			want:       "pravda",
+			wantErr:    false,
 			setup: func() {
 				returnsNews := []news.News{
 					{
@@ -102,18 +104,20 @@ func TestSaveSource(t *testing.T) {
 			},
 		},
 		{
-			name:    "Add invalid RSS source",
-			url:     "https://www.test1.com",
-			want:    "",
-			wantErr: true,
+			name:       "Add invalid RSS source",
+			url:        "https://www.test1.com",
+			sourceName: "test1",
+			want:       "",
+			wantErr:    true,
 			setup: func() {
 			},
 		},
 		{
-			name:    "Add empty source",
-			url:     "",
-			want:    "",
-			wantErr: true,
+			name:       "Add empty source",
+			sourceName: "",
+			url:        "",
+			want:       "",
+			wantErr:    true,
 			setup: func() {
 			},
 		},
@@ -126,7 +130,8 @@ func TestSaveSource(t *testing.T) {
 			}
 
 			service := sourceService.NewService(mockStorage)
-			got, err := service.SaveSource(tt.url)
+			request := sourceService.AddSourceRequest{Name: tt.sourceName, URL: tt.url}
+			got, err := service.SaveSource(request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SaveSource() error = %v, wantErr %v", err, tt.wantErr)
 				return

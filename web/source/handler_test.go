@@ -83,11 +83,11 @@ func TestDeleteSourceByNameHandler(t *testing.T) {
 }
 
 // mockSaveSource mocks the SaveSource method
-func mockSaveSource(_ *Service, url string) (source.Name, error) {
-	if url == "" {
+func mockSaveSource(_ *Service, request AddSourceRequest) (source.Name, error) {
+	if request.URL == "" {
 		return "", fmt.Errorf("passed url is empty")
 	}
-	if url == "https://www.pravda.com.ua/" {
+	if request.URL == "https://www.pravda.com.ua/" {
 		return "pravda", nil
 	}
 	return "", fmt.Errorf("unknown error")
@@ -112,19 +112,19 @@ func TestAddSourceHandler(t *testing.T) {
 	}{
 		{
 			name:           "ValidRequest",
-			requestBody:    addSourceRequest{URL: "https://www.pravda.com.ua/"},
+			requestBody:    AddSourceRequest{URL: "https://www.pravda.com.ua/"},
 			expectedStatus: http.StatusOK,
 			expectedBody:   "News saved successfully. Name of source: pravda",
 		},
 		{
 			name:           "EmptyURL",
-			requestBody:    addSourceRequest{URL: ""},
+			requestBody:    AddSourceRequest{URL: ""},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   "passed url is empty",
 		},
 		{
 			name:           "UnknownURL",
-			requestBody:    addSourceRequest{URL: "https://unknown.com/"},
+			requestBody:    AddSourceRequest{URL: "https://unknown.com/"},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   "unknown error",
 		},

@@ -1,0 +1,7 @@
+apiVersion: aggregator.com.teamdev/v1
+kind: Feed
+metadata:
+  name: cbsnews
+spec:
+  name: cbsnews
+  url: https://www.cbsnews.com/
