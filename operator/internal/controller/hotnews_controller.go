@@ -66,17 +66,17 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 
-	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() {
-		if containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
-			if cleanupErr := r.CleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
-				return ctrl.Result{}, cleanupErr
-			}
-			logrus.Info("Removing finalizer of: " + hotNews.Name)
-			hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
-			if err := r.Client.Update(ctx, &hotNews); err != nil {
-				return ctrl.Result{}, err
-			}
+	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() && containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+
+		if cleanupErr := r.CleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
+			return ctrl.Result{}, cleanupErr
 		}
+		logrus.Info("Removing finalizer of: " + hotNews.Name)
+		hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+		if err := r.Client.Update(ctx, &hotNews); err != nil {
+			return ctrl.Result{}, err
+		}
+
 		return ctrl.Result{}, nil
 	}
 
@@ -137,18 +137,18 @@ func (r *HotNewsReconciler) reconcileHotNews(hotNews *aggregatorv1.HotNews, name
 	var feedGroupConfigMap v1.ConfigMap
 	var feedNames []string
 
+	if len(hotNews.Spec.FeedsName) != 0 {
+		feedNames = append(feedNames, hotNews.Spec.FeedsName...)
+	}
+
 	err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: r.ConfigMapName}, &feedGroupConfigMap)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 
 	if err == nil {
-		feedNames = r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap)
+		feedNames = append(feedNames, r.getFeedNamesFromConfigMap(hotNews, &feedGroupConfigMap)...)
 		logrus.Info("feeds name from config map length: ", len(feedNames))
-
-		if len(hotNews.Spec.FeedsName) != 0 {
-			feedNames = append(feedNames, hotNews.Spec.FeedsName...)
-		}
 	}
 
 	createdUrl, err := r.createUrl(*hotNews, feedNames)
