@@ -45,7 +45,7 @@ func (storage *jsonStorage) SaveSource(source source.Source) error {
 
 	existingSources = append(existingSources, source)
 
-	file, err := os.Create(string(storage.pathToStorage))
+	file, err := os.Create(string(storage.pathToStorage)) // Use os.Create to create or truncate the file
 	if err != nil {
 		logrus.Error("jsonStorage: Failed to create storage file: ", err)
 		return err
@@ -53,7 +53,7 @@ func (storage *jsonStorage) SaveSource(source source.Source) error {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			logrus.Error("jsonStorage: Error closing storage file: ", err)
+			logrus.Error("jsonStorage: Error closing file: ", err)
 		}
 	}(file)
 
@@ -71,27 +71,33 @@ func (storage *jsonStorage) GetSources() ([]source.Source, error) {
 	logrus.Info("jsonStorage: Starting loading the existing sources from storage")
 	file, err := os.Open(string(storage.pathToStorage))
 	if err != nil {
+		if os.IsNotExist(err) {
+			return []source.Source{}, nil // Return empty slice if file does not exist
+		}
+		logrus.Error("jsonStorage: Failed to open storage file: ", err)
 		return nil, err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			logrus.Error("Source: Error closing file: ", err)
+			logrus.Error("jsonStorage: Error closing storage file: ", err)
 		}
 	}(file)
 
 	reader := bufio.NewReader(file)
 	content, err := io.ReadAll(reader)
 	if err != nil {
+		logrus.Error("jsonStorage: Failed to read storage file: ", err)
 		return nil, err
 	}
-
 	var sources []source.Source
-	err = json.Unmarshal(content, &sources)
-	if err != nil {
-		return nil, err
+	if len(content) != 0 {
+		err = json.Unmarshal(content, &sources)
+		if err != nil {
+			logrus.Error("jsonStorage: Failed to unmarshal sources: ", err)
+			return nil, err
+		}
 	}
-
 	return sources, nil
 }
 
@@ -173,6 +179,6 @@ func (storage *jsonStorage) GetSourceByName(name source.Name) (source.Source, er
 			return s, nil
 		}
 	}
-	logrus.Info("jsonStorage: source not found", name)
+	logrus.Info("jsonStorage: source not found: ", name)
 	return source.Source{}, nil
 }

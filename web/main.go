@@ -12,8 +12,6 @@ import (
 	"news-aggregator/storage"
 	newsStorage "news-aggregator/storage/news"
 	sourceStorage "news-aggregator/storage/source"
-	"news-aggregator/web/news"
-	"time"
 )
 
 func main() {
@@ -21,7 +19,6 @@ func main() {
 	port := flag.String("port", constant.PORT, "port to listen on")
 	pathToCertificate := flag.String("certificate-path", constant.PathToCertFile, "Certificate file path")
 	pathToKey := flag.String("key-path", constant.PathToKeyFile, "Key file path")
-	newsUpdatePeriod := flag.Int("news-update-period", constant.NewsUpdatePeriodIOnMinutes, "Period of time in minutes for periodically news updating")
 	flag.Parse()
 
 	newsJsonStorage, err := newsStorage.NewJsonStorage(source.PathToFile(constant.PathToResources))
@@ -50,15 +47,6 @@ func main() {
 		handler.GetSourceHandler().DeleteSourceByNameHandler(w, r)
 	})
 	logrus.Info("Starting server on: " + *port)
-
-	logrus.Info("Starting periodic news update every ", *newsUpdatePeriod, " minutes")
-	service := news.NewService(resourcesStorage)
-	go func() {
-		err := service.PeriodicallyUpdateNews(time.Duration(*newsUpdatePeriod) * time.Second)
-		if err != nil {
-			logrus.Fatalf("Error in periodic news update: %s\n", err)
-		}
-	}()
 
 	err = http.ListenAndServeTLS(":"+*port, *pathToCertificate, *pathToKey, nil)
 	if err != nil {

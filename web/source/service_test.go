@@ -4,7 +4,7 @@ import (
 	"errors"
 	"news-aggregator/entity/news"
 	"news-aggregator/entity/source"
-	"news-aggregator/storage/mock_aggregator"
+	client "news-aggregator/storage/mock_aggregator"
 	sourceService "news-aggregator/web/source"
 	"os"
 	"testing"

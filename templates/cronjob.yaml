@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: news-aggregator-cronjob
+  namespace: news-aggregator
+spec:
+  schedule: "0 9 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cronjob-service-account
+          containers:
+            - name: news-aggregator-updater
+              image: alanut93/updater:v1.0.2
+              volumeMounts:
+                - mountPath: "/mnt"
+                  name: news-aggregator-mnt
+          restartPolicy: OnFailure
+          volumes:
+            - name: news-aggregator-mnt
+              persistentVolumeClaim:
+                claimName: news-aggregator-pvc-mnt
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
