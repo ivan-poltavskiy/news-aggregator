@@ -1,0 +1,30 @@
+version: '3'
+
+env:
+  NEWS_UPDATER_AWS_REGION: "eu-west-2"
+  NEWS_UPDATER_AWS_ACCOUNT_ID: "406477933661"
+  NEWS_UPDATER_NAMESPACE: "news-aggregator"
+  NEWS_UPDATER_DOCKERFILE_PATH: "news-updater/.Dockerfile"
+  NEWS_UPDATER_DOCKER_IMAGE_TAG: "v1.0.21"
+  NEWS_UPDATER_AWS_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater"
+
+output:
+  group:
+    begin: '::group::{{.TASK}}'
+    end: '::endgroup::'
+
+tasks:
+
+  aws-auth:
+    desc: "Auth to the AWS for pushing image to AWS ECR"
+    cmds:
+      - aws ecr get-login-password --region $NEWS_UPDATER_AWS_REGION | docker login --username AWS --password-stdin $NEWS_UPDATER_AWS_ACCOUNT_ID.dkr.ecr.$NEWS_UPDATER_AWS_REGION.amazonaws.com
+
+  aws-image-push-updater:
+    desc: "Build and push the image of news aggregator updater to the AWS ECR"
+    deps: [aws-auth]
+    cmds:
+      - cd .. && docker build -t $NEWS_UPDATER_AWS_IMAGE:$NEWS_UPDATER_DOCKER_IMAGE_TAG -f $NEWS_UPDATER_DOCKERFILE_PATH .
+      - docker image push $NEWS_UPDATER_AWS_IMAGE:$NEWS_UPDATER_DOCKER_IMAGE_TAG
+
+

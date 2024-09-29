@@ -27,6 +27,7 @@ tasks:
   create-aws-chart:
     desc: "Creates a Helm chart with all needed resources for the news-aggregator"
     cmds:
+      - rm -r ./charts
       - helm dependency update .
       - helm lint .
       - helm package .
@@ -38,7 +39,7 @@ tasks:
     desc: "Pushes aws auth chart to the ECR"
     deps:
       - aws-auth-helm
-      - create_aws_chart
+      - create-aws-chart
     cmds:
       - helm push $AWS_AUTH_CHART_PATH oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_AUTH_CHART_REGION.amazonaws.com
     silent: true
