@@ -37,8 +37,10 @@ type FeedStatus struct {
 
 // FeedSpec contains the specification's fields of the Feed
 type FeedSpec struct {
+	// Describe name of the news feed
 	Name string `json:"name,omitempty"`
-	Url  string `json:"url,omitempty"`
+	// URL for fetching news articles for feed
+	Url string `json:"url,omitempty"`
 }
 
 // +kubebuilder:object:root=true
