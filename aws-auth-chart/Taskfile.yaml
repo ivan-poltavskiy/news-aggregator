@@ -14,7 +14,7 @@ output:
 
 tasks:
 
-  install_aws_auth_chart:
+  install-aws-auth-chart:
     desc: "Install Helm chart with provided access keys"
     cmds:
       - helm install $AWS_AUTH_HELM_CHART_NAME . --namespace {{.NAMESPACE}}  --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}} --set namespace={{.NAMESPACE}} --create-namespace
@@ -24,7 +24,7 @@ tasks:
     cmds:
       - aws ecr get-login-password --region $AWS_AUTH_CHART_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_AUTH_CHART_REGION.amazonaws.com
 
-  create_aws_chart:
+  create-aws-chart:
     desc: "Creates a Helm chart with all needed resources for the news-aggregator"
     cmds:
       - helm dependency update .
@@ -34,7 +34,7 @@ tasks:
       - mv ./*.tgz ./charts
     silent: true
 
-  pushAwsAuthChart:
+  push-aws-auth-chart:
     desc: "Pushes aws auth chart to the ECR"
     deps:
       - aws-auth-helm

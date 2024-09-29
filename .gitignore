@@ -14,3 +14,4 @@
 /.idea/modules.xml
 /charts/*
 /aws-auth-chart/charts/*
+/news-aggregator/charts/*

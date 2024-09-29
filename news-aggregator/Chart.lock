@@ -2,5 +2,11 @@ dependencies:
 - name: vertical-pod-autoscaler
   repository: https://stevehipwell.github.io/helm-charts/
   version: 1.7.0
-digest: sha256:e175d68afb62f3face339ec528a75d8877102dec1af77bb653dfc188d9360ca9
-generated: "2024-09-03T13:15:02.531495407+03:00"
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.15.3
+- name: metrics-server
+  repository: https://kubernetes-sigs.github.io/metrics-server/
+  version: 3.12.1
+digest: sha256:70217d9229ec5d6293eab51b249cc40bf6ab977c8278b150159c1fd67781296a
+generated: "2024-09-29T20:40:29.724460147+03:00"
