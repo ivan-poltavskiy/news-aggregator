@@ -4,8 +4,10 @@ containerPort: 443
 imageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server:v1.0.18"
 updaterImageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater:v1.0.2"
 namespace: "news-aggregator"
+appName: "news-aggregator"
 serviceAccount: "news-aggregator-service-account"
 serviceName: "news-aggregator-service"
+secretName: news-aggregator-tls
 accessKey: ""
 privateAccessKey: ""
 
