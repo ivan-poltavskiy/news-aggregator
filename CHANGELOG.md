@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.3.0...v2.4.0) (2024-10-01)
+
+
+### Features
+
+* add cert manager chart for news aggregator server ([b0e034b](https://github.com/ivan-poltavskiy/news-aggregator/commit/b0e034b312bc0f729ecd8cb283915ab42eda29aa))
+
 ## [2.3.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.2.0...v2.3.0) (2024-10-01)
 
 
