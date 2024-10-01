@@ -1,0 +1,125 @@
+version: '3'
+
+vars:
+  IMG: "alanut93/news-aggregator-operator:v1.0.3"
+  CONTAINER_TOOL: "docker"
+  KUBECTL: "kubectl"
+  PLATFORMS: "linux/arm64,linux/amd64,linux/s390x,linux/ppc64le"
+  ignore_not_found: "false"
+
+tasks:
+  default:
+    cmds:
+      - task: build
+
+  help:
+    desc: "Display help"
+    cmds:
+      - |
+        echo "Usage:"
+        echo "  task [target]"
+        echo ""
+        echo "Targets:"
+        task: list
+
+  list:
+    desc: "List available tasks"
+    cmds:
+      - task: help
+
+  manifests:
+    desc: "Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects."
+    cmds:
+      - "controller-gen rbac:roleName=manager-role crd webhook paths=\"./...\" output:crd:artifacts:config=config/crd/bases"
+
+  generate:
+    desc: "Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations."
+    cmds:
+      - "controller-gen object:headerFile=\"hack/boilerplate.go.txt\" paths=\"./...\""
+
+  fmt:
+    desc: "Run go fmt against code."
+    cmds:
+      - "go fmt ./..."
+
+  vet:
+    desc: "Run go vet against code."
+    cmds:
+      - "go vet ./..."
+
+  test:
+    desc: "Run tests."
+    cmds:
+      - "go test $(go list ./... | grep -v /e2e) -coverprofile cover.out"
+
+  build:
+    desc: "Build manager binary."
+    cmds:
+      - task: manifests
+      - task: generate
+      - task: fmt
+      - task: vet
+      - "go build -o bin/manager cmd/main.go"
+
+  run:
+    desc: "Run a controller from your host."
+    cmds:
+      - task: manifests
+      - task: generate
+      - task: fmt
+      - task: vet
+      - "go run ./cmd/main.go"
+
+  docker-build:
+    desc: "Build docker image with the manager."
+    cmds:
+      - "{{.CONTAINER_TOOL}} build -t {{.IMG}} ."
+
+  docker-push:
+    desc: "Push docker image with the manager."
+    cmds:
+      - "{{.CONTAINER_TOOL}} push {{.IMG}}"
+
+  docker-buildx:
+    desc: "Build and push docker image for the manager for cross-platform support."
+    cmds:
+      - |
+        sed -e '1 s/^FROM/FROM --platform=$${BUILDPLATFORM}/; t' -e '1,// s//FROM --platform=$${BUILDPLATFORM}/' Dockerfile > Dockerfile.cross
+        {{.CONTAINER_TOOL}} buildx create --name operator-builder
+        {{.CONTAINER_TOOL}} buildx use operator-builder
+        {{.CONTAINER_TOOL}} buildx build --push --platform={{.PLATFORMS}} --tag {{.IMG}} -f Dockerfile.cross .
+        {{.CONTAINER_TOOL}} buildx rm operator-builder
+        rm Dockerfile.cross
+
+  build-installer:
+    desc: "Generate a consolidated YAML with CRDs and deployment."
+    cmds:
+      - task: manifests
+      - task: generate
+      - "kustomize build config/default > dist/install.yaml"
+
+  install:
+    desc: "Install CRDs into the K8s cluster specified in ~/.kube/config."
+    cmds:
+      - task: manifests
+      - "kustomize build config/crd | {{.KUBECTL}} apply -f -"
+
+  uninstall:
+    desc: "Uninstall CRDs from the K8s cluster specified in ~/.kube/config."
+    cmds:
+      - task: manifests
+      - "kustomize build config/crd | {{.KUBECTL}} delete --ignore-not-found={{.ignore_not_found}} -f -"
+
+  deploy:
+    desc: "Deploy controller to the K8s cluster specified in ~/.kube/config."
+    cmds:
+      - task: manifests
+      - |
+        cd config/manager && kustomize edit set image controller={{.IMG}}
+        cd -
+        kustomize build config/default | {{.KUBECTL}} apply -f -
+
+  undeploy:
+    desc: "Undeploy controller from the K8s cluster specified in ~/.kube/config."
+    cmds:
+      - "kustomize build config/default | {{.KUBECTL}} delete --ignore-not-found={{.ignore_not_found}} -f -"
