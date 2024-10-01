@@ -5,11 +5,15 @@ metadata:
     app.kubernetes.io/name: operator
     app.kubernetes.io/managed-by: kustomize
   name: hotnews-sample
+  namespace: operator-system
 spec:
+  dateStart: "2024-09-29"
+  dateEnd: "2024-10-01"
   keywords:
     - "Війна"
     - "Harris"
     - "ukr"
+    - "Trump"
   feedGroups:
     - "westMedias"
   feedsName:
@@ -18,34 +22,3 @@ spec:
     titlesCount: 10
 
 ---
-#
-#apiVersion: aggregator.com.teamdev/v1
-#kind: HotNews
-#metadata:
-#  labels:
-#    app.kubernetes.io/name: operator
-#    app.kubernetes.io/managed-by: kustomize
-#  name: west-media
-#spec:
-#  keywords:
-#    - "Harris"
-#    - "ukr"
-#    - "Biden"
-#  feedGroups:
-#    - "westMedias"
-#  summaryConfig:
-#    titlesCount: 10
-#apiVersion: aggregator.com.teamdev/v1
-#kind: HotNews
-#metadata:
-#  labels:
-#    app.kubernetes.io/name: operator
-#    app.kubernetes.io/managed-by: kustomize
-#  name: west-media
-#spec:
-#  keywords:
-#    - "Harris"
-#    - "ukr"
-#    - "Biden"
-#  summaryConfig:
-#    titlesCount: 10

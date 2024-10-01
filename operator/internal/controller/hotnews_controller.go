@@ -58,7 +58,7 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	if !containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+	if !containsFinalizer(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
 		logrus.Info("Adding finalizer to: " + hotNews.Name)
 		hotNews.ObjectMeta.Finalizers = append(hotNews.ObjectMeta.Finalizers, r.Finalizer)
 		if err := r.Client.Update(ctx, &hotNews); err != nil {
@@ -66,13 +66,13 @@ func (r *HotNewsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 
-	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() && containsString(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
+	if !hotNews.ObjectMeta.DeletionTimestamp.IsZero() && containsFinalizer(hotNews.ObjectMeta.Finalizers, r.Finalizer) {
 
 		if cleanupErr := r.CleanupOwnerReferences(ctx, req.Namespace, req.Name); cleanupErr != nil {
 			return ctrl.Result{}, cleanupErr
 		}
 		logrus.Info("Removing finalizer of: " + hotNews.Name)
-		hotNews.ObjectMeta.Finalizers = removeString(hotNews.ObjectMeta.Finalizers, r.Finalizer)
+		hotNews.ObjectMeta.Finalizers = removeFinalizer(hotNews.ObjectMeta.Finalizers, r.Finalizer)
 		if err := r.Client.Update(ctx, &hotNews); err != nil {
 			return ctrl.Result{}, err
 		}

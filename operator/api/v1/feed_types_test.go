@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGetCurrentCondition(t *testing.T) {
+func TestGetFeedCurrentCondition(t *testing.T) {
 	tests := []struct {
 		name       string
 		conditions []Condition

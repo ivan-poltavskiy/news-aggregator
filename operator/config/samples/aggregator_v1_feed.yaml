@@ -1,6 +1,7 @@
 apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
+  namespace: operator-system
   name: kashtan
 spec:
   name: kashtan
@@ -11,6 +12,7 @@ apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
   name: nytimes
+  namespace: operator-system
 spec:
   name: nytimes
   url: https://www.nytimes.com/
@@ -19,6 +21,7 @@ apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
   name: cbsnews
+  namespace: operator-system
 spec:
   name: cbsnews
   url: https://www.cbsnews.com/world/
