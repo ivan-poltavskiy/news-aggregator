@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.0.0...v2.1.0) (2024-10-01)
+
+
+### Features
+
+* add taskfile for operator ([fe8578e](https://github.com/ivan-poltavskiy/news-aggregator/commit/fe8578ecf96b1c9f26a73f8b29db650512e94345))
+
 ## [2.0.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v1.0.17...v2.0.0) (2024-10-01)
 
 
