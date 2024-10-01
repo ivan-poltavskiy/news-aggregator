@@ -8,6 +8,7 @@ env:
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
+  HELM_CHART_NAME: "news-aggregator"
 
 output:
   group:
@@ -94,3 +95,20 @@ tasks:
     cmds:
       - kubectl delete -f templates
 
+  createChart:
+    desc: "Creates a Helm chart for news-aggregator"
+    cmds:
+      - helm package ./helm-chart
+      - mkdir -p ./helm-chart
+      - mv *.tgz ./helm-chart/
+    silent: true
+
+  installChart:
+    desc: "Installs the Helm chart on the Kubernetes cluster"
+    cmds:
+      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --create-namespace
+
+  uninstallChart:
+    desc: "Uninstalls the Helm chart from the Kubernetes cluster"
+    cmds:
+      - helm uninstall $HELM_CHART_NAME --namespace news-aggregator

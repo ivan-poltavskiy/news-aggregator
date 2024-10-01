@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: news-aggregator-role
-  namespace: news-aggregator
+  namespace: {{ .Values.namespace }}
 rules:
   - apiGroups: [""]
     resources: ["pods", "services", "configmaps"]
@@ -19,11 +19,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: news-aggregator-rolebinding
-  namespace: news-aggregator
+  namespace: {{ .Values.namespace }}
 subjects:
   - kind: ServiceAccount
     name: news-aggregator-service-account
-    namespace: news-aggregator
+    namespace: {{ .Values.namespace }}
 roleRef:
   kind: Role
   name: news-aggregator-role
