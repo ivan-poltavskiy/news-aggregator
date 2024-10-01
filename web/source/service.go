@@ -77,6 +77,7 @@ func (service *Service) GetParsedNews(request AddSourceRequest) ([]newsEntity.Ne
 	if err != nil {
 		return nil, err
 	}
+
 	return parsedNews, nil
 }
 
