@@ -12,7 +12,7 @@ spec:
           serviceAccountName: cronjob-service-account
           containers:
             - name: news-aggregator-updater
-              image: alanut93/updater:v1.0.2
+              image: {{ .Values.updaterImageName }}
               volumeMounts:
                 - mountPath: "/mnt"
                   name: news-aggregator-mnt

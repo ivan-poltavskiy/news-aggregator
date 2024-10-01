@@ -45,3 +45,11 @@ It is also possible to run the server in a container using Docker. The configura
 
 The aggregator has auto news updates every 5 minutes for the server, but this time can also be changed using the --news-update-period flag at server startup.
 
+To deploy the aggregator to a k8s cluster, run the 
+```bash
+ task install_aws_auth_chart 
+ ```
+task, which will create the necessary secrets for the aggregator to work correctly in the cluster. When running this task, enter the necessary keys from your AWS account using the `ACCESS_KEY` and `PRIVATE_ACCESS_KEY` flags, and then run 
+```bash
+task installChart. 
+```

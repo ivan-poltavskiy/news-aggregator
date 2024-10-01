@@ -4,5 +4,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: alanut93/news-aggregator-operator
-  newTag: v1.0.43
+  newName: 406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-operator
+  newTag: v1.0.1

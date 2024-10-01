@@ -1,0 +1,44 @@
+version: '3'
+
+env:
+  AWS_AUTH_HELM_CHART_NAME: "aws-auth-chart"
+  AWS_AUTH_CHART_NAMESPACE: "news-aggregator"
+  AWS_AUTH_CHART_PATH: "./charts/aws-auth-chart-0.1.0.tgz"
+  AWS_AUTH_CHART_REGION: "eu-west-2"
+  AWS_ACCOUNT_ID: "406477933661"
+
+output:
+  group:
+    begin: '::group::{{.TASK}}'
+    end: '::endgroup::'
+
+tasks:
+
+  install-aws-auth-chart:
+    desc: "Install Helm chart with provided access keys"
+    cmds:
+      - helm install $AWS_AUTH_HELM_CHART_NAME . --namespace {{.NAMESPACE}}  --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}} --set namespace={{.NAMESPACE}} --create-namespace
+
+  aws-auth-helm:
+    desc: "Authenticate Helm with AWS ECR"
+    cmds:
+      - aws ecr get-login-password --region $AWS_AUTH_CHART_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_AUTH_CHART_REGION.amazonaws.com
+
+  create-aws-chart:
+    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
+    cmds:
+      - helm dependency update .
+      - helm lint .
+      - helm package .
+      - mkdir -p ./charts
+      - mv ./*.tgz ./charts
+    silent: true
+
+  push-aws-auth-chart:
+    desc: "Pushes aws auth chart to the ECR"
+    deps:
+      - aws-auth-helm
+      - create-aws-chart
+    cmds:
+      - helm push $AWS_AUTH_CHART_PATH oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_AUTH_CHART_REGION.amazonaws.com
+    silent: true

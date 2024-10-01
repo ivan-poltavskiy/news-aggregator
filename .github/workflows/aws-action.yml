@@ -1,0 +1,56 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+
+      - name: Install Taskfile
+        run: |
+          sh -c "$(curl -sL https://taskfile.dev/install.sh)"
+          sudo mv ./bin/task /usr/local/bin/task
+
+      - name: Configure AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.PRIVATE_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
+
+      - name: Login to AWS
+        run: task aws-auth-helm
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Check for formatting changes
+        run: |
+          git diff --exit-code > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Formatting changes detected. Please run 'task fmt' locally and commit the changes."
+            exit 1
+          else
+            echo "No formatting changes detected."
+          fi
+
+      - name: Push all images to ECR
+        run: |
+          task push-all-images-to-ecr

@@ -1,19 +1,34 @@
 version: '3'
 
 env:
-  DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
-  UPDATER_DOCKER_IMAGE_NAME: "alanut93/news-aggregator-updater"
+  DOCKER_IMAGE_NAME: "ivan-news-aggregator-server"
   DOCKER_IMAGE_TAG: "v1.0.18"
-  UPDATER_DOCKER_IMAGE_TAG: "v1.0.2"
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
+  AWS_REGION: "eu-west-2"
+  AWS_ACCOUNT_ID: "406477933661"
+  AWS_SERVER_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server"
 
 output:
   group:
     begin: '::group::{{.TASK}}'
     end: '::endgroup::'
+
+includes:
+  news-updater:
+    taskfile: ./news-updater/Taskfile.yaml
+    dir: ./news-updater/
+  operator:
+    taskfile: ./operator/Taskfile.yaml
+    dir: ./operator/
+  news-aggregator:
+    taskfile: ./news-aggregator/Taskfile.yaml
+    dir: ./news-aggregator/
+  aws-auth-chart:
+    taskfile: ./aws-auth-chart/Taskfile.yaml
+    dir: ./aws-auth-chart
 
 tasks:
   tidy:
@@ -41,14 +56,6 @@ tasks:
     desc: "Run docker build"
     cmd: docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
 
-  updater-docker-build:
-    desc: "Run docker build for updater"
-    cmd: docker build -t $UPDATER_DOCKER_IMAGE_NAME:$UPDATER_DOCKER_IMAGE_TAG -f ./news-updater/$DOCKERFILE_PATH .
-
-  updater-docker-push:
-    desc: "Run push image for updater"
-    cmd: docker image push $UPDATER_DOCKER_IMAGE_NAME:$UPDATER_DOCKER_IMAGE_TAG
-
   docker-run:
     desc: "Run docker container"
     cmd: docker run -d -p $DOCKER_PORT:$SERVER_EXPOSE_PORT $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
@@ -69,46 +76,36 @@ tasks:
       - task: test
       - task: vet
 
-  create-namespace:
-    desc: "Create a Kubernetes namespace if it does not exist"
-    cmds:
-        - |
-          if ! kubectl get namespace news-aggregator >/dev/null 2>&1; then
-            kubectl create namespace news-aggregator
-            echo "Namespace news-aggregator created"
-          else
-            echo "Namespace news-aggregator already exists"
-          fi
-
-  delete-namespace:
-    cmd: kubectl delete namespace news-aggregator
-    desc: "Delete a Kubernetes namespace"
-
-  deploy:
-    desc: "Deploys news-aggregator app on Kubernetes cluster"
-    deps: [ create-namespace ]
-    cmds:
-      - kubectl apply -f templates
-
   undeploy:
     desc: "Removes news-aggregator app from Kubernetes cluster"
     cmds:
       - kubectl delete -f templates
 
-  createChart:
-    desc: "Creates a Helm chart for news-aggregator"
-    cmds:
-      - helm package ./helm-chart
-      - mkdir -p ./helm-chart
-      - mv *.tgz ./helm-chart/
-    silent: true
+  docker-login:
+    desc: "Login to the ECR registry"
+    cmd: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-  installChart:
-    desc: "Installs the Helm chart on the Kubernetes cluster"
+  aws-image-push-server:
+    desc: "Build and push the image of news aggregator server to te AWS ECR"
+    deps: [docker-login]
     cmds:
-      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --create-namespace
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - docker build -t $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
+      - docker image push $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG
 
-  uninstallChart:
-    desc: "Uninstalls the Helm chart from the Kubernetes cluster"
+  aws-auth-helm:
+    desc: "Authenticate Helm with AWS ECR"
     cmds:
-      - helm uninstall $HELM_CHART_NAME --namespace news-aggregator
+      - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+  push-all-images-to-ecr:
+    desc: "Push the Docker image and Helm charts to the ECR registry"
+    deps: [docker-login]
+    cmds:
+      - task aws-image-push-server
+      - task news-updater:aws-image-push-updater
+      - task news-aggregator:push-chart
+      - task operator:docker-build
+      - task operator:docker-push
+      - task aws-auth-chart:push-aws-auth-chart
+

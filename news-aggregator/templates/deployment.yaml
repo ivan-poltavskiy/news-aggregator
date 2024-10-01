@@ -16,9 +16,12 @@ spec:
         app: news-aggregator
     spec:
       serviceAccountName: {{ .Values.serviceAccount }}
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: news-aggregator
           image: {{ .Values.imageName }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.containerPort }}
           resources:
@@ -41,3 +44,4 @@ spec:
         - name: news-aggregator-mnt
           persistentVolumeClaim:
             claimName: news-aggregator-pvc-mnt
+

@@ -1,10 +1,12 @@
 replicaCount: 1
+name: "news-aggregator"
 containerPort: 443
-imageName: alanut93/news_aggregator:v1.0.20
-namespace: news-aggregator
-appName: news-aggregator
-serviceName: news-aggregator-service
-secretName: news-aggregator-tls
+imageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server:v1.0.18"
+updaterImageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater:v1.0.2"
+namespace: "news-aggregator"
+serviceAccount: "news-aggregator-service-account"
+accessKey: ""
+privateAccessKey: ""
 
 resources:
   limits:
@@ -19,6 +21,14 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
+
+vpa:
+  minAllowed:
+    cpu: "300m"
+    memory: "50Mi"
+  maxAllowed:
+    cpu: "500m"
+    memory: "500Mi"
 
 service:
   port: 443

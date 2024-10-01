@@ -1,8 +1,15 @@
 apiVersion: v2
-name: News-Aggregator-Chart
+name: ivan-news-aggregator-chart
 version: 0.1.0
+type: application
 appVersion: "1.0.19"
 dependencies:
+  - name: vertical-pod-autoscaler
+    version: 1.7.0
+    repository: https://stevehipwell.github.io/helm-charts/
   - name: cert-manager
     version: 1.15.3
     repository: https://charts.jetstack.io
+  - name: metrics-server
+    version: 3.12.1
+    repository: https://kubernetes-sigs.github.io/metrics-server/
