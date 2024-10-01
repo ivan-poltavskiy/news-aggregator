@@ -136,3 +136,76 @@ func TestValidateHotNews(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateFeeds(t *testing.T) {
+	scheme := runtime.NewScheme()
+	_ = AddToScheme(scheme)
+
+	tests := []struct {
+		name      string
+		hotNews   *HotNews
+		feedList  *FeedList
+		expectErr bool
+		errorMsg  string
+	}{
+		{
+			name: "valid feed",
+			hotNews: &HotNews{
+				Spec: HotNewsSpec{
+					FeedsName: []string{"feed1"},
+				},
+			},
+			feedList: &FeedList{
+				Items: []Feed{
+					{Spec: FeedSpec{Name: "feed1"}},
+				},
+			},
+			expectErr: false,
+		},
+		{
+			name: "feed does not exist",
+			hotNews: &HotNews{
+				Spec: HotNewsSpec{
+					FeedsName: []string{"nonexistent_feed"},
+				},
+			},
+			feedList: &FeedList{
+				Items: []Feed{
+					{Spec: FeedSpec{Name: "feed1"}},
+				},
+			},
+			expectErr: true,
+			errorMsg:  "validateFeeds: feed nonexistent_feed does not exist in namespace ",
+		},
+		{
+			name: "one invalid feed",
+			hotNews: &HotNews{
+				Spec: HotNewsSpec{
+					FeedsName: []string{"feed1", "invalid_feed"},
+				},
+			},
+			feedList: &FeedList{
+				Items: []Feed{
+					{Spec: FeedSpec{Name: "feed1"}},
+				},
+			},
+			expectErr: true,
+			errorMsg:  "validateFeeds: feed invalid_feed does not exist in namespace ",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			k8sClient = fake.NewClientBuilder().WithScheme(scheme).WithLists(tt.feedList).Build()
+
+			err := tt.hotNews.validateFeeds()
+
+			if tt.expectErr {
+				assert.Error(t, err)
+				assert.Equal(t, tt.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

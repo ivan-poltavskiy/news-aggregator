@@ -15,3 +15,8 @@
 /charts/*
 /aws-auth-chart/charts/*
 /news-aggregator/charts/*
+/news-aggregator/Chart.lock
+/.idea/misc.xml
+/.mirrord/mirrord.json
+/.idea/remote-targets.xml
+

@@ -37,8 +37,10 @@ type FeedStatus struct {
 
 // FeedSpec contains the specification's fields of the Feed
 type FeedSpec struct {
+	// Describe name of the news feed
 	Name string `json:"name,omitempty"`
-	Url  string `json:"url,omitempty"`
+	// URL for fetching news articles for feed
+	Url string `json:"url,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -62,18 +64,16 @@ type FeedList struct {
 	Items           []Feed `json:"items"`
 }
 
-// AddCondition adds new condition to the Feed's status
-func (f *FeedStatus) AddCondition(condition Condition) {
-	newCondition := Condition{
-		Type:            condition.Type,
-		Success:         condition.Success,
-		Reason:          condition.Reason,
-		Message:         condition.Message,
-		LastUpdatedName: condition.LastUpdatedName,
-		LastUpdateTime:  metav1.Now(),
-	}
+// SetCondition adds new condition to the Feed's status
+func (f *FeedStatus) SetCondition(condition Condition) {
 
-	f.Conditions = append(f.Conditions, newCondition)
+	for i, currentCondition := range f.Conditions {
+		if currentCondition.Type == condition.Type {
+			f.Conditions[i] = condition
+			return
+		}
+	}
+	f.Conditions = append(f.Conditions, condition)
 }
 
 // GetCurrentCondition returns the current condition of the Feed
@@ -82,6 +82,19 @@ func (f *FeedStatus) GetCurrentCondition() Condition {
 		return Condition{}
 	}
 	return f.Conditions[len(f.Conditions)-1]
+}
+
+// AddPositiveCondition Set the success status to the condition of the feed
+func AddPositiveCondition(feed *Feed) {
+
+	feed.Status.SetCondition(Condition{
+		Type:            ConditionAdded,
+		Success:         true,
+		LastUpdatedName: feed.Spec.Name,
+		Message:         "",
+		Reason:          "",
+		LastUpdateTime:  metav1.Now(),
+	})
 }
 
 func init() {

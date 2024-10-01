@@ -14,6 +14,13 @@ output:
     end: '::endgroup::'
 
 tasks:
+  tidy:
+    desc: "Run go mod tidy"
+    cmd: go mod tidy
+
+  mocks-generate:
+    desc: "Generate mocks for the project"
+    cmd: go generate ./...
 
   aws-auth:
     desc: "Auth to the AWS for pushing image to AWS ECR"

@@ -9,7 +9,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: news-aggregator-service-account
+          serviceAccountName: cronjob-service-account
           containers:
             - name: news-aggregator-updater
               image: {{ .Values.updaterImageName }}
