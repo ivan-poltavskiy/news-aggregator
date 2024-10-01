@@ -2,7 +2,7 @@
 Operator of Feed CRD uses for work with the news source like K8S resources. It 
 controls the behavior of the Feed in K8s cluster.
 ## Description
-There are three operations that can be performed on a feed as a Kubernetes resource, namely adding, modifying and deleting. The reconsile method communicates with the http server's news aggregator service to retrieve news, resources and, in general, to work with them. Thus, the operator uses the news aggregator server.
+There are three operations that can be performed on a feed as a Kubernetes resource, namely adding, modifying and deleting. The reconcile method communicates with the http server's news aggregator service to retrieve news, resources and, in general, to work with them. Thus, the operator uses the news aggregator server.
 To validate the input data, the operator uses web hooks with certain restrictions and rules for incoming data.
 
 Translated with DeepL.com (free version)

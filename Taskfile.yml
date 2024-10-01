@@ -2,7 +2,9 @@ version: '3'
 
 env:
   DOCKER_IMAGE_NAME: "alanut93/news_aggregator"
+  UPDATER_DOCKER_IMAGE_NAME: "alanut93/news-aggregator-updater"
   DOCKER_IMAGE_TAG: "v1.0.18"
+  UPDATER_DOCKER_IMAGE_TAG: "v1.0.2"
   DOCKERFILE_PATH: ".Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
@@ -38,9 +40,13 @@ tasks:
     desc: "Run docker build"
     cmd: docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
 
-  docker-build-operator:
-    desc: "Run docker build for operator image"
-    cmd: docker build -t alanut93/updater:v1.0.2 -f operator/Dockerfile .
+  updater-docker-build:
+    desc: "Run docker build for updater"
+    cmd: docker build -t $UPDATER_DOCKER_IMAGE_NAME:$UPDATER_DOCKER_IMAGE_TAG -f ./news-updater/$DOCKERFILE_PATH .
+
+  updater-docker-push:
+    desc: "Run push image for updater"
+    cmd: docker image push $UPDATER_DOCKER_IMAGE_NAME:$UPDATER_DOCKER_IMAGE_TAG
 
   docker-run:
     desc: "Run docker container"
