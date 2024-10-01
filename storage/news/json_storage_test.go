@@ -2,6 +2,7 @@ package news
 
 import (
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"news-aggregator/entity/source"
 	"os"
 	"path/filepath"
@@ -12,13 +13,6 @@ import (
 	"news-aggregator/constant"
 	"news-aggregator/entity/news"
 )
-
-func createTestSource(name string) source.Source {
-	return source.Source{
-		Name:       source.Name(name),
-		PathToFile: source.PathToFile(filepath.Join(constant.PathToResources, name, name+".json")),
-	}
-}
 
 func TestSaveNews(t *testing.T) {
 	tests := []struct {
@@ -42,18 +36,28 @@ func TestSaveNews(t *testing.T) {
 			defer os.RemoveAll(tmpDir)
 
 			constant.PathToResources = tmpDir
+			logrus.Infof("Temporary directory created: %s", tmpDir)
+
 			jsonStorage, _ := NewJsonStorage(source.PathToFile(filepath.Join(tmpDir, tt.sourceName)))
 
-			if tt.name == "directory creation error" {
-				constant.PathToResources = "/invalid/path"
+			currentSource := source.Source{
+				Name:       source.Name(tt.sourceName),
+				PathToFile: source.PathToFile(filepath.Join(constant.PathToResources, tt.sourceName, tt.sourceName+".json")),
 			}
 
-			currentSource := createTestSource(tt.sourceName)
+			if err := os.MkdirAll(filepath.Dir(filepath.Join(constant.PathToResources, tt.sourceName, tt.sourceName+".json")), os.ModePerm); err != nil {
+				logrus.Error("Failed to create directory: ", err)
+			}
+
+			logrus.Infof("Current source path: %s", currentSource.PathToFile)
+
 			_, err = jsonStorage.SaveNews(currentSource, tt.newsArticles)
 			if tt.expectError {
 				require.Error(t, err)
+				logrus.Infof("Expected error occurred: %s", err)
 			} else {
 				require.NoError(t, err)
+				logrus.Infof("File saved successfully, checking existence: %s", currentSource.PathToFile)
 				_, err := os.Stat(string(currentSource.PathToFile))
 				require.NoError(t, err)
 			}

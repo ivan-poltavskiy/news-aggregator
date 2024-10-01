@@ -1,0 +1,129 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: hotnews.aggregator.com.teamdev
+spec:
+  group: aggregator.com.teamdev
+  names:
+    kind: HotNews
+    listKind: HotNewsList
+    plural: hotnews
+    singular: hotnews
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: HotNews is the Schema for the hotnews API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: HotNewsSpec contains the specification's fields of the HotNews
+              CRD
+            properties:
+              dateEnd:
+                description: DateEnd defines the end date for collecting news, in
+                  the format YYYY-MM-DD
+                type: string
+              dateStart:
+                description: DateStart defines the start date for collecting news,
+                  in the format YYYY-MM-DD
+                type: string
+              feedGroups:
+                description: FeedGroups specifies the groups of news sources for aggregation
+                items:
+                  type: string
+                type: array
+              feedsName:
+                description: FeedsName lists the names of the news sources to collect
+                  articles from
+                items:
+                  type: string
+                type: array
+              keywords:
+                description: Keywords specifies the list of keywords used to filter
+                  news articles
+                items:
+                  type: string
+                type: array
+              summaryConfig:
+                description: SummaryConfig contains configuration options for summarizing
+                  the news
+                properties:
+                  titlesCount:
+                    description: TitlesCount contains the quantity of the titles which
+                      will be stored in CRD
+                    type: integer
+                type: object
+            type: object
+          status:
+            description: HotNewsStatus defines the observed state of HotNews
+            properties:
+              articlesCount:
+                description: ArticlesCount is the number of news articles collected
+                type: integer
+              articlesTitles:
+                description: ArticlesTitles lists the titles of the collected news
+                  articles
+                items:
+                  type: string
+                type: array
+              conditions:
+                description: Conditions represent the current state or conditions
+                  of the HotNews resource
+                items:
+                  description: Condition describes the states of a feed during its
+                    life cycle in the system
+                  properties:
+                    lastUpdateTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    lastUpdatedName:
+                      type: string
+                    message:
+                      description: If Success is False, the message should be populated
+                      type: string
+                    reason:
+                      description: If Success is False, the reason should be populated
+                      type: string
+                    status:
+                      description: Success of the condition. Could be true or false
+                      type: boolean
+                    type:
+                      description: Type of the condition, e.g., Added, Deleted.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              newsLink:
+                description: NewsLink provides a URL to access the aggregated news
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

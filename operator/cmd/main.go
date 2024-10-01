@@ -41,12 +41,14 @@ func init() {
 func main() {
 	var defaultServerUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
 	var endpointForSourceManaging = "/sources"
+	var endpointForGetNews = "/news"
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
 	var secureMetrics bool
 	var enableHTTP2 bool
 	var tlsOpts []func(*tls.Config)
+	var configMapName = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -60,9 +62,11 @@ func main() {
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
 	flag.StringVar(&defaultServerUrl, "server-url", defaultServerUrl, "The URL of the news aggregator service.")
 	flag.StringVar(&endpointForSourceManaging, "feed-managing-enpoint", endpointForSourceManaging, "The endpoint of the news aggregator service for managing feeds.")
+	flag.StringVar(&endpointForGetNews, "get-news-endpoint", endpointForGetNews, "The endpoint of the news aggregator service for getting news.")
 	opts := zap.Options{
 		Development: true,
 	}
+	flag.StringVar(&configMapName, "config-map-name", configMapName, "The name of the ConfigMap that will be used to store feed groups.")
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
@@ -155,6 +159,27 @@ func main() {
 	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
 		if err = (&aggregatorv1.Feed{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Feed")
+			os.Exit(1)
+		}
+	}
+
+	if err = (&controller.HotNewsReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		HttpsLinks: controller.HttpsClientData{
+			ServerUrl:                 serverUrl,
+			EndpointForSourceManaging: endpointForGetNews,
+		},
+		HttpClient:    httpClient,
+		ConfigMapName: configMapName,
+		Finalizer:     finalizer,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "HotNews")
+		os.Exit(1)
+	}
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err = (&aggregatorv1.HotNews{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "HotNews")
 			os.Exit(1)
 		}
 	}
