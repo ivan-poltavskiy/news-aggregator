@@ -39,7 +39,7 @@ func init() {
 }
 
 func main() {
-	var serverUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
+	var defaultServerUrl = "https://news-aggregator-service.news-aggregator.svc.cluster.local:443"
 	var endpointForSourceManaging = "/sources"
 	var endpointForGetNews = "/news"
 	var metricsAddr string
@@ -48,8 +48,9 @@ func main() {
 	var secureMetrics bool
 	var enableHTTP2 bool
 	var tlsOpts []func(*tls.Config)
-	var configMapMame = "feed-group-source"
+	var configMapName = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
+	var configmapNamespace = "operator-system"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -60,12 +61,14 @@ func main() {
 		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
-	flag.StringVar(&serverUrl, "server-url", serverUrl, "The URL of the news aggregator service.")
+	flag.StringVar(&defaultServerUrl, "server-url", defaultServerUrl, "The URL of the news aggregator service.")
 	flag.StringVar(&endpointForSourceManaging, "feed-managing-enpoint", endpointForSourceManaging, "The endpoint of the news aggregator service for managing feeds.")
+	flag.StringVar(&endpointForGetNews, "get-news-endpoint", endpointForGetNews, "The endpoint of the news aggregator service for getting news.")
 	opts := zap.Options{
 		Development: true,
 	}
-	flag.StringVar(&configMapMame, "config-map-name", configMapMame, "The name of the ConfigMap that will be used to store feed groups.")
+	flag.StringVar(&configMapName, "config-map-name", configMapName, "The name of the ConfigMap that will be used to store feed groups.")
+	flag.StringVar(&configmapNamespace, "configmap-namespace", configmapNamespace, "The namespace of the configmap.")
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
@@ -148,7 +151,7 @@ func main() {
 		HttpClient: httpClient,
 		Finalizer:  finalizer,
 		HttpsLinks: controller.HttpsClientData{
-			ServerUrl:                 serverUrl,
+			ServerUrl:                 defaultServerUrl,
 			EndpointForSourceManaging: endpointForSourceManaging,
 		},
 	}).SetupWithManager(mgr); err != nil {
@@ -162,15 +165,27 @@ func main() {
 		}
 	}
 
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		cfgValidator := &aggregatorv1.ConfigMapValidator{
+			Client:             mgr.GetClient(),
+			ConfigMapName:      configMapName,
+			ConfigMapNamespace: configmapNamespace,
+		}
+		if err = cfgValidator.SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMap")
+			os.Exit(1)
+		}
+	}
+
 	if err = (&controller.HotNewsReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		HttpsLinks: controller.HttpsClientData{
-			ServerUrl:                 serverUrl,
+			ServerUrl:                 defaultServerUrl,
 			EndpointForSourceManaging: endpointForGetNews,
 		},
 		HttpClient:    httpClient,
-		ConfigMapMame: configMapMame,
+		ConfigMapName: configMapName,
 		Finalizer:     finalizer,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "HotNews")

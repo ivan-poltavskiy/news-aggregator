@@ -3,23 +3,32 @@ version: '3'
 env:
   DOCKER_IMAGE_NAME: "ivan-news-aggregator-server"
   DOCKER_IMAGE_TAG: "v1.0.18"
-  DOCKER_UPDATER_IMAGE_TAG: "v1.0.2"
   DOCKERFILE_PATH: ".Dockerfile"
-  UPDATER_DOCKERFILE_PATH: "news-updater/.Dockerfile"
   DOCKER_PORT: "443"
   SERVER_EXPOSE_PORT: "443"
   HELM_CHART_NAME: "news-aggregator"
-  AWS_AUTH_HELM_CHART_NAME: "ivan-aws-auth-chart"
   AWS_REGION: "eu-west-2"
   AWS_ACCOUNT_ID: "406477933661"
-  AWS_DEFAULT_REGION: "eu-west-2"
   AWS_SERVER_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-server"
-  AWS_UPDATER_IMAGE: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater"
 
 output:
   group:
     begin: '::group::{{.TASK}}'
     end: '::endgroup::'
+
+includes:
+  news-updater:
+    taskfile: ./news-updater/Taskfile.yaml
+    dir: ./news-updater/
+  operator:
+    taskfile: ./operator/Taskfile.yaml
+    dir: ./operator/
+  news-aggregator:
+    taskfile: ./news-aggregator/Taskfile.yaml
+    dir: ./news-aggregator/
+  aws-auth-chart:
+    taskfile: ./aws-auth-chart/Taskfile.yaml
+    dir: ./aws-auth-chart
 
 tasks:
   tidy:
@@ -47,27 +56,9 @@ tasks:
     desc: "Run docker build"
     cmd: docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
 
-  docker-build-operator:
-    desc: "Run docker build for operator image"
-    cmd: docker build -t alanut93/updater:v1.0.2 -f operator/Dockerfile .
-
   docker-run:
     desc: "Run docker container"
     cmd: docker run -d -p $DOCKER_PORT:$SERVER_EXPOSE_PORT $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
-
-  aws-image-push-server:
-    desc: "Build and push the image of news aggregator server to te AWS ECR"
-    cmds:
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      - docker build -t $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
-      - docker image push $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG
-
-  aws-image-push-updater:
-    desc: "Build and push the image of news aggregator updater to te AWS ECR"
-    cmds:
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      - docker build -t $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG -f $UPDATER_DOCKERFILE_PATH .
-      - docker image push $AWS_UPDATER_IMAGE:$DOCKER_UPDATER_IMAGE_TAG
 
   cli-run:
     desc: "Run the CLI locally"
@@ -85,96 +76,36 @@ tasks:
       - task: test
       - task: vet
 
-  create-namespace:
-    desc: "Create a Kubernetes namespace if it does not exist"
-    cmds:
-      - |
-        if ! kubectl get namespace news-aggregator >/dev/null 2>&1; then
-          kubectl create namespace news-aggregator
-          echo "Namespace news-aggregator created"
-        else
-          echo "Namespace news-aggregator already exists"
-        fi
-
-  delete-namespace:
-    cmd: kubectl delete namespace news-aggregator
-    desc: "Delete a Kubernetes namespace"
-
-  deploy:
-    desc: "Deploys news-aggregator app on Kubernetes cluster"
-    deps: [ create-namespace ]
-    cmds:
-      - kubectl apply -f templates
-
   undeploy:
     desc: "Removes news-aggregator app from Kubernetes cluster"
     cmds:
       - kubectl delete -f templates
 
-  createChart:
-    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
-    cmds:
-      - helm dependency update ./$HELM_CHART_NAME
-      - helm lint ./$HELM_CHART_NAME
-      - helm package ./$HELM_CHART_NAME
-      - mkdir -p ./charts
-      - mv ./*.tgz ./charts
-    silent: true
+  docker-login:
+    desc: "Login to the ECR registry"
+    cmd: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-  installChart:
-    desc: "Install Helm chart with provided access keys"
+  aws-image-push-server:
+    desc: "Build and push the image of news aggregator server to te AWS ECR"
+    deps: [docker-login]
     cmds:
-      - helm install $HELM_CHART_NAME ./$HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
-  install_aws_auth_chart:
-    desc: "Install Helm chart with provided access keys"
-    cmds:
-      - helm install $AWS_AUTH_HELM_CHART_NAME ./$AWS_AUTH_HELM_CHART_NAME --namespace news-aggregator --set accessKey={{.ACCESS_KEY}} --set privateAccessKey={{.PRIVATE_ACCESS_KEY}}
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - docker build -t $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG -f $DOCKERFILE_PATH .
+      - docker image push $AWS_SERVER_IMAGE:$DOCKER_IMAGE_TAG
 
-  uninstallChart:
-    desc: "Uninstalls the Helm chart from the Kubernetes cluster"
-    cmds:
-      - helm uninstall $HELM_CHART_NAME --namespace news-aggregator
   aws-auth-helm:
     desc: "Authenticate Helm with AWS ECR"
     cmds:
       - aws ecr get-login-password --region $AWS_REGION | helm registry login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-  docker_login:
-    desc: "Login to the ECR registry"
-    cmd: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-  configureAWS:
-    cmds:
-      - aws configure set aws_access_key_id {{.AWS_ACCESS_KEY_ID}}
-      - aws configure set aws_secret_access_key {{.AWS_SECRET_ACCESS_KEY}}
-      - aws configure set region ${AWS_DEFAULT_REGION}
-      - aws configure set output json
-    vars:
-      AWS_ACCESS_KEY_ID: ""
-      AWS_SECRET_ACCESS_KEY: ""
 
-  pushChart:
-    desc: "Pushes news aggregator chart to the ECR"
-    deps:
-      - aws-auth-helm
-      - createChart
+  push-all-images-to-ecr:
+    desc: "Push the Docker image and Helm charts to the ECR registry"
+    deps: [docker-login]
     cmds:
-      - helm push ./charts/ivan-news-aggregator-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-    silent: true
+      - task aws-image-push-server
+      - task news-updater:aws-image-push-updater
+      - task news-aggregator:push-chart
+      - task operator:docker-build
+      - task operator:docker-push
+      - task aws-auth-chart:push-aws-auth-chart
 
-  createAwsChart:
-    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
-    cmds:
-      - helm dependency update ./$AWS_AUTH_HELM_CHART_NAME
-      - helm lint ./$AWS_AUTH_HELM_CHART_NAME
-      - helm package ./$AWS_AUTH_HELM_CHART_NAME
-      - mkdir -p ./charts
-      - mv ./*.tgz ./charts
-    silent: true
-
-  pushAwsAuthChart:
-    desc: "Pushes aws auth chart to the ECR"
-    deps:
-      - aws-auth-helm
-      - createAwsChart
-    cmds:
-      - helm push ./charts/ivan-aws-auth-chart-0.1.0.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-    silent: true

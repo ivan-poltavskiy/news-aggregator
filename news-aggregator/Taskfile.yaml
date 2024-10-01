@@ -1,0 +1,50 @@
+version: '3'
+
+env:
+  NEWS_AGGREGATOR_CHART_TGZ_PATH: "./charts/ivan-news-aggregator-chart-0.1.0.tgz"
+  NEWS_AGGREGATOR_AWS_REGION: "eu-west-2"
+  NEWS_AGGREGATOR_AWS_ACCOUNT_ID: "406477933661"
+  NEWS_AGGREGATOR_NAMESPACE: "news-aggregator"
+  NEWS_AGGREGATOR_HELM_CHART_NAME: "news-aggregator"
+
+output:
+  group:
+    begin: '::group::{{.TASK}}'
+    end: '::endgroup::'
+
+tasks:
+  create-chart:
+    desc: "Creates a Helm chart with all needed resources for the news-aggregator"
+    cmds:
+      - helm dependency update .
+      - helm lint .
+      - helm package .
+      - mkdir -p ./charts
+      - mv ./*.tgz ./charts
+    silent: true
+
+  aws-auth-helm:
+    desc: "Authenticate Helm with AWS ECR"
+    cmds:
+      - aws ecr get-login-password --region $NEWS_AGGREGATOR_AWS_REGION | helm registry login --username AWS --password-stdin $NEWS_AGGREGATOR_AWS_ACCOUNT_ID.dkr.ecr.$NEWS_AGGREGATOR_AWS_REGION.amazonaws.com
+
+
+  install-chart:
+    desc: "Install Helm chart with provided access keys"
+    cmds:
+      - helm dependency update
+      - helm install $NEWS_AGGREGATOR_HELM_CHART_NAME . --namespace $NEWS_AGGREGATOR_NAMESPACE --create-namespace
+
+  uninstall-chart:
+    desc: "Uninstalls the Helm chart from the Kubernetes cluster"
+    cmds:
+      - helm uninstall $NEWS_AGGREGATOR_HELM_CHART_NAME --namespace $NEWS_AGGREGATOR_NAMESPACE
+
+  push-chart:
+    desc: "Pushes news aggregator chart to the ECR"
+    deps:
+      - aws-auth-helm
+      - create-chart
+    cmds:
+      - helm push $NEWS_AGGREGATOR_CHART_TGZ_PATH oci://$NEWS_AGGREGATOR_AWS_ACCOUNT_ID.dkr.ecr.$NEWS_AGGREGATOR_AWS_REGION.amazonaws.com
+    silent: true
