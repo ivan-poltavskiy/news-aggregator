@@ -145,6 +145,102 @@
         }
       }
     },
+    "golangci-lint@1.59.1": {
+      "last_modified": "2024-07-31T08:48:38Z",
+      "resolved": "github:NixOS/nixpkgs/c3392ad349a5227f4a3464dce87bcc5046692fce#golangci-lint",
+      "source": "devbox-search",
+      "version": "1.59.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/k3rnfx753gnx5v8l3i4sx1g1al2ds0di-golangci-lint-1.59.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/k3rnfx753gnx5v8l3i4sx1g1al2ds0di-golangci-lint-1.59.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/29908ar68rrr9jzdhzcrlkbfk30gnihf-golangci-lint-1.59.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/29908ar68rrr9jzdhzcrlkbfk30gnihf-golangci-lint-1.59.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/v7882fqgdy46a7l432q11f3xmbln80rc-golangci-lint-1.59.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/v7882fqgdy46a7l432q11f3xmbln80rc-golangci-lint-1.59.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1m1i9zhrgdw2192803n6wf2k7g86y6d5-golangci-lint-1.59.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/1m1i9zhrgdw2192803n6wf2k7g86y6d5-golangci-lint-1.59.1"
+        }
+      }
+    },
+    "kubebuilder@4.1.0": {
+      "last_modified": "2024-08-14T11:41:26Z",
+      "resolved": "github:NixOS/nixpkgs/0cb2fd7c59fed0cd82ef858cbcbdb552b9a33465#kubebuilder",
+      "source": "devbox-search",
+      "version": "4.1.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6chd3dj8k5xvgjkw5hwzvcm5494y9431-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6chd3dj8k5xvgjkw5hwzvcm5494y9431-kubebuilder-4.1.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5kmn9rqgqrgpaf1dyvk0nvh7ka31782v-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/5kmn9rqgqrgpaf1dyvk0nvh7ka31782v-kubebuilder-4.1.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qb94vk89dhn5j6chqwb2c40mfaf76mvy-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/qb94vk89dhn5j6chqwb2c40mfaf76mvy-kubebuilder-4.1.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rxsbhhmfp2nyyx603shw1r4gnksr8542-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rxsbhhmfp2nyyx603shw1r4gnksr8542-kubebuilder-4.1.0"
+        }
+      }
+    },
     "kubectl@1.30.2": {
       "last_modified": "2024-07-07T07:43:47Z",
       "resolved": "github:NixOS/nixpkgs/b60793b86201040d9dee019a05089a9150d08b5b#kubectl",

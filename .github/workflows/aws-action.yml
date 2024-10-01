@@ -50,14 +50,7 @@ jobs:
           else
             echo "No formatting changes detected."
           fi
-      - name: Push Helm chart
+
+      - name: Push all images to ECR
         run: |
-          task pushChart
-          task pushAwsAuthChart
-          task aws-image-push-server
-          task aws-image-push-updater
-          cd operator
-          task docker_login
-          task docker-build
-          task docker-push
-          cd ..
+          task push-all-images-to-ecr

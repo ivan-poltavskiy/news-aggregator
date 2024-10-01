@@ -3,7 +3,4 @@ aws_region: "eu-west-2"
 docker_secret_name: "regcred"
 accessKey: ""
 privateAccessKey: ""
-news_aggregator:
-  namespace: news-aggregator
-operator_system:
-  namespace: operator-system
+namespace: ""

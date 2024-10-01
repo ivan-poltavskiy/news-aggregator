@@ -1,6 +1,0 @@
-dependencies:
-- name: vertical-pod-autoscaler
-  repository: https://stevehipwell.github.io/helm-charts/
-  version: 1.7.0
-digest: sha256:e175d68afb62f3face339ec528a75d8877102dec1af77bb653dfc188d9360ca9
-generated: "2024-09-03T13:15:02.531495407+03:00"
