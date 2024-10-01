@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.6.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.5.0...v2.6.0) (2024-10-01)
+
+
+### Features
+
+* add ability to push the charts and images to ecr. Change Taskfiles structure ([32a9606](https://github.com/ivan-poltavskiy/news-aggregator/commit/32a96066ba870cf41de055a2f81ee4399e9275bb))
+* add task for aws auth ([c0ff7c6](https://github.com/ivan-poltavskiy/news-aggregator/commit/c0ff7c6db0788afc62ab4f2d277e6b5d16dd6f23))
+* update aws taskfile ([e13194a](https://github.com/ivan-poltavskiy/news-aggregator/commit/e13194a08277817bba64c3039d63818d9d2f842a))
+* update aws-action.yml ([22ad5f5](https://github.com/ivan-poltavskiy/news-aggregator/commit/22ad5f5a281b28dcf8484fb797bd7aea4ca9e224))
+* update main taskfile. Add docker-build task in push-all-images-to-ecr for building the image before pushing. ([41b9c36](https://github.com/ivan-poltavskiy/news-aggregator/commit/41b9c36e0b194fdb6abd27d6f5fd7e2128be5063))
+
 ## [2.5.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.4.0...v2.5.0) (2024-10-01)
 
 
