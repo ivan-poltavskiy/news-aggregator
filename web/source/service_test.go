@@ -142,3 +142,63 @@ func TestSaveSource(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllSources(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := client.NewMockStorage(ctrl)
+
+	tests := []struct {
+		name      string
+		mockFunc  func()
+		expected  []source.Name
+		expectErr bool
+	}{
+		{
+			name: "Success - Get all STORAGE sources",
+			mockFunc: func() {
+				mockStorage.EXPECT().GetSources().Return([]source.Source{
+					{Name: "source1", SourceType: source.STORAGE},
+					{Name: "source2", SourceType: source.STORAGE},
+					{Name: "source3", SourceType: source.JSON},
+				}, nil)
+			},
+			expected:  []source.Name{"source1", "source2"},
+			expectErr: false,
+		},
+		{
+			name: "Failure - Error retrieving sources",
+			mockFunc: func() {
+				mockStorage.EXPECT().GetSources().Return(nil, errors.New("storage error"))
+			},
+			expected:  nil,
+			expectErr: true,
+		},
+		{
+			name: "Success - No STORAGE sources",
+			mockFunc: func() {
+				mockStorage.EXPECT().GetSources().Return([]source.Source{
+					{Name: "source3", SourceType: source.JSON},
+				}, nil)
+			},
+			expected:  nil,
+			expectErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc()
+			service := sourceService.NewService(mockStorage)
+			sources, err := service.GetAllSources()
+
+			if tt.expectErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, sources)
+			}
+		})
+	}
+}

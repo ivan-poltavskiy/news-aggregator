@@ -149,3 +149,101 @@ func TestAddSourceHandler(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllSources(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := storage.NewMockStorage(ctrl)
+	handler := NewSourceHandler(mockService)
+
+	tests := []struct {
+		name           string
+		mockFunc       func()
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name: "SuccessfulFetch",
+			mockFunc: func() {
+				mockService.EXPECT().GetSources().Return([]source.Source{
+					{Name: "Source1", SourceType: source.STORAGE},
+					{Name: "Source2", SourceType: source.STORAGE},
+				}, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `["Source1","Source2"]`,
+		},
+		{
+			name: "ServiceError",
+			mockFunc: func() {
+				mockService.EXPECT().GetSources().Return(nil, errors.New("internal server error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   "internal server error",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc()
+
+			rr := httptest.NewRecorder()
+
+			handler.GetAllSources(rr)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+		})
+	}
+}
+
+func TestGetAllSourcesWithWriteError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := storage.NewMockStorage(ctrl)
+	handler := NewSourceHandler(mockService)
+
+	tests := []struct {
+		name           string
+		mockFunc       func()
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name: "WriteError",
+			mockFunc: func() {
+				mockService.EXPECT().GetSources().Return([]source.Source{
+					{Name: "Source1", SourceType: source.STORAGE},
+					{Name: "Source2", SourceType: source.STORAGE},
+				}, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc()
+
+			rr := httptest.NewRecorder()
+			writer := &CustomResponseWriter{ResponseWriter: rr, err: errors.New("write error")}
+
+			handler.GetAllSources(writer)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			assert.Empty(t, rr.Body.String())
+		})
+	}
+}
+
+// CustomResponseWriter simulates an error during the Write operation.
+type CustomResponseWriter struct {
+	http.ResponseWriter
+	err error
+}
+
+func (c *CustomResponseWriter) Write(b []byte) (int, error) {
+	return 0, c.err
+}
