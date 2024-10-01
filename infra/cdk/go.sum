@@ -1,0 +1,17 @@
+github.com/Masterminds/semver/v3 v3.2.1 h1:RN9w6+7QoMeJVGyfmbcgs28Br8cvmnucEXnY0rYXWg0=
+github.com/Masterminds/semver/v3 v3.2.1/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=
+github.com/aws/aws-cdk-go/awscdk/v2 v2.158.0 h1:tr1kWDuewQgenaeC6lTSHeelRe7ebp8jx7ozWtHCtao=
+github.com/aws/aws-cdk-go/awscdk/v2 v2.158.0/go.mod h1:DKU6PSvsf02PiyVR5JB4uIvcUElwXIgFKGiAehqIORY=
+github.com/aws/constructs-go/constructs/v10 v10.3.0 h1:LsjBIMiaDX/vqrXWhzTquBJ9pPdi02/H+z1DCwg0PEM=
+github.com/aws/constructs-go/constructs/v10 v10.3.0/go.mod h1:GgzwIwoRJ2UYsr3SU+JhAl+gq5j39bEMYf8ev3J+s9s=
+github.com/aws/jsii-runtime-go v1.103.1 h1:7CwjdpiSrylOeuYP1LzHu2AJKV2K65P89nuOC/8Do7g=
+github.com/aws/jsii-runtime-go v1.103.1/go.mod h1:PPR8BRc8cv9lDs5gDPe2SGG4+crOahE4SRrNHR1SvhA=
+github.com/cdklabs/awscdk-asset-awscli-go/awscliv1/v2 v2.2.202 h1:VixXB9DnHN8oP7pXipq8GVFPjWCOdeNxIaS/ZyUwTkI=
+github.com/cdklabs/awscdk-asset-awscli-go/awscliv1/v2 v2.2.202/go.mod h1:iPUti/SWjA3XAS3CpnLciFjS8TN9Y+8mdZgDfSgcyus=
+github.com/cdklabs/awscdk-asset-kubectl-go/kubectlv20/v2 v2.1.2 h1:k+WD+6cERd59Mao84v0QtRrcdZuuSMfzlEmuIypKnVs=
+github.com/cdklabs/awscdk-asset-kubectl-go/kubectlv20/v2 v2.1.2/go.mod h1:CvFHBo0qcg8LUkJqIxQtP1rD/sNGv9bX3L2vHT2FUAo=
+github.com/cdklabs/awscdk-asset-node-proxy-agent-go/nodeproxyagentv6/v2 v2.1.0 h1:kElXjprC8wkpJu58vp+WFH6z0AJw4zitg5iSKJPKe3c=
+github.com/cdklabs/awscdk-asset-node-proxy-agent-go/nodeproxyagentv6/v2 v2.1.0/go.mod h1:JY4UnvNa1YDGQ4H5wohXTHl6YVY3uCDUWl4JYUrQfb8=
+github.com/cdklabs/cloud-assembly-schema-go/awscdkcloudassemblyschema/v36 v36.0.24 h1:LUbzbmLODkoCLiVaQ5Tju+svzqD5KOZ4r0igoNRyrwE=
+github.com/cdklabs/cloud-assembly-schema-go/awscdkcloudassemblyschema/v36 v36.0.24/go.mod h1:Y4IW0WqYYpn4YCOuU029wda5fPfsCEPsRGwZ7B4c5H0=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
