@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.2.0...v2.3.0) (2024-10-01)
+
+
+### Features
+
+* add GetAllSources endpoint to news aggregator server ([e3ad7b6](https://github.com/ivan-poltavskiy/news-aggregator/commit/e3ad7b6f1b60d6b968e3e36db3d5bfd2042f836e))
+
 ## [2.2.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.1.0...v2.2.0) (2024-10-01)
 
 
