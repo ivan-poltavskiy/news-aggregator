@@ -12,3 +12,9 @@
 /.idea/vcs.xml
 /.idea/workspace.xml
 /.idea/modules.xml
+/.mirrord/mirrord.json
+/.idea/remote-targets.xml
+/.idea/misc.xml
+/news-aggregator/Chart.lock
+/news-aggregator/charts/*
+/charts/*
