@@ -3,6 +3,7 @@ package source
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	newsEntity "news-aggregator/entity/news"
 	"news-aggregator/entity/source"
 	"news-aggregator/storage"
 	"news-aggregator/web/feed"
@@ -33,17 +34,7 @@ func (service *Service) DeleteSourceByName(name source.Name) error {
 // SaveSource processes the source URL and returns the source entity
 func (service *Service) SaveSource(request AddSourceRequest) (source.Name, error) {
 
-	if request.URL == "" || request.Name == "" {
-		return "", fmt.Errorf("passed url or name are empty")
-	}
-
-	rssURL, err := feed.GetRssFeedLink(request.URL)
-	if err != nil {
-		return "", err
-	}
-	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
-
-	parsedNews, err := feed.ParseRssFeed(rssURL, request.Name)
+	parsedNews, err := service.GetParsedNews(request)
 	if err != nil {
 		return "", err
 	}
@@ -69,6 +60,25 @@ func (service *Service) SaveSource(request AddSourceRequest) (source.Name, error
 		logrus.Info("Source already exists")
 	}
 	return sourceEntity.Name, nil
+}
+
+func (service *Service) GetParsedNews(request AddSourceRequest) ([]newsEntity.News, error) {
+	if request.URL == "" || request.Name == "" {
+		return nil, fmt.Errorf("passed url or name are empty")
+	}
+
+	rssURL, err := feed.GetRssFeedLink(request.URL)
+	if err != nil {
+		return nil, err
+	}
+	logrus.Info("Save: The URL of feed was successfully retrieved: ", rssURL)
+
+	parsedNews, err := feed.ParseRssFeed(rssURL, request.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return parsedNews, nil
 }
 
 // GetAllSources returns all source with Storage type in the system
@@ -113,6 +123,20 @@ func (service *Service) UpdateSourceByName(currentName, newName, newURL string) 
 	err = service.storage.UpdateSource(currentSource, currentName)
 	if err != nil {
 		logrus.Error("Failed to save updated sources: ", err)
+		return err
+	}
+
+	parsedNews, err := service.GetParsedNews(AddSourceRequest{
+		Name: newName,
+		URL:  newURL,
+	})
+	if err != nil {
+		return err
+	}
+
+	newsService := news.NewService(service.storage)
+	_, err = newsService.SaveNews(currentSource, parsedNews)
+	if err != nil {
 		return err
 	}
 

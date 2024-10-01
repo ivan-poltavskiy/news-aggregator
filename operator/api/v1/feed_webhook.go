@@ -9,8 +9,8 @@ import (
 	"net/url"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"time"
 )
 
 var k8sClient client.Client
@@ -22,18 +22,7 @@ func (r *Feed) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// +kubebuilder:webhook:path=/mutate-aggregator-com-teamdev-v1-feed,mutating=true,failurePolicy=fail,sideEffects=None,groups=aggregator.com.teamdev,resources=feeds,verbs=create;update;delete,versions=v1,name=mfeed.kb.io,admissionReviewVersions=v1
-
-var _ webhook.Defaulter = &Feed{}
-
-// Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *Feed) Default() {
-	logrus.Info("default", "name", r.Name)
-}
-
 // +kubebuilder:webhook:path=/validate-aggregator-com-teamdev-v1-feed,mutating=false,failurePolicy=fail,sideEffects=None,groups=aggregator.com.teamdev,resources=feeds,verbs=create;update;delete,versions=v1,name=vfeed.kb.io,admissionReviewVersions=v1
-
-var _ webhook.Validator = &Feed{}
 
 // ValidateCreate validates the input data at the time of Feed's creation
 func (r *Feed) ValidateCreate() (admission.Warnings, error) {
@@ -52,6 +41,9 @@ func (r *Feed) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 
 // ValidateDelete validates the input data at the time of Feed's delete
 func (r *Feed) ValidateDelete() (admission.Warnings, error) {
+	if len(r.OwnerReferences) > 0 {
+		return nil, fmt.Errorf("this Feed is used in the following OwnerReferences: %+v", r.OwnerReferences)
+	}
 	logrus.Info("validate delete", "name", r.Name)
 	return nil, nil
 }
@@ -95,9 +87,12 @@ func isValidURL(str string) bool {
 
 // checkNameUniqueness queries the Kubernetes API to ensure that no other Feed with the same name exists in the same namespace.
 func checkNameUniqueness(feed *Feed) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	feedList := &FeedList{}
 	listOpts := client.ListOptions{Namespace: feed.Namespace}
-	err := k8sClient.List(context.Background(), feedList, &listOpts)
+	err := k8sClient.List(ctx, feedList, &listOpts)
 	if err != nil {
 		return fmt.Errorf("checkNameUniqueness: failed to list feeds: %v", err)
 	}

@@ -37,7 +37,7 @@ spec:
       volumes:
         - name: tls-secret
           secret:
-            secretName: news-aggregator-tls
+            secretName: {{ .Values.secretName }}
         - name: news-aggregator-mnt
           persistentVolumeClaim:
             claimName: news-aggregator-pvc-mnt
