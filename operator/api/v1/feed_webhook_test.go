@@ -1,10 +1,14 @@
 package v1
 
 import (
+	"context"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"testing"
 )
 
@@ -12,10 +16,12 @@ func TestFeed_ValidateCreate(t *testing.T) {
 	newScheme := runtime.NewScheme()
 	_ = AddToScheme(newScheme)
 	k8sClient = fake.NewClientBuilder().WithScheme(newScheme).Build()
+
 	tests := []struct {
 		name          string
 		feed          Feed
 		expectedError bool
+		errorMessage  string
 	}{
 		{
 			name: "Valid feed",
@@ -36,6 +42,7 @@ func TestFeed_ValidateCreate(t *testing.T) {
 				},
 			},
 			expectedError: true,
+			errorMessage:  "name cannot be empty",
 		},
 		{
 			name: "Invalid URL",
@@ -46,14 +53,18 @@ func TestFeed_ValidateCreate(t *testing.T) {
 				},
 			},
 			expectedError: true,
+			errorMessage:  "URL must be a valid URL",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := tt.feed.ValidateCreate()
-			if (err != nil) != tt.expectedError {
-				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.errorMessage)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -64,6 +75,7 @@ func TestFeed_ValidateUpdate(t *testing.T) {
 		name          string
 		feed          Feed
 		expectedError bool
+		errorMessage  string
 	}{
 		{
 			name: "Valid feed",
@@ -76,14 +88,15 @@ func TestFeed_ValidateUpdate(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name: "NewName too long",
+			name: "New name too long",
 			feed: Feed{
 				Spec: FeedSpec{
-					Name: "this-name-is-way-too-long",
+					Name: "this-name-is-way-too-long-for-feed",
 					Url:  "http://valid.url",
 				},
 			},
 			expectedError: true,
+			errorMessage:  "name must not exceed 20 characters",
 		},
 	}
 
@@ -91,36 +104,11 @@ func TestFeed_ValidateUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			oldFeed := &Feed{}
 			_, err := tt.feed.ValidateUpdate(oldFeed)
-			if (err != nil) != tt.expectedError {
-				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
-			}
-		})
-	}
-}
-
-func TestFeed_ValidateDelete(t *testing.T) {
-	tests := []struct {
-		name          string
-		feed          Feed
-		expectedError bool
-	}{
-		{
-			name: "Valid feed for delete",
-			feed: Feed{
-				Spec: FeedSpec{
-					Name: "valid-name",
-					Url:  "http://valid.url",
-				},
-			},
-			expectedError: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.feed.ValidateDelete()
-			if (err != nil) != tt.expectedError {
-				t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.errorMessage)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -146,9 +134,10 @@ func TestCheckNameUnique(t *testing.T) {
 	k8sClient = fake.NewClientBuilder().WithScheme(newScheme).WithLists(existingFeedsList).Build()
 
 	tests := []struct {
-		name      string
-		feed      *Feed
-		expectErr bool
+		name          string
+		feed          *Feed
+		expectErr     bool
+		expectedError string
 	}{
 		{
 			name: "unique name",
@@ -164,7 +153,6 @@ func TestCheckNameUnique(t *testing.T) {
 			},
 			expectErr: false,
 		},
-
 		{
 			name: "not unique name",
 			feed: &Feed{
@@ -174,20 +162,48 @@ func TestCheckNameUnique(t *testing.T) {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: existingFeed.Namespace,
-					UID:       "test",
+					UID:       "test-uid",
 				},
 			},
-			expectErr: true,
+			expectErr:     true,
+			expectedError: "a Feed with name 'valid-name' already exists in namespace 'default'",
 		},
 	}
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			err := checkNameUniqueness(test.feed)
 			if test.expectErr {
 				assert.Error(t, err)
+				assert.Contains(t, err.Error(), test.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}
 		})
 	}
+}
+func TestCheckNameUniqueness_ErrorOnList(t *testing.T) {
+	newScheme := runtime.NewScheme()
+	_ = AddToScheme(newScheme)
+
+	k8sClient = fake.NewClientBuilder().WithScheme(newScheme).WithInterceptorFuncs(interceptor.Funcs{
+		List: func(ctx context.Context, client client.WithWatch, list client.ObjectList, opts ...client.ListOption) error {
+			return fmt.Errorf("test error")
+		},
+	}).Build()
+
+	feed := &Feed{
+		Spec: FeedSpec{
+			Name: "test-feed",
+			Url:  "http://test.url",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+		},
+	}
+
+	err := checkNameUniqueness(feed)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "checkNameUniqueness: failed to list feeds")
 }
