@@ -193,6 +193,54 @@
         }
       }
     },
+    "kubebuilder@4.1.0": {
+      "last_modified": "2024-08-14T11:41:26Z",
+      "resolved": "github:NixOS/nixpkgs/0cb2fd7c59fed0cd82ef858cbcbdb552b9a33465#kubebuilder",
+      "source": "devbox-search",
+      "version": "4.1.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6chd3dj8k5xvgjkw5hwzvcm5494y9431-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6chd3dj8k5xvgjkw5hwzvcm5494y9431-kubebuilder-4.1.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5kmn9rqgqrgpaf1dyvk0nvh7ka31782v-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/5kmn9rqgqrgpaf1dyvk0nvh7ka31782v-kubebuilder-4.1.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qb94vk89dhn5j6chqwb2c40mfaf76mvy-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/qb94vk89dhn5j6chqwb2c40mfaf76mvy-kubebuilder-4.1.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rxsbhhmfp2nyyx603shw1r4gnksr8542-kubebuilder-4.1.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rxsbhhmfp2nyyx603shw1r4gnksr8542-kubebuilder-4.1.0"
+        }
+      }
+    },
     "kubectl@1.30.2": {
       "last_modified": "2024-07-07T07:43:47Z",
       "resolved": "github:NixOS/nixpkgs/b60793b86201040d9dee019a05089a9150d08b5b#kubectl",

@@ -26,21 +26,35 @@ func NewJsonStorage(pathToStorage source.PathToFile) (storage.News, error) {
 
 // SaveNews saves the provided news articles to the specified JSON file.
 func (jsonStorage *jsonStorage) SaveNews(currentSource source.Source, news []news.News) (source.Source, error) {
+	var jsonFilePath string
+	var jsonFile *os.File
+	var err error
 
-	directoryPath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(currentSource.Name)))
+	if currentSource.PathToFile != "" {
+		jsonFilePath = string(currentSource.PathToFile)
 
-	if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
-		logrus.Error("Failed to create directory: ", err)
-		return source.Source{}, fmt.Errorf("failed to create directory")
+		jsonFile, err = os.Create(jsonFilePath)
+		if err != nil {
+			logrus.Error("Failed to open JSON file for writing: ", err)
+			return source.Source{}, fmt.Errorf("failed to open JSON file for writing")
+		}
+	} else {
+		directoryPath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(currentSource.Name)))
+
+		if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
+			logrus.Error("Failed to create directory: ", err)
+			return source.Source{}, fmt.Errorf("failed to create directory")
+		}
+
+		jsonFilePath = filepath.ToSlash(filepath.Join(directoryPath, string(currentSource.Name)+".json"))
+
+		jsonFile, err = os.Create(jsonFilePath)
+		if err != nil {
+			logrus.Error("Failed to create JSON file: ", err)
+			return source.Source{}, fmt.Errorf("failed to create JSON file")
+		}
 	}
 
-	jsonFilePath := filepath.ToSlash(filepath.Join(constant.PathToResources, string(currentSource.Name), string(currentSource.Name)+".json"))
-
-	jsonFile, err := os.Create(jsonFilePath)
-	if err != nil {
-		logrus.Error("Failed to create JSON file: ", err)
-		return source.Source{}, fmt.Errorf("failed to create JSON file")
-	}
 	defer func(jsonFile *os.File) {
 		err := jsonFile.Close()
 		if err != nil {
