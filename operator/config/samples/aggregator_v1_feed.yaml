@@ -1,6 +1,7 @@
 apiVersion: aggregator.com.teamdev/v1
 kind: Feed
 metadata:
+  namespace: operator-system
   name: kashtan
   namespace: operator-system
 spec:

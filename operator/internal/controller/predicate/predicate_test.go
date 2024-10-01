@@ -3,118 +3,111 @@ package predicate
 import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"testing"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-var _ = ginkgo.Describe("CustomPredicate", func() {
-	var pod *corev1.Pod
+var _ = ginkgo.Describe("HotNewsPredicate", func() {
+	var pod *v1.Pod
 
 	ginkgo.BeforeEach(func() {
-		pod = &corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{Namespace: "biz", Name: "baz"},
+		pod = &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "test-namespace", Name: "test-name"},
 		}
 	})
 
-	ginkgo.Describe("Funcs", func() {
-		var instance *CustomPredicate
+	ginkgo.Describe("Check correct call to the funcs of predicate", func() {
+		var instance predicate.Predicate
 
 		ginkgo.BeforeEach(func() {
-			instance = &CustomPredicate{
-				CreateFunc: func(e event.CreateEvent) bool {
-					defer ginkgo.GinkgoRecover()
-					ginkgo.Fail("Did not expect CreateFunc to be called.")
-					return false
-				},
-				DeleteFunc: func(e event.DeleteEvent) bool {
-					defer ginkgo.GinkgoRecover()
-					ginkgo.Fail("Did not expect DeleteFunc to be called.")
-					return false
-				},
-				UpdateFunc: func(e event.UpdateEvent) bool {
-					defer ginkgo.GinkgoRecover()
-					ginkgo.Fail("Did not expect UpdateFunc to be called.")
-					return false
-				},
-				GenericFunc: func(e event.GenericEvent) bool {
-					defer ginkgo.GinkgoRecover()
-					ginkgo.Fail("Did not expect GenericFunc to be called.")
-					return false
-				},
-			}
+			instance = HotNewsPredicate()
 		})
 
 		ginkgo.It("should call Create", func() {
-			instance.CreateFunc = func(e event.CreateEvent) bool {
-				defer ginkgo.GinkgoRecover()
-				gomega.Expect(e.Object).To(gomega.Equal(pod))
-				return true
-			}
 			evt := event.CreateEvent{
 				Object: pod,
 			}
 			gomega.Expect(instance.Create(evt)).To(gomega.BeTrue())
-
-			instance.CreateFunc = nil
-			gomega.Expect(instance.Create(evt)).To(gomega.BeTrue())
 		})
 
-		ginkgo.It("should call Update", func() {
+		ginkgo.It("should call Update when generation changes", func() {
 			newPod := pod.DeepCopy()
-			newPod.Name = "baz2"
-			newPod.Namespace = "biz2"
+			newPod.Generation = 2
 
-			instance.UpdateFunc = func(e event.UpdateEvent) bool {
-				defer ginkgo.GinkgoRecover()
-				gomega.Expect(e.ObjectOld).To(gomega.Equal(pod))
-				gomega.Expect(e.ObjectNew).To(gomega.Equal(newPod))
-				return true
-			}
 			evt := event.UpdateEvent{
 				ObjectOld: pod,
 				ObjectNew: newPod,
 			}
 			gomega.Expect(instance.Update(evt)).To(gomega.BeTrue())
-
-			instance.UpdateFunc = nil
-			gomega.Expect(instance.Update(evt)).To(gomega.BeTrue())
 		})
 
-		ginkgo.It("should call Delete", func() {
-			instance.DeleteFunc = func(e event.DeleteEvent) bool {
-				defer ginkgo.GinkgoRecover()
-				gomega.Expect(e.Object).To(gomega.Equal(pod))
-				return true
-			}
-			evt := event.DeleteEvent{
-				Object: pod,
-			}
-			gomega.Expect(instance.Delete(evt)).To(gomega.BeTrue())
+		ginkgo.It("should not call Update when generation is the same", func() {
+			newPod := pod.DeepCopy()
 
-			instance.DeleteFunc = nil
+			evt := event.UpdateEvent{
+				ObjectOld: pod,
+				ObjectNew: newPod,
+			}
+			gomega.Expect(instance.Update(evt)).To(gomega.BeFalse())
+		})
+
+		ginkgo.It("should call Delete when DeleteStateUnknown is false", func() {
+			evt := event.DeleteEvent{
+				Object:             pod,
+				DeleteStateUnknown: false,
+			}
 			gomega.Expect(instance.Delete(evt)).To(gomega.BeTrue())
+		})
+
+		ginkgo.It("should not call Delete when DeleteStateUnknown is true", func() {
+			evt := event.DeleteEvent{
+				Object:             pod,
+				DeleteStateUnknown: true,
+			}
+			gomega.Expect(instance.Delete(evt)).To(gomega.BeFalse())
 		})
 
 		ginkgo.It("should call Generic", func() {
-			instance.GenericFunc = func(e event.GenericEvent) bool {
-				defer ginkgo.GinkgoRecover()
-				gomega.Expect(e.Object).To(gomega.Equal(pod))
-				return true
-			}
 			evt := event.GenericEvent{
 				Object: pod,
 			}
-			gomega.Expect(instance.Generic(evt)).To(gomega.BeTrue())
-
-			instance.GenericFunc = nil
 			gomega.Expect(instance.Generic(evt)).To(gomega.BeTrue())
 		})
 	})
 })
 
-func TestPredicates(t *testing.T) {
-	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "CustomPredicate Suite")
-}
+var _ = ginkgo.Describe("ConfigMapNamePredicate", func() {
+	var configMap *v1.ConfigMap
+
+	ginkgo.BeforeEach(func() {
+		configMap = &v1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "test-namespace", Name: "test-configmap"},
+		}
+	})
+
+	ginkgo.It("should return true for matching ConfigMap name", func() {
+		instance := ConfigMapNamePredicate("test-configmap")
+		gomega.Expect(instance.Create(event.CreateEvent{
+			Object: configMap,
+		})).To(gomega.BeTrue())
+	})
+
+	ginkgo.It("should return false for non-matching ConfigMap name", func() {
+		instance := ConfigMapNamePredicate("different-configmap")
+		gomega.Expect(instance.Create(event.CreateEvent{
+			Object: configMap,
+		})).To(gomega.BeFalse())
+	})
+
+	ginkgo.It("should return false if object is not a ConfigMap", func() {
+		pod := &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "test-namespace", Name: "test-pod"},
+		}
+		instance := ConfigMapNamePredicate("test-configmap")
+		gomega.Expect(instance.Create(event.CreateEvent{
+			Object: pod,
+		})).To(gomega.BeFalse())
+	})
+})

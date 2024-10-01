@@ -1,0 +1,25 @@
+replicaCount: 1
+containerPort: 443
+imageName: alanut93/news_aggregator:v1.0.20
+namespace: news-aggregator
+appName: news-aggregator
+serviceName: news-aggregator-service
+secretName: news-aggregator-tls
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+service:
+  port: 443
+  targetPort: 443

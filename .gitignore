@@ -15,3 +15,7 @@
 /news-aggregator/Chart.lock
 /.idea/misc.xml
 /news-aggregator/charts/*
+/.mirrord/mirrord.json
+/.idea/remote-targets.xml
+/charts/*
+

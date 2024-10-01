@@ -77,7 +77,26 @@ func (service *Service) GetParsedNews(request AddSourceRequest) ([]newsEntity.Ne
 	if err != nil {
 		return nil, err
 	}
+
 	return parsedNews, nil
+}
+
+// GetAllSources returns all source with Storage type in the system
+func (service *Service) GetAllSources() ([]source.Name, error) {
+	sources, err := service.storage.GetSources()
+	if err != nil {
+		logrus.Error("Error getting sources:", err)
+		return nil, err
+	}
+
+	var sourcesName []source.Name
+	for _, s := range sources {
+		if s.SourceType == source.STORAGE {
+			sourcesName = append(sourcesName, s.Name)
+		}
+
+	}
+	return sourcesName, nil
 }
 
 func (service *Service) UpdateSourceByName(currentName, newName, newURL string) error {

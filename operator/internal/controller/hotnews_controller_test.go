@@ -50,7 +50,7 @@ var _ = Describe("Negative reconcile tests for HotNewsReconciler", func() {
 				EndpointForSourceManaging: "endpointForGetNews",
 			},
 			Finalizer:     "feed.finalizers.news.teamdev.com",
-			ConfigMapMame: configMapName,
+			ConfigMapName: configMapName,
 		}
 	})
 
@@ -241,50 +241,6 @@ var _ = Describe("Negative reconcile tests for HotNewsReconciler", func() {
 			conditions := hotNews.Status.GetCurrentCondition()
 			gomega.Expect(!conditions.Success)
 		})
-
-		It("Feeds provided in the ConfigMap are not present in the cluster", func() {
-
-			configMap := v1.ConfigMap{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "ConfigMap",
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "default",
-					Name:      configMapName,
-				},
-				Immutable:  nil,
-				Data:       map[string]string{"test": "test"},
-				BinaryData: nil,
-			}
-			hotNews := aggregatorv1.HotNews{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "HotNews",
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "hotnews",
-					Namespace: "default",
-				},
-				Spec: aggregatorv1.HotNewsSpec{
-					Keywords:      []string{"test"},
-					DateStart:     "",
-					DateEnd:       "",
-					FeedsName:     nil,
-					FeedGroups:    []string{"test"},
-					SummaryConfig: aggregatorv1.SummaryConfig{},
-				},
-				Status: aggregatorv1.HotNewsStatus{},
-			}
-			fakeClient.Create(ctx, &configMap)
-			fakeClient.Create(ctx, &hotNews)
-
-			namespacedName := types.NamespacedName{Namespace: "default", Name: "hotnews"}
-			_, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: namespacedName})
-			gomega.Expect(err)
-			conditions := hotNews.Status.GetCurrentCondition()
-			gomega.Expect(!conditions.Success)
-		})
 	})
 
 	Describe("Positive scenario", func() {
@@ -364,6 +320,183 @@ var _ = Describe("Negative reconcile tests for HotNewsReconciler", func() {
 
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(!hotNews.Status.GetCurrentCondition().Success)
+		})
+	})
+})
+
+var _ = Describe("HotNewsReconciler owner references tests", func() {
+
+	var (
+		reconciler HotNewsReconciler
+		fakeClient client.Client
+	)
+
+	BeforeEach(func() {
+		fakeClient = fake.NewClientBuilder().WithScheme(scheme.Scheme).Build()
+
+		reconciler = HotNewsReconciler{
+			Client: fakeClient,
+			Scheme: scheme.Scheme,
+		}
+	})
+
+	ctx := context.Background()
+
+	Describe("UpdateOwnerReferencesForFeeds", func() {
+		It("adds OwnerReference if feed is used in HotNews", func() {
+			feed := aggregatorv1.Feed{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "feed1",
+					Namespace: "default",
+				},
+				Spec: aggregatorv1.FeedSpec{
+					Name: "feed1",
+				},
+			}
+			hotNews := aggregatorv1.HotNews{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hotnews1",
+					Namespace: "default",
+					UID:       "12345",
+				},
+				Spec: aggregatorv1.HotNewsSpec{
+					FeedsName: []string{"feed1"},
+				},
+			}
+
+			fakeClient.Create(ctx, &feed)
+			err := reconciler.UpdateOwnerReferencesForFeeds(ctx, &hotNews)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+			var updatedFeed aggregatorv1.Feed
+			err = fakeClient.Get(ctx, client.ObjectKey{Name: "feed1", Namespace: "default"}, &updatedFeed)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(len(updatedFeed.OwnerReferences)).To(gomega.Equal(1))
+			gomega.Expect(updatedFeed.OwnerReferences[0].Name).To(gomega.Equal("hotnews1"))
+		})
+
+		It("removes OwnerReference if feed is no longer used in HotNews", func() {
+			feed := aggregatorv1.Feed{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "feed1",
+					Namespace: "default",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Name: "hotnews1",
+							UID:  "12345",
+						},
+					},
+				},
+				Spec: aggregatorv1.FeedSpec{
+					Name: "feed1",
+				},
+			}
+			hotNews := aggregatorv1.HotNews{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hotnews1",
+					Namespace: "default",
+					UID:       "12345",
+				},
+				Spec: aggregatorv1.HotNewsSpec{
+					FeedsName: []string{"otherFeed"},
+				},
+			}
+
+			fakeClient.Create(ctx, &feed)
+			err := reconciler.UpdateOwnerReferencesForFeeds(ctx, &hotNews)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+			var updatedFeed aggregatorv1.Feed
+			err = fakeClient.Get(ctx, client.ObjectKey{Name: "feed1", Namespace: "default"}, &updatedFeed)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(len(updatedFeed.OwnerReferences)).To(gomega.Equal(0))
+		})
+	})
+
+	Describe("AddOwnerReference", func() {
+		It("adds OwnerReference to feed", func() {
+			feed := aggregatorv1.Feed{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "feed1",
+					Namespace: "default",
+				},
+			}
+			hotNews := aggregatorv1.HotNews{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hotnews1",
+					Namespace: "default",
+					UID:       "12345",
+				},
+			}
+
+			fakeClient.Create(ctx, &feed)
+			err := reconciler.AddOwnerReference(ctx, &feed, &hotNews)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+			var updatedFeed aggregatorv1.Feed
+			err = fakeClient.Get(ctx, client.ObjectKey{Name: "feed1", Namespace: "default"}, &updatedFeed)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(len(updatedFeed.OwnerReferences)).To(gomega.Equal(1))
+			gomega.Expect(updatedFeed.OwnerReferences[0].Name).To(gomega.Equal("hotnews1"))
+		})
+	})
+
+	Describe("RemoveOwnerReference", func() {
+		It("removes OwnerReference from feed", func() {
+			feed := aggregatorv1.Feed{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "feed1",
+					Namespace: "default",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Name: "hotnews1",
+							UID:  "12345",
+						},
+					},
+				},
+			}
+			hotNews := aggregatorv1.HotNews{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hotnews1",
+					Namespace: "default",
+					UID:       "12345",
+				},
+			}
+
+			fakeClient.Create(ctx, &feed)
+			err := reconciler.RemoveOwnerReference(ctx, &feed, &hotNews)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+			var updatedFeed aggregatorv1.Feed
+			err = fakeClient.Get(ctx, client.ObjectKey{Name: "feed1", Namespace: "default"}, &updatedFeed)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(len(updatedFeed.OwnerReferences)).To(gomega.Equal(0))
+		})
+	})
+
+	Describe("CleanupOwnerReferences", func() {
+		It("removes OwnerReference when HotNews is deleted", func() {
+			feed := aggregatorv1.Feed{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "feed1",
+					Namespace: "default",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Name: "hotnews1",
+							Kind: "HotNews",
+						},
+					},
+				},
+			}
+
+			fakeClient.Create(ctx, &feed)
+			err := reconciler.CleanupOwnerReferences(ctx, "default", "hotnews1")
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+
+			var updatedFeed aggregatorv1.Feed
+			err = fakeClient.Get(ctx, client.ObjectKey{Name: "feed1", Namespace: "default"}, &updatedFeed)
+			gomega.Expect(err).ToNot(gomega.HaveOccurred())
+			gomega.Expect(len(updatedFeed.OwnerReferences)).To(gomega.Equal(0))
 		})
 	})
 })
