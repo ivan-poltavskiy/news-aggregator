@@ -5,6 +5,7 @@ imageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-se
 updaterImageName: "406477933661.dkr.ecr.eu-west-2.amazonaws.com/ivan-news-aggregator-updater:v1.0.2"
 namespace: "news-aggregator"
 serviceAccount: "news-aggregator-service-account"
+serviceName: "news-aggregator-service"
 accessKey: ""
 privateAccessKey: ""
 
