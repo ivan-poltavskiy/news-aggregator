@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.1.0...v2.2.0) (2024-10-01)
+
+
+### Features
+
+* add hekm chart for news aggregator server ([d7ccd2f](https://github.com/ivan-poltavskiy/news-aggregator/commit/d7ccd2f8451f4e3b9351377c1d0ec8c3ec850dfc))
+
 ## [2.1.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.0.0...v2.1.0) (2024-10-01)
 
 
