@@ -105,6 +105,7 @@ tasks:
       - task aws-image-push-server
       - task news-updater:aws-image-push-updater
       - task news-aggregator:push-chart
+      - task operator:docker-build
       - task operator:docker-push
       - task aws-auth-chart:push-aws-auth-chart
 
