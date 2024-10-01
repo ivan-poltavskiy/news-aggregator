@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.4.0...v2.5.0) (2024-10-01)
+
+
+### Features
+
+* add webhook for configmap which storage feed groups. ([b59349e](https://github.com/ivan-poltavskiy/news-aggregator/commit/b59349efcc16866a9a816aef00dae90b30d2fdd7))
+
 ## [2.4.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.3.0...v2.4.0) (2024-10-01)
 
 
