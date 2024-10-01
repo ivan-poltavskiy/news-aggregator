@@ -27,7 +27,6 @@ tasks:
   create-aws-chart:
     desc: "Creates a Helm chart with all needed resources for the news-aggregator"
     cmds:
-      - rm -r ./charts
       - helm dependency update .
       - helm lint .
       - helm package .
