@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.6.0...v2.7.0) (2024-10-01)
+
+
+### Features
+
+* add CloudFormation stack for deploying EKS cluster to AWS. ([a572dd9](https://github.com/ivan-poltavskiy/news-aggregator/commit/a572dd96536161d40fc5e3b6ccdb3839646086a7))
+
 ## [2.6.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.5.0...v2.6.0) (2024-10-01)
 
 
