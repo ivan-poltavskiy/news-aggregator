@@ -3,6 +3,7 @@ kind: Feed
 metadata:
   namespace: operator-system
   name: kashtan
+  namespace: operator-system
 spec:
   name: kashtan
   url: https://www.kashtan.news/

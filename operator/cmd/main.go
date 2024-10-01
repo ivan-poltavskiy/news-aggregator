@@ -50,6 +50,7 @@ func main() {
 	var tlsOpts []func(*tls.Config)
 	var configMapName = "feed-group-source"
 	const finalizer = "feed.finalizers.news.teamdev.com"
+	var configmapNamespace = "operator-system"
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -67,6 +68,7 @@ func main() {
 		Development: true,
 	}
 	flag.StringVar(&configMapName, "config-map-name", configMapName, "The name of the ConfigMap that will be used to store feed groups.")
+	flag.StringVar(&configmapNamespace, "configmap-namespace", configmapNamespace, "The namespace of the configmap.")
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
@@ -163,11 +165,23 @@ func main() {
 		}
 	}
 
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		cfgValidator := &aggregatorv1.ConfigMapValidator{
+			Client:             mgr.GetClient(),
+			ConfigMapName:      configMapName,
+			ConfigMapNamespace: configmapNamespace,
+		}
+		if err = cfgValidator.SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "ConfigMap")
+			os.Exit(1)
+		}
+	}
+
 	if err = (&controller.HotNewsReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		HttpsLinks: controller.HttpsClientData{
-			ServerUrl:                 serverUrl,
+			ServerUrl:                 defaultServerUrl,
 			EndpointForSourceManaging: endpointForGetNews,
 		},
 		HttpClient:    httpClient,
