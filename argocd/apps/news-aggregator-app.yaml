@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: news-aggregator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    name: ''
+    namespace: news-aggregator
+    server: https://kubernetes.default.svc
+  source:
+    path: news-aggregator
+    repoURL: https://github.com/ivan-poltavskiy/news-aggregator
+    targetRevision: feat/add-argocd-config
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

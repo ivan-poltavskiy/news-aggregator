@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: news-aggregator-day0
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  destination:
+    name: ''
+    namespace: news-aggregator
+    server: https://kubernetes.default.svc
+  source:
+    path: aws-auth-chart
+    repoURL: https://github.com/ivan-poltavskiy/news-aggregator
+    targetRevision: feat/add-argocd-config
+    helm:
+      parameters:
+        - name: namespace
+          value: news-aggregator
+        - name: privateAccessKey
+          value:
+        - name: accessKey
+          value:
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
