@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.7.1...v2.8.0) (2024-10-03)
+
+
+### Features
+
+* update target branch to master. ([64b1ae6](https://github.com/ivan-poltavskiy/news-aggregator/commit/64b1ae61c7de0691f00d7e783c5c35663780fd68))
+
 ## [2.7.1](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.7.0...v2.7.1) (2024-10-03)
 
 
