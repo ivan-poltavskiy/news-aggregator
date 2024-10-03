@@ -10,6 +10,7 @@ import (
 
 func TestCdkIvanStack(t *testing.T) {
 	// GIVEN
+
 	app := awscdk.NewApp(nil)
 
 	// WHEN
