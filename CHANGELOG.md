@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.7.1](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.7.0...v2.7.1) (2024-10-03)
+
+
+### Bug Fixes
+
+* fix the values in the feed manifest. ([be509e7](https://github.com/ivan-poltavskiy/news-aggregator/commit/be509e7b19833af11356f024a3fecc3a27d28f93))
+* fix the values.yaml and add step for installing certmanager to the install-chart task. ([04e83a5](https://github.com/ivan-poltavskiy/news-aggregator/commit/04e83a5ad75123f7111f27b10a6b927464749272))
+* fix the values.yaml for news-aggregator chart. Add name for service. ([befd1b7](https://github.com/ivan-poltavskiy/news-aggregator/commit/befd1b7e89487a6a03d5f1e894f17072df735802))
+
 ## [2.7.0](https://github.com/ivan-poltavskiy/news-aggregator/compare/v2.6.0...v2.7.0) (2024-10-01)
 
 
