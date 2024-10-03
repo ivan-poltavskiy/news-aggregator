@@ -32,6 +32,7 @@ tasks:
   install-chart:
     desc: "Install Helm chart with provided access keys"
     cmds:
+      - kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.15.3/cert-manager.crds.yaml
       - helm dependency update
       - helm install $NEWS_AGGREGATOR_HELM_CHART_NAME . --namespace $NEWS_AGGREGATOR_NAMESPACE --create-namespace
 
