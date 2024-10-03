@@ -15,7 +15,7 @@ spec:
   source:
     path: aws-auth-chart
     repoURL: https://github.com/ivan-poltavskiy/news-aggregator
-    targetRevision: feat/add-argocd-config
+    targetRevision: master
     helm:
       parameters:
         - name: namespace

@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/ivan-poltavskiy/news-aggregator
     path: argocd/apps
-    targetRevision: feat/add-argocd-config
+    targetRevision: master
   project: default
   syncPolicy:
     automated:
